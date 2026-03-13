@@ -1,0 +1,29 @@
+---
+description: [Constitution] Infinity Protocol v3.0 Master Core Rules
+globs: **/*
+alwaysApply: true
+---
+
+# SYSTEM CONTEXT: Infinity Protocol v3.0
+
+## 1. IDENTITY HANDSHAKE & INGESTION
+- **Mandate**: Start every session by explicitly stating: "Infinity Protocol v3.0: In [PROJECT_NAME], resuming from [MISSION_STATE.md]."
+- **Ingestion**: Auto-read `MISSION_STATE.md` and `KNOWLEDGE.md` to align context. DO NOT use cross-project context.
+- **Persistence**: Update `MISSION_STATE.md` after EVERY significant file edit or block of edits.
+
+## 2. HARDENED DIRECTIVES
+- **Aesthetics**: Liquid Glass architecture ONLY (`blur`, `perspective-1000`). NEVER use `zinc`/`slate` defaults.
+- **Autonomous Ops**: Self-Heal proactively (Research -> Hypothesis -> Fix).
+- **Poison Check**: NEVER output legacy nomenclature: [CareKey, SARAH, Vast].
+- **Pre-Commit**: Always run `/audit` before executing `git commit`. 
+- **Redactive Logging**: Use `[REDACTED]` for secrets in terminal output. NEVER leak keys.
+
+## 3. MASTERCLASS ENGINEERING (INFINITY v3.0)
+- **Error Path Analysis (EPA)**: Design for failure explicitly (timeouts, nulls, retries) before success paths.
+- **Intent Mapping**: Prioritize the ultimate goal. Halt and query if instructions are ambiguous. NEVER guess architecture.
+- **Impact Assessment (PFIA)**: Output a brief "Current vs. Proposed vs. Cascade Risk" summary before critical logic edits.
+- **Research Ratio**: Apply 3:1 (Research:Write) for standard logic, 5:1 for critical systems.
+- **Zero-Guessing**: Verify URLs/variables via search. Do not hallucinate.
+
+## 4. ARCHITECTURAL MODULARITY
+Targeted responsibilities split across: `ux_lead.mdc` (Frontend), `backend_arch.mdc` (Integrity/DB), `safeguard_sentinel.mdc` (Security).

@@ -1,0 +1,29 @@
+---
+description: Infinity Protocol E-Commerce Standard (Shopify-Light)
+---
+
+# Infinity Protocol: E-Commerce Architect
+
+**Goal**: Zero-trust checkout pipelines, unbreakable mathematical integrity, absolute state persistence across viewports, and secure administrative shop management.
+
+## 1. TRANSACTIONAL INTEGRITY (Server-Side Sovereignty)
+- **Zero-Trust Pricing**: The frontend is NEVER the source of truth for financial transactions. PaymentIntents (e.g., Stripe) MUST calculate the final gross amount entirely on the server using authoritative database reads (`/products` schema).
+- **Rule of No Negatives**: The final calculated price prior to intent generation MUST invoke `Math.max(0, total)` to cryptographically neutralize negative combination variants.
+
+## 2. DATABASE DEFENSE (Schema Hardening)
+- **Cart/Order Mutations**: All user-writable collections containing financial state (like `/carts`) MUST enforce strict structural rules in `firestore.rules`.
+- **Numeric Intercepts**: Rules must explicitly assert `quantity > 0` and `price >= 0` preventing sub-zero data-tampering attacks from bypassing the UI.
+
+## 3. CHECKOUT UX RESILIENCE (Rule 19 Enforcement)
+- **Mobile Overlap Traps**: Checkout buttons ("Confirm & Add to Cart", "Pay") MUST survive the Z-Index Trap. They cannot be obscured by transparent drop-shadows `backdrop-blur` or parent bounding boxes.
+- **E2E Bypass Testing**: End-to-End checks for interactive checkout stages must implement explicit locators (`visible=true`, `{ force: true }`) capable of punching through synthetic structural barriers on mobile views.
+
+## 4. FULFILLMENT AUTOMATION
+- **Idempotent Webhooks**: Use webhook signature verification (e.g., `payment_intent.succeeded`) to confidently process an order independent of the user's browser session. Double-billing is forbidden.
+- **Asynchronous Flow**: Post-purchase UI logic (receipts, confirmation emails) must run synchronously to the webhook, assuming the user will immediately kill the browser tab upon successful payment.
+
+## 5. ADMINISTRATIVE SOVEREIGNTY (The Merchant Interface)
+- **Strict RBAC Enforcement**: All backend routes managing inventory, products, and order statuses MUST be hard-locked behind verified custom claims (e.g., `admin: true`). Client-side UI gating is insufficient.
+- **Master Inventory Controller**: Admins must possess isolated UI pipelines to alter SKU availability, manually reconcile stock, and toggle visibility states (Active vs. Draft) without corrupting historical invoice data attached to UUIDs.
+- **Order Lifecycle Orchestration**: The system must provide a clear status transition pipeline (`Pending -> Processing -> Shipped -> Delivered/Refunded`) capable of injecting Tracking IDs securely onto the Order payload.
+- **Data Protection Execution**: Refer to the `admin_ecommerce_management_strategy.md` blueprint when architecting internal Admin views to ensure safe mutation of Pricing and Image Assets (Storage orchestration).

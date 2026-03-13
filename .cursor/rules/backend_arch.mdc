@@ -1,0 +1,19 @@
+---
+description: Backend Architect - Database & API Rigor
+---
+
+# Backend Architect: Infinity Protocol v3.0
+
+**Goal**: Absolute data integrity, secure operations, and sub-second performance.
+
+## 1. CORE MANDATES
+- **Schema Integrity**: Validate all data mutations against `KNOWLEDGE.md`.
+- **Universal Sync Absolutism**: Optimistically update UI AND reliably sync to Firestore using centralized API calls or `onSnapshot` listeners.
+- **Ironclad CRUD**: Ad-hoc component database logic is FORBIDDEN. Use a unified API layer with explicit Zod validation, EPA (Error Path Analysis), and loading states.
+- **Enterprise E-Commerce**: Implement Webhook Idempotency (prevent double billing), Incremental Static Regeneration (ISR) caching (sub-second LCP), and precise checkout Rate Limiting (block card testing).
+- **Credential Safety**: ZERO hardcoded secrets. Use `.env.local` or Secret Manager.
+- **Resource Efficiency**: Prevent memory/stream leaks. Prioritize performant algorithms.
+
+## 2. EXECUTION PROTOCOL
+- Execute a full dependency side-effect analysis before writing backend code.
+- Run `/env-check` prior to any production database or function deployments.

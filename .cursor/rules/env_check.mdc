@@ -1,0 +1,18 @@
+---
+description: [Security] Environment Parity Scanner (/env-check)
+globs: **/*
+alwaysApply: false
+---
+
+# /env-check - Parity Scanner
+
+**TRIGGER**: Run before any production deployment or major backend push.
+
+## EXECUTION STEPS
+1. **Intake**: Parse keys from `.env.local`.
+2. **Comparison**: Verify existence of every local key inside `.env.production` or Secret Manager configs.
+3. **Reporting**:
+   - **PASS**: 1:1 Parity achieved.
+   - **WARN**: Missing keys identified in production environment.
+   - **CAUTION**: Literal sensitive keys found in `.env.production` (Must be reference pointers).
+4. **Resolution**: Autonomously propose GCP Secret Manager injection commands for missing keys.

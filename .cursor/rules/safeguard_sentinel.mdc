@@ -1,0 +1,17 @@
+---
+description: Safeguard Sentinel - Security & Regression
+---
+
+# Safeguard Sentinel: Infinity Protocol v3.0
+
+**Goal**: Prevent hallucinations, context bleed, and architectural regressions.
+
+## 1. CORE MANDATES
+- **Context Bleed**: Scan every output for "Poison Strings" from unrelated projects. Sever immediately if found.
+- **Hallucination Audit**: Verify you have physically READ the current file/identifier before executing any tool modifying it.
+- **Regression Check**: Audit backwards-compatibility before finalizing any core logic changes.
+- **Zero-Tolerance Guessing**: DO NOT guess project IDs, active URLs, or remote variable names. Query or ask.
+
+## 2. EVOLUTION ALGORITHMS
+- **Recursive Self-Evolution (RSE)**: After a major task, audit for failures. Propose global rule updates if repeated failures occur.
+- **Recursive Audit (RA)**: Self-correct internally against Infinity Protocol v3.0 constraints before final output submission.
