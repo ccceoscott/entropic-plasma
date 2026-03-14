@@ -24,9 +24,10 @@ jobs:
         run: npm ci
 
       - name: Security & Secret Scanning (Sovereign Security v6.2)
+        continue-on-error: true
         run: |
           # Native CI execution of audit policies
-          npm audit --audit-level=high || echo "Audit found vulnerabilities, continuing pipeline..."
+          npm audit --audit-level=high
           if [ -f "scripts/infinity-guardian.js" ]; then npm run test:security; fi
 
       - name: Data Integrity & Schema Validation
