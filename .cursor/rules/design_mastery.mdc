@@ -1,34 +1,41 @@
 ---
 alwaysApply: true
-description: DESIGN MASTERY - Figma, Dribbble, and Vibe Coding UI Standards
-globs: **/*.tsx, **/*.css, **/*.ts
+description: DESIGN MASTERY - Figma, Dribbble, Vibe Coding, Liquid Glass UI Standards
+globs: **/*.tsx, **/*.css, **/*.ts, tailwind.config.ts
 ---
-# Design Mastery Rule
+# DESIGN MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. Visual Standard (Liquid Glass)
-- **Aesthetic**: Translucency (`backdrop-blur-md`), subtle borders (`border-white/10`), and deep gradients.
-- **Reference**: ALWAYS ask for a "Vibe Reference" (Screenshot or URL) if none is provided.
-- **Anti-Pattern**: Default browser styles, plain flat colors without texture, "Bootstrap" look.
+> Visual design law. Every UI decision must pass these gates.
 
-## 2. Figma Translation Protocol
-- **Naming**: Match codebase component names to Figma layer names.
-- **Tailwind v4**: The styling engine. Use arbitrary values ONLY when pixel-perfect replication is required.
-- **Tokens**: Translate Figma variables to Tailwind classes.
-    - `Primary Color` -> `text-primary` / `bg-primary`
-    - `Corner Radius 12` -> `rounded-xl`
-    - `Auto Layout` -> `flex` / `gap-x`
+## 1. VISUAL STANDARD — LIQUID GLASS
+- **Aesthetic**: Translucency (`backdrop-blur-xl`), subtle borders (`border-white/10`), deep layered gradients.
+- **Vibe Check**: If no reference is provided, ASK: "Drop a Vibe Reference (screenshot/URL) so I match the aesthetic."
+- **Anti-Patterns**: Default browser styles, flat colors without texture, Bootstrap/Material look → reject instantly.
 
-## 3. Performance Optimization
-- **LCP**: Prioritize critical images with `priority` or `fetchpriority`.
-- **CLS**: Use Skeleton screens and aspect-ratio preservation to prevent layout shifts.
+## 2. FIGMA TRANSLATION PROTOCOL
+- Match component names in code to Figma layer names exactly.
+- **Tailwind**: The styling engine. Arbitrary values ONLY for pixel-perfect Figma replication.
+- **Token Map**:
+  | Figma Token | Tailwind Class |
+  |---|---|
+  | `Primary Color` | `text-primary` / `bg-primary` |
+  | `Corner Radius 12` | `rounded-xl` |
+  | `Corner Radius 8` | `rounded-lg` |
+  | `Auto Layout` | `flex` + `gap-x-*` |
+  | `Shadow/Elevation` | `shadow-lg shadow-black/20` |
 
-## 4. "Dribbble" Inspection Mode
+## 3. PERFORMANCE
+- **LCP**: Critical images use `priority` or `fetchpriority="high"`.
+- **CLS**: Skeleton screens + `aspect-ratio` preservation on all media.
+- **Fonts**: Only `next/font` or Google Font `display=swap`. No raw `<link>` font tags.
+
+## 4. DRIBBBLE INSPECTION MODE
 When given a visual reference:
-1.  **Analyze**: Identify the Light Source, Shadow Depth, and Corner Smoothing.
-2.  **Replicate**: Use Tailwind utilities to match the *feeling*, not just the metrics.
-3.  **Refine**: Add `framer-motion` layout animations to match the "Dribbble Shot" quality.
+1. **Analyze**: Identify Light Source, Shadow Depth, Corner Smoothing radius, and Color Temperature.
+2. **Replicate**: Use Tailwind utilities to match the *feeling*, not just metrics.
+3. **Refine**: Add `framer-motion` layout animations to match shot quality.
 
-## 4. Mobile-First Mandate
-- **Start Small**: Design for `w-[375px]` first.
-- **Scale Up**: Use `md:` and `lg:` modifiers for desktop adaptations.
-- **Touch Targets**: All interactable elements MUST be min 44px height.
+## 5. MOBILE-FIRST MANDATE
+- Design for `w-[375px]` first. Scale up with `md:` / `lg:` modifiers.
+- All interactive elements: min `44px` height (touch target law).
+- Test visual in both light and dark modes before declaring done.

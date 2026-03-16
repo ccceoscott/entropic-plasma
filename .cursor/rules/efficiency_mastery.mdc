@@ -1,26 +1,31 @@
 ---
 alwaysApply: true
-description: EFFICIENCY MASTERY - Resource Optimization for 16GB Environments
-globs: **/*
+description: EFFICIENCY MASTERY - Resource optimization for AI agent + 16GB environments
+globs: "**/*"
 ---
-# Efficiency Mastery Rule
+# EFFICIENCY MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. Context Economy
-- **Constraint**: DO NOT read more than 3 files in a single turn unless absolutely critical.
-- **Constraint**: DO NOT read "lockfiles" (`package-lock.json`, `yarn.lock`) unless debugging exact dependency version mismatches.
-- **Strategy**: Use `ls` or `grep` to locate files first. Do not "browse" via `read`.
+## 1. CONTEXT ECONOMY
+- Read max 3 files per turn unless explicitly critical — use `grep`/`find` to locate first.
+- Never read `package-lock.json` or `yarn.lock` unless debugging exact version mismatches.
+- Use `ls` scans to understand directory topology before diving into files.
 
-## 2. Sequential Operations
-- **Trigger**: If the user asks for multi-step complex tasks (Build + Test + Deploy).
-- **Action**: Execute sequentially. Do not spawn background processes for all 3 simultaneously.
-- **Check**: Verify system load (feel) before launching heavy compiles.
+## 2. SEQUENTIAL OPERATIONS
+- Multi-step tasks (Build + Test + Deploy): execute sequentially, not in parallel.
+- Check for obvious failure conditions before launching a heavy compile.
+- Report status between steps — don't chain silently.
 
-## 3. Terminal Discipline
-- **Output**: When running commands with long output (logs, builds), always pipe to a file or use generic status checks.
-- **Anti-Pattern**: Flooding the chat context with 500 lines of success logs.
+## 3. TERMINAL DISCIPLINE
+- Long output commands: pipe to file or use status-only flags. Never flood chat with 500-line success logs.
+- Background processes you start, you kill. No orphaned processes.
+- Always use `set -euo pipefail` in bash scripts.
 
-- **Mandate**: If you start a temporary process, YOU are responsible for killing it.
+## 4. TOOL MINIMALISM
+- Prefer a single precise `grep -rn` over opening multiple files to find context.
+- Use `git diff --stat HEAD` to understand scope of changes before reading full diffs.
+- `wc -l` a file before reading it — if > 800 lines, read targeted ranges only.
 
-## 5. Bundle Integrity
-- **Analyze**: Use `rollup-plugin-visualizer` to monitor bundle health.
-- **Budgets**: Enforce 200KB limit for initial JS. Use dynamic imports for heavy modules.
+## 5. BUNDLE INTEGRITY
+- Use `rollup-plugin-visualizer` or `@next/bundle-analyzer` to monitor bundle health.
+- Enforce **200KB** limit for initial JS payload. `next/dynamic` for anything heavier.
+- Direct imports preferred over barrel files for tree-shaking efficiency.
