@@ -6,7 +6,7 @@ globs: "**/*.{ts,tsx,js,jsx,json,rules}"
 
 # Firebase Mastery Rule
 
-## 1. Authentication Infinity Protocol v6.2ty
+## 1. Authentication Integrity
 - **Hook**: ALWAYS use a robust `useAuth` hook with `useEffect` and `onAuthStateChanged`.
 - **Safety**: NEVER assume `user` is defined immediately; handle `loading` state explicitly.
 - **Pattern**:

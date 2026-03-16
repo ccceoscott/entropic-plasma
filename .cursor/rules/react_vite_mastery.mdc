@@ -16,7 +16,7 @@ globs: vite.config.ts, tsconfig.json, **/*.tsx, **/*.ts
 - **Preloading**: Use `prefetchDNS`, `preconnect`, and `preload` in the app entry point.
 - **Lazy**: Route-level code splitting via `React.lazy` and `Suspense`.
 
-## 3. Type Infinity Protocol v6.2ty
+## 3. Type Safety
 - **Strict Mode**: `strict: true` and `noUncheckedIndexedAccess: true` are NON-NEGOTIABLE.
 - **Imports**: Use `@/` path aliases. NO relative paths deeper than one level (`../`).
 - **Type-Only**: Use `import type` for interfaces to reduce bundle weight.

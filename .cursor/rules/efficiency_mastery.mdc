@@ -21,6 +21,6 @@ globs: **/*
 
 - **Mandate**: If you start a temporary process, YOU are responsible for killing it.
 
-## 5. Bundle Infinity Protocol v6.2ty
+## 5. Bundle Integrity
 - **Analyze**: Use `rollup-plugin-visualizer` to monitor bundle health.
 - **Budgets**: Enforce 200KB limit for initial JS. Use dynamic imports for heavy modules.

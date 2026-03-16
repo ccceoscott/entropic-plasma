@@ -8,7 +8,7 @@ globs: **/*.ts, **/*.tsx, **/*.json
 ## Context
 - **Protocol**: Infinity Protocol v6.2
 - **Authority**: `knowledge/modules/CRM_MASTERY.md`
-- **Goal**: Full Data Infinity Protocol v6.2ty. No Salesforce. No HubSpot. We own the graph.
+- **Goal**: Full Data Integrity. No Salesforce. No HubSpot. We own the graph.
 
 ## 1. The Schema (Firebase-First)
 - **Users**: Core identity (`uid`, `role`, `metadata`).

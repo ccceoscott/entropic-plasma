@@ -5,7 +5,7 @@ globs: **/*.tsx, **/*.ts, app.json, babel.config.js
 ---
 # Mobile Mastery Rule
 
-## 1. Stack Infinity Protocol v6.2ty
+## 1. Stack Integrity
 - **Constraint**: MUST use **Expo Router** for navigation. No `react-navigation` boilerplate.
 - **Styling**: MUST use **NativeWind** (`className`). No `StyleSheet.create`.
 - **Imports**: Use `import { View, Text, Pressable } from 'react-native'`.
@@ -19,7 +19,7 @@ globs: **/*.tsx, **/*.ts, app.json, babel.config.js
 - **Preloading**: Use `Asset.loadAsync` for critical UI assets during splash screen.
 - **Updates**: Leverage EAS Update for hotfixes to bypass app store friction.
 
-## 3. Scroll Infinity Protocol v6.2ty
+## 3. Scroll Integrity
 - **Lists**: NEVER use `.map()` inside a `ScrollView` for data lists.
 - **Mandate**: ALWAYS use `FlashList` (Shopify) or `FlatList` for performance.
 

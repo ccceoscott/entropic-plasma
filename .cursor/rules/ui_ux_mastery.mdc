@@ -1,26 +1,57 @@
 ---
 alwaysApply: true
-description: UI/UX MASTERY - Liquid Glass, Mobile Design, Animation
+description: UX SOVEREIGNTY - Liquid Glass Design System, Framer Motion, Accessibility, Mobile
 globs: **/*.tsx, **/*.ts, tailwind.config.ts
 ---
-# UI/UX MASTERY (Sovereign v6.2)
+# UX SOVEREIGNTY: INFINITY PROTOCOL v6.2
 
-## 1. VISUAL LANGUAGE: LIQUID GLASS
-- **Glassmorphism**: `backdrop-blur-xl` + `bg-white/5` + `border-white/10`.
-- **Bento Grids**: 12-column rigid grids. Everything is a cell.
-- **Typography**: Inter/Geist. Tracking tight (-0.02em).
+> Consolidates `ux_lead.mdc` + `ui_ux_mastery.mdc`. One rule, absolute authority.
 
-## 2. MOTION PHYSICS (Framer Motion)
-- **FPS**: 60fps Mandatory.
-- **Springs**: `stiffness: 100`, `damping: 15`.
-- **Transitions**: 300ms sweet spot.
+## 1. VISUAL LANGUAGE — LIQUID GLASS (Non-Negotiable)
+```tsx
+// ✅ The standard Liquid Glass card
+<div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-xl">
+```
+- **Glassmorphism**: `backdrop-blur-xl` + `bg-white/5` + `border-white/10`. Always.
+- **Colors**: REJECT generic Tailwind (`zinc`, `slate`, `gray` defaults). Use HSL/variable-driven palettes with deep contrast.
+- **Typography**: Inter or Geist. `tracking-tight` (`-0.02em`). No browser defaults.
+- **Bento Grid**: 12-column. Every element is a cell. No freeform layouts.
+
+## 2. MOTION PHYSICS — FRAMER MOTION
+```tsx
+// ✅ Standard spring — feel alive, not mechanical
+<motion.div
+  initial={{ opacity: 0, y: 16 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ type: "spring", stiffness: 100, damping: 15 }}
+/>
+```
+- **60fps mandatory**. Test on real devices, not just localhost.
+- **300ms** is the transition sweet spot. Never exceed 500ms for UI feedback.
+- **`<AnimatePresence>`** for all mount/unmount transitions. No abrupt DOM changes.
+- **Hover**: `scale-105` or glow. **Click**: `scale-95` depress. Both mandatory on interactive elements.
 
 ## 3. MOBILE SOVEREIGNTY
-- **Touch**: Min 44px/pt targets.
-- **Safe Area**: ALWAYS respect `safe-area-inset`.
-- **Gestures**: Swipe-to-back, Pull-to-refresh supported.
+- **Touch targets**: Minimum 44×44px. Non-negotiable.
+- **Safe area**: Always `safe-area-inset-*` for notched devices.
+- **Mobile-first**: Design for `375px` first. Scale up with `md:` / `lg:`.
+- **Gestures**: Support swipe-to-back and pull-to-refresh where applicable.
+- **Testing**: Capture UI state with `browser_snapshot` before AND after any UI mutation.
 
-## 4. ACCESSIBILITY
-- **Contrast**: WCAG AA.
-- **Focus**: Visible focus rings for keyboard users.
-- **Reduced Motion**: Respect `prefers-reduced-motion`.
+## 4. ACCESSIBILITY (WCAG AA)
+- **Contrast ratio**: ≥ 4.5:1 for body text, ≥ 3:1 for large text.
+- **Focus rings**: Visible for all keyboard-navigable elements.
+- **ARIA**: Semantic HTML + `aria-label` on all interactive elements.
+- **Reduced motion**: Wrap animations in `@media (prefers-reduced-motion: no-preference)`.
+
+## 5. DESIGN SYSTEM SOVEREIGNTY
+- Figma variables → Tailwind CSS custom properties only. No `style={{}}`.
+- Map: `Primary Color` → `text-primary/bg-primary`, `Corner Radius 12` → `rounded-xl`, `Auto Layout` → `flex/gap-x`.
+- Before replicating a Dribbble/Figma reference: analyze **light source**, **shadow depth**, **corner smoothing** — then replicate the *feeling*, not just metrics.
+
+## 6. ANTI-PATTERNS (Instant Reject)
+- ❌ `style={{}}` inline styles — use Tailwind classes
+- ❌ Generic color names (`gray-500`, `zinc-800`) without design token
+- ❌ `linear` easing — use `spring` physics
+- ❌ Animations > 500ms for critical path UI
+- ❌ Missing `alt` on images, missing `aria-label` on icon buttons

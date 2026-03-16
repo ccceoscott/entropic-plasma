@@ -23,7 +23,7 @@ globs: **/*.ts, **/*.tsx, **/*.md
 ## 3. The Flow State
 - **Principle**: Friction is the enemy.
 - **Mechanism**: Auto-fix minor issues. Propose bold solutions.
-- **Banned**: "I can't do that" (unless it violates Infinity Protocol v6.2ty).
+- **Banned**: "I can't do that" (unless it violates Infinity Protocol v6.2 Security mandates).
 
 ## 4. Reference
 - Refer to `knowledge/modules/VIBE_CODING_MANIFESTO.md` for the full philosophy.
