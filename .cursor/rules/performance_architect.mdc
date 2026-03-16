@@ -5,27 +5,84 @@ globs: **/*.tsx, **/*.ts, next.config.mjs
 ---
 # PERFORMANCE ARCHITECT: INFINITY PROTOCOL v6.2
 
-## Context
-- **Protocol**: Infinity Protocol v6.2
+> **THE 100ms MANDATE**: All interactions must provide feedback < 100ms (Optimistic UI).
 
-## 1. The 100ms Mandate
-- **Goal**: All interactions must provide feedback < 100ms (Optimistic UI).
-- **Rule**: Use `useOptimistic` (React 19) for mutations.
+## 1. REACT 19 OPTIMISTIC UI
 
-## 2. React 19 Readiness
-- **Memoization**: Stop using `useMemo/useCallback` by default. Assume React Compiler.
-- **Server Actions**: Prefer Server Actions over Client Fetch for mutations.
+Stop waiting for network trips to update the screen. All mutations MUST use `useOptimistic`.
 
-## 3. Next.js Hard Rules
+```tsx
+// ✅ REQUIRED: Optimistic UI Pattern (React 19)
+import { useOptimistic } from 'react';
+import { updateRecord } from '@/app/actions';
+
+export function LikeButton({ initialCount }: { initialCount: number }) {
+  const [optimisticCount, addOptimistic] = useOptimistic(
+    initialCount,
+    (state, amount: number) => state + amount
+  );
+
+  const handleLike = async () => {
+    addOptimistic(1); // ⚡️ Instant UI Feedback (< 16ms)
+    await updateRecord(); // Background network request
+  };
+
+  return <button onClick={handleLike}>Likes {optimisticCount}</button>;
+}
+```
+
+## 2. DYNAMIC IMPORTS & CHUNKING
+
+Never bundle massive libraries on initial load.
+
+```tsx
+// ✅ REQUIRED: Strict Code Splitting for heavy components
+import dynamic from 'next/dynamic';
+
+const DynamicMap = dynamic(() => import('@/components/HeavyMap'), {
+  loading: () => <div className="h-64 w-full animate-pulse bg-muted rounded-xl" />,
+  ssr: false, // Map usually requires window object
+});
+
+export function ContactPage() {
+  return (
+    <section>
+      <h1>Location</h1>
+      <DynamicMap />
+    </section>
+  );
+}
+```
+
+## 3. ASSET HYGIENE (Next.js Hard Rules)
+
 - **Images**: CRITICAL ERROR if `<img>` is used instead of `next/image`.
 - **Fonts**: CRITICAL ERROR if standard `<link>` fonts are used. Use `next/font`.
 - **Scripts**: CRITICAL ERROR if `<script>` tags are used. Use `next/script`.
 
-## 4. Bundle Hygiene
-- **Imports**: Direct imports preferred over Barrel files for tree-shaking.
-- **Lazy Loading**: `next/dynamic` for any component > 50kb (e.g., Rich Text Editors, Maps).
+```tsx
+// ✅ REQUIRED: Third-party Script Loading
+import Script from 'next/script';
 
-## 5. Monitoring
-- **Vitals**: Ensure `useReportWebVitals` is hooked up in production logging.
+export function Analytics() {
+  return (
+    <>
+      {/* Load immediately but without blocking parser */}
+      <Script src="https://example.com/critical.js" strategy="beforeInteractive" />
+      
+      {/* Standard load (default) */}
+      <Script src="https://example.com/analytics.js" strategy="afterInteractive" />
+      
+      {/* Load only when browser is idle (GTM, Chat tracking) */}
+      <Script src="https://example.com/chat.js" strategy="lazyOnload" />
+    </>
+  );
+}
+```
 
-## Reference
+## 4. BUNDLE SIZE GOVERNANCE
+- **Imports**: Direct imports preferred over Barrel files for tree-shaking (e.g., `import { X } from 'lucide-react'` works because Next.js has `optimizePackageImports`).
+- **React Compiler**: Stop using manual `useMemo`/`useCallback` unless strictly profiling a known bottleneck. Let the React 19 Compiler handle memoization.
+
+## 5. MONITORING
+- **Vitals**: Use `useReportWebVitals` to pipe real-world LCP/CLS/INP metrics to Google Analytics or Sentry.

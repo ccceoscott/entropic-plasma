@@ -7,36 +7,112 @@ globs: **/*.tsx, **/*.ts, app/**/page.tsx, app/**/layout.tsx
 
 > Consolidates `seo_governance.mdc`. One rule, absolute authority.
 
-## 1. METADATA API (Next.js App Router)
+## 1. NEXT.JS METADATA API (App Router)
+
+Every public-facing page MUST export a strongly-typed `generateMetadata` function.
+
 ```typescript
-// Every page MUST export generateMetadata
-export async function generateMetadata({ params }): Promise<Metadata> {
+// ✅ REQUIRED: Strict Metadata Generation
+import { Metadata } from 'next';
+import { getProductById } from '@/lib/db/products';
+
+type Props = { params: { slug: string } };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const product = await getProductById(params.slug);
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  if (!product) return { title: 'Not Found' };
+
   return {
-    title: `${product.name} | Brand`,
+    title: `${product.name} | Premium Brand`,
     description: product.description.slice(0, 160),
-    openGraph: { images: [{ url: product.imageUrl }] },
-    alternates: { canonical: `https://domain.com/${params.slug}` },
+    alternates: {
+      canonical: `${baseUrl}/products/${params.slug}`,
+    },
+    openGraph: {
+      title: product.name,
+      description: product.description.slice(0, 160),
+      url: `${baseUrl}/products/${params.slug}`,
+      siteName: 'Premium Brand',
+      images: [
+        {
+          url: product.imageUrl || `${baseUrl}/og-default.png`,
+          width: 1200,
+          height: 630,
+          alt: product.name,
+        },
+      ],
+      locale: 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: product.description.slice(0, 160),
+      images: [product.imageUrl || `${baseUrl}/og-default.png`],
+    },
   };
 }
 ```
 
-## 2. SCHEMA.ORG (schema-dts)
+## 2. DYNAMIC SITEMAP MANDATE (`app/sitemap.ts`)
+
+Hardcoded XML sitemaps are forbidden. All Next.js projects MUST dynamically generate sitemaps using Server Components.
+
+```typescript
+// ✅ REQUIRED: Dynamic Sitemap Generation (app/sitemap.ts)
+import { MetadataRoute } from 'next';
+import { getAllProducts } from '@/lib/db/products';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://domain.com';
+  
+  // Fetch dynamic routes
+  const products = await getAllProducts();
+  const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
+    url: `${baseUrl}/products/${product.slug}`,
+    lastModified: product.metadata.updatedAt.toDate(),
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  // Static routes
+  const staticEntries: MetadataRoute.Sitemap = [
+    { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
+    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+  ];
+
+  return [...staticEntries, ...productEntries];
+}
+```
+
+## 3. ROBOTS MANDATE (`app/robots.ts`)
+
+```typescript
+// ✅ REQUIRED: Dynamic Robots (app/robots.ts)
+import { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://domain.com';
+  
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/admin/', '/api/', '/_debug/', '/tmp/'],
+    },
+    sitemap: `${baseUrl}/sitemap.xml`,
+  };
+}
+```
+
+## 4. SCHEMA.ORG (schema-dts)
 - Use `schema-dts` for all structured data. No raw JSON-LD strings.
-- Required schemas: `Organization` (root), `Product` (commerce), `Article` (blog), `BreadcrumbList` (nav).
+- Required schemas: `Organization` (root layout), `Product` (commerce), `Article` (blog), `BreadcrumbList` (navigation).
 
-## 3. TECHNICAL SEO MANDATES
-- **Sitemap**: Dynamic `app/sitemap.ts` — auto-generates from Firestore/CMS data.
-- **Robots**: `app/robots.ts` — block `/admin*`, `/api*`, `/dashboard*`.
-- **Canonical**: Always set. Trailing-slash consistency enforced (Rule 17).
-- **Core Web Vitals**: LCP < 2.5s, CLS < 0.1, INP < 200ms. Non-negotiable.
-
-## 4. IMAGE SEO
+## 5. IMAGE SEO & VITAL METRICS
 - ALL `<img>` → `next/image` with `alt`, `width`, `height`.
 - WebP/AVIF format mandatory.
-- Preload hero images via `priority` prop.
-
-## 5. FORBIDDEN PATTERNS
-- Duplicate `<title>` tags.
-- Missing `alt` attributes.
-- `noindex` on public content pages.
-- Blocking Googlebot in `robots.ts`.
+- Preload hero images via `priority={true}` prop.
+- **Core Web Vitals Budget**: LCP < 2.5s, CLS < 0.1, INP < 200ms. Non-negotiable.

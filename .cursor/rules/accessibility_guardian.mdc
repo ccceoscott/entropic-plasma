@@ -5,47 +5,93 @@ globs: **/*.{tsx,jsx}
 ---
 # ACCESSIBILITY GUARDIAN: INFINITY PROTOCOL v6.2
 
-## 1. SEMANTIC HTML — Zero Div Buttons
+> **MANDATE**: Build for everyone. A site without a11y is a broken site. Radix Primitives / Shadcn are the standard.
+
+## 1. SEMANTIC HTML & KEYBOARD SOVEREIGNTY
+
+Building "div buttons" is a critical architecture failure.
+
 ```tsx
 // ❌ REJECTED — div with onClick and no accessibility
 <div onClick={handleClick}>Submit</div>
 
-// ✅ REQUIRED — proper button with keyboard support
+// ✅ REQUIRED — semantic button with keyboard support built-in
 <button type="button" onClick={handleClick}>Submit</button>
-// OR if truly custom:
-<div role="button" tabIndex={0} onClick={handleClick} onKeyDown={(e) => e.key === 'Enter' && handleClick()}>
+
+// ✅ REQUIRED — focusable custom interactive element (rare)
+<div 
+  role="button" 
+  tabIndex={0} 
+  onClick={handleClick} 
+  onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+  aria-label="Submit Form"
+>
 ```
+
+- **Focus Control**: `outline-none focus-visible:ring-2 focus-visible:ring-ring` MUST be on all interactive elements.
 - All `<img>` must have `alt`. Decorative images: `alt=""`.
 - Use `<nav>`, `<main>`, `<article>`, `<section>` — not `<div>` wrappers.
 
-## 2. ARIA REQUIREMENTS
+## 2. RADIX PRIMITIVES MANDATE
+
+Do not reinvent complex ARIA widgets. Use `@radix-ui` / `shadcn/ui`.
+
+```tsx
+// ✅ REQUIRED: Radix Dialog (handles focus trap, esc to close, aria-modal implicitly)
+import * as Dialog from '@radix-ui/react-dialog';
+
+export const AccessibleModal = () => (
+  <Dialog.Root>
+    <Dialog.Trigger asChild>
+      <button className="btn">Open Profile</button>
+    </Dialog.Trigger>
+    <Dialog.Portal>
+      <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+      <Dialog.Content className="fixed bg-background p-6">
+        <Dialog.Title>Edit Profile</Dialog.Title>
+        <Dialog.Description>Make changes below.</Dialog.Description>
+        <Dialog.Close />
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog.Root>
+);
+```
+
+## 3. ARIA REQUIREMENTS
 | Element | Required ARIA |
 |---|---|
 | Icon-only button | `aria-label="Description"` |
 | Input field | `<label htmlFor="id">` + matching `id` on input |
-| Modal/Dialog | `role="dialog"` + `aria-modal="true"` + `aria-labelledby` |
-| Loading state | `aria-busy="true"` on container |
-| Error message | `role="alert"` on error container |
+| Loading state | `aria-busy="true"` + `aria-live="polite"` on container |
+| Error message | `role="alert"` + `aria-live="assertive"` |
 
-## 3. KEYBOARD NAVIGATION
-- All interactive elements reachable via `Tab`.
-- Modal open: focus trapped inside. Modal close: focus returns to trigger.
-- Dropdown: `ArrowUp`/`ArrowDown` to navigate, `Escape` to close.
-- Skip-to-main link: first focusable element on every page.
+## 4. MOTION SAFETY (Vestibular Defense)
 
-## 4. COLOR & CONTRAST
+Flashy animations can induce vertigo. Always respect OS-level motion reduction flags.
+
+```tsx
+// ✅ REQUIRED: Framer Motion reduced-motion hook
+import { motion, useReducedMotion } from 'framer-motion';
+
+export const SafeAnimation = () => {
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        duration: shouldReduceMotion ? 0.01 : 0.5, 
+        ease: 'easeOut' 
+      }}
+    >
+      Content
+    </motion.div>
+  );
+};
+```
+
+## 5. COLOR & CONTRAST
 - **Body text**: ≥ 4.5:1 contrast ratio (WCAG AA).
 - **Large text / UI components**: ≥ 3:1 contrast ratio.
 - **Never convey information via color alone** — pair with icon or text label.
-
-## 5. MOTION SAFETY
-```tsx
-// ✅ Respect user preference
-<motion.div
-  animate={{ opacity: 1 }}
-  transition={
-    prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 100 }
-  }
-/>
-```
-- Wrap all Framer Motion animations with `prefers-reduced-motion` checks.
