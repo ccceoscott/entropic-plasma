@@ -5,31 +5,45 @@ globs: MISSION_STATE.md, scripts/dv
 ---
 # PROTOCOL SYNC MASTERY: INFINITY PROTOCOL v6.2
 
+> **The Synchronization Mandate**: A decentralized portfolio requires a unified mind. Drift is failure.
+
 ## 1. THE TRIGGER (Auto-Detection)
 On every session start, the agent MUST check for protocol drift:
-- `.cursor/rules/` missing `secret_management_guardian.mdc` or `constitution.mdc` → DRIFT
-- `.cursorrules` hash differs from HUB → DRIFT
-- `GEMINI.md` missing or outdated → DRIFT
+1. Is `.cursor/rules/` missing core rules (e.g., `constitution.mdc`)? → **DRIFT**
+2. Does `.cursorrules` hash differ from HUB? → **DRIFT**
+3. Is `GEMINI.md` missing or outdated? → **DRIFT**
 
-## 2. THE FIX — `dv` CLI Commands
+## 2. THE FIX — `dv` CLI COMMANDS
+The `dv` utility is the central nervous system of Infinity Protocol.
+
 ```bash
-# Detect drift across all workspaces
+# 1. Detect drift across the current workspace
 dv doctor
 
-# Auto-heal the current workspace
+# 2. Auto-heal the current workspace (Pulls from Hub)
 dv fix-drift
 
-# Broadcast v6.2 protocol to ALL workspaces (parallel, git auto-commit)
+# 3. Broadcast v6.2 protocol from Hub to ALL workspaces (parallel, git auto-commit)
 dv broadcast
 
-# Verify post-heal state
+# 4. Verify post-heal state
 dv lint-rules
 ```
 
-## 3. LOGGING
-- Record sync events in `MISSION_STATE.md` under `## 🔄 Sync Log`.
-- If local rules had manual overrides that were overwritten → notify the user immediately.
+## 3. THE HEARTBEAT (Functional Auto-Sync)
+The `dv` utility automatically checks for drift and heals `.cursorrules`, `GEMINI.md`, and `.cursor/rules/` every time it is invoked. 
 
-## 4. GOVERNANCE
-- `SOVEREIGN_LOCK` is the checksum authority. Run `dv locksheet` to regenerate.
-- Rule drift is a CRITICAL issue. Never defer mitigation.
+**(Optional) Local Machine Auto-Heal Hook (`~/.zshrc`):**
+```bash
+# Add to ~/.zshrc to ensure dv doctor runs upon entering a workspace
+chpwd() {
+  if [ -f ".firebaserc" ] || [ -f "next.config.js" ]; then
+    dv doctor --quiet || echo "⚠️ Protocol Drift Detected. Run 'dv fix-drift'."
+  fi
+}
+```
+
+## 4. GOVERNANCE & LOGGING
+- Record sync events in `MISSION_STATE.md` under `## Optimization History`.
+- If local rules had manual overrides that were overwritten by a broadcast → notify the user immediately.
+- `SOVEREIGN_LOCK` is the checksum authority. Run `dv locksheet` to regenerate it.

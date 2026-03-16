@@ -1,28 +1,85 @@
 ---
 alwaysApply: true
 description: UX FEEDBACK LOOPS - Toasts, Notifications, and Real-Time Feedback Standards
-globs: **/*.tsx, **/*.ts
+globs: "**/*.{tsx,ts,jsx,js}"
 ---
 # UX FEEDBACK LOOPS: INFINITY PROTOCOL v6.2
 
-## Context
-- **Protocol**: Infinity Protocol v6.2
-- **Goal**: The system must always acknowledge user intent.
+> **UX SOVEREIGNTY**: The system must ALWAYS acknowledge user intent instantly. Silence is a failure state.
 
-## 1. The "Zero-Latency" Illusion
+## 1. The "Zero-Latency" Illusion (Optimistic UI)
 - **Principle**: UI updates immediately; Server syncs in background.
-- **Mechanism**: **Optimistic UI** (TanStack Query / SWR).
-- **Requirement**: ALL mutations must have an optimistic update.
+- **Requirement**: ALL mutations must have an optimistic update or immediate visual feedback.
 
-## 2. Notification Standards
-- **Success**: `toast.success("Action Completed")` (Green/Teal).
-- **Error**: `toast.error("Action Failed")` (Red/Rose).
-- **Loading**: `toast.loading("Processing...")` OR Skeleton Screen.
-- **Library**: `sonner` is the standard for toasts.
+```tsx
+// ✅ FUNCTIONAL PATTERN: Optimistic UI with React 19 / SWR
+import { useOptimistic } from 'react';
 
-## 3. Micro-Interactions
-- **Hover**: Buttons must scale (`scale-105`) or glow on hover.
-- **Click**: Buttons must depress (`scale-95`) on click.
-- **Transition**: No abrupt DOM changes. Use `<AnimatePresence>`.
+export function LikeButton({ serverLikes, onLike }) {
+  const [optimisticLikes, addOptimisticLike] = useOptimistic(
+    serverLikes,
+    (state, current) => state + 1
+  );
 
-## 4. Reference
+  return (
+    <button 
+      onClick={async () => {
+        addOptimisticLike();    // Instant UI update
+        await onLike();         // Background server sync
+      }}
+      className="active:scale-95 transition-transform"
+    >
+      {optimisticLikes} Likes
+    </button>
+  );
+}
+```
+
+## 2. Notification Standards (Sonner)
+- **Library**: `sonner` is the ABSOLUTE STANDARD for toasts.
+- **Success**: Green/Teal. `toast.success("Action Completed")`
+- **Error**: Red/Rose. `toast.error("Action Failed", { description: "Details..." })`
+- **Loading/Promise**: Use `toast.promise` for async actions without optimistic UI.
+
+```tsx
+// ✅ FUNCTIONAL PATTERN: Async Toast Promise
+import { toast } from 'sonner';
+
+const handlePayment = async () => {
+  toast.promise(processPayment(), {
+    loading: 'Processing payment...',
+    success: 'Payment successful! Receipt sent.',
+    error: 'Payment failed. Please try again.',
+  });
+};
+```
+
+## 3. Micro-Interactions (Framer Motion)
+- **Hover**: Elements must respond fluidly (`scale: 1.02`).
+- **Click**: Buttons must depress (`scale: 0.95`, `active:scale-95`).
+- **Transition**: Use `<AnimatePresence>` for mounting/unmounting. No abrupt DOM changes.
+
+```tsx
+// ✅ FUNCTIONAL PATTERN: Liquid Glass Interactive Button
+import { motion } from 'framer-motion';
+
+export const InteractiveButton = ({ children, onClick }) => (
+  <motion.button
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={onClick}
+    className="px-6 py-2 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white shadow-[0_4px_24px_-8px_rgba(255,255,255,0.2)] hover:bg-white/20 transition-colors"
+  >
+    {children}
+  </motion.button>
+);
+```
+
+## 4. Skeleton States
+- Never show a blank screen or unstyled raw data while loading.
+- Use animated pulse skeletons matching the exact shape of the incoming data.
+
+```tsx
+// ✅ FUNCTIONAL PATTERN: Skeleton Pulse
+<div className="w-full h-32 rounded-xl bg-white/5 animate-pulse border border-white/10" />
+```

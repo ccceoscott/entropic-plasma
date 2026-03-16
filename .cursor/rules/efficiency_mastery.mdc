@@ -5,27 +5,47 @@ globs: "**/*"
 ---
 # EFFICIENCY MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. CONTEXT ECONOMY
+> **Maximum Throughput**: Never block the main thread. Never await sequentially if you can await concurrently.
+
+## 1. PARALLEL EXECUTION (Promise.all)
+Convert sequential `await` cascades into parallel data fetching matrices to drastically reduce backend compute time.
+
+**Anti-Pattern (Slow, Sequential Waterfall):**
+```typescript
+// Takes 300ms + 200ms = 500ms
+const user = await getUser(userId);
+const orders = await getOrders(userId);
+```
+
+**Infinity Protocol Standard (Fast, Concurrent):**
+```typescript
+// Takes Math.max(300ms, 200ms) = 300ms
+const [user, orders] = await Promise.all([
+  getUser(userId),
+  getOrders(userId)
+]);
+```
+
+## 2. BUNDLE INTEGRITY & TREE-SHAKING
+- Enforce a **200KB** limit for the initial JS payload. 
+- Use `next/dynamic` to lazy-load heavy components (PDF generators, charting libraries, rich text editors) that are not required for Above-The-Fold LCP.
+
+**Functional Implementation (Lazy Loading):**
+```tsx
+import dynamic from 'next/dynamic';
+
+// Heavy chart only loads when the component actually renders on client
+const LazyChart = dynamic(() => import('@/components/AnalyticsChart'), {
+  ssr: false,
+  loading: () => <div className="h-64 w-full animate-pulse bg-white/5 rounded-xl" />
+});
+```
+
+## 3. AGENT RESOURCE ECONOMY
 - Read max 3 files per turn unless explicitly critical — use `grep`/`find` to locate first.
 - Never read `package-lock.json` or `yarn.lock` unless debugging exact version mismatches.
-- Use `ls` scans to understand directory topology before diving into files.
+- Multi-step OS tasks (Build + Test + Deploy): execute sequentially, not in parallel, to preserve 16GB RAM constraints.
 
-## 2. SEQUENTIAL OPERATIONS
-- Multi-step tasks (Build + Test + Deploy): execute sequentially, not in parallel.
-- Check for obvious failure conditions before launching a heavy compile.
-- Report status between steps — don't chain silently.
-
-## 3. TERMINAL DISCIPLINE
-- Long output commands: pipe to file or use status-only flags. Never flood chat with 500-line success logs.
-- Background processes you start, you kill. No orphaned processes.
-- Always use `set -euo pipefail` in bash scripts.
-
-## 4. TOOL MINIMALISM
-- Prefer a single precise `grep -rn` over opening multiple files to find context.
-- Use `git diff --stat HEAD` to understand scope of changes before reading full diffs.
-- `wc -l` a file before reading it — if > 800 lines, read targeted ranges only.
-
-## 5. BUNDLE INTEGRITY
-- Use `rollup-plugin-visualizer` or `@next/bundle-analyzer` to monitor bundle health.
-- Enforce **200KB** limit for initial JS payload. `next/dynamic` for anything heavier.
-- Direct imports preferred over barrel files for tree-shaking efficiency.
+## 4. TERMINAL DISCIPLINE
+- Long output commands: pipe to file or use status-only flags (`npm ci --quiet`). Never flood chat with 500-line success logs.
+- Always use `set -euo pipefail` in bash scripts to fail fast and prevent runaway execution.

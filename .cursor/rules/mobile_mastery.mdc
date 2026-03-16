@@ -5,26 +5,64 @@ globs: **/*.tsx, **/*.ts, app.json, babel.config.js, eas.json
 ---
 # MOBILE MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. STACK INTEGRITY
-- **Navigation**: Expo Router ONLY. No `react-navigation` boilerplate.
-- **Styling**: NativeWind (`className`). No `StyleSheet.create`.
-- **Imports**: `import { View, Text, Pressable } from 'react-native'`
+> **Mobile Sovereignty**: 60fps gesture physics, instant cold starts, and absolute cross-platform parity.
 
-## 2. TOUCH MANDATE
-- All pressable elements MUST have feedback: `Pressable` with visual states + `expo-haptics`.
-- Critical actions (Success, Error, Delete) MUST trigger `Haptics`.
-- Min touch target: **44×44pt** — non-negotiable.
+## 1. STACK INTEGRITY (EXPO ROUTER + NATIVEWIND)
+- **Navigation**: Expo Router ONLY. No boilerplate `react-navigation`.
+- **Styling**: NativeWind (`className` and Tailwind v4). No `StyleSheet.create`.
 
-## 3. LIST PERFORMANCE
-- NEVER use `.map()` in a `ScrollView` for data lists.
-- ALWAYS use `FlashList` (Shopify) or `FlatList`.
+**Functional Architecture Blueprint:**
+```tsx
+import { View, Text, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 
-## 4. PLATFORM DISCIPLINE
+export default function MobileCard() {
+  const router = useRouter();
+
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/details');
+  };
+
+  // 44px min-height enforces Touch Target Law
+  return (
+    <Pressable 
+      onPress={handlePress}
+      className="min-h-[44px] flex-row items-center justify-between rounded-xl bg-black/40 p-4 border border-white/10 active:opacity-70"
+    >
+      <Text className="text-white font-medium">View Details</Text>
+    </Pressable>
+  );
+}
+```
+
+## 2. LIST PERFORMANCE (FLASHLIST ABSOLUTISM)
+- **NEVER** use `.map()` in a `ScrollView` for data lists.
+- **ALWAYS** use `@shopify/flash-list` for infinite scrolling and virtualized memory management.
+
+```tsx
+import { FlashList } from '@shopify/flash-list';
+
+export function TransactionsList({ data }) {
+  return (
+    <View className="flex-1 w-full h-full">
+      <FlashList
+        data={data}
+        renderItem={({ item }) => <TransactionCard tx={item} />}
+        estimatedItemSize={80} // CRITICAL: Must calculate accurate average height
+      />
+    </View>
+  );
+}
+```
+
+## 3. PLATFORM DISCIPLINE
 - Handle platform differences: `Platform.OS === 'ios'` / `'android'` for specific tweaks.
 - `KeyboardAvoidingView` behavior: `Platform.OS === 'ios' ? 'padding' : 'height'`.
-- Wrap root screens in `SafeAreaView` or valid safe-area insets from `react-native-safe-area-context`.
+- Wrap root screens in `SafeAreaView` from `react-native-safe-area-context`.
 
-## 5. PERFORMANCE & UPDATES
+## 4. PERFORMANCE & UPDATES
 - Preload critical UI assets via `Asset.loadAsync` during splash screen.
 - **EAS Update** for hotfixes — bypass app store friction for non-binary changes.
-- `minInstances: 1` on Firebase Functions called from mobile for cold-start latency.
+- `minInstances: 1` on Firebase Functions called from mobile to kill cold-start latency.

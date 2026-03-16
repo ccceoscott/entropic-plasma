@@ -5,7 +5,7 @@ globs: **/*.tsx, **/*.ts, tailwind.config.*
 ---
 # UX SOVEREIGNTY: INFINITY PROTOCOL v6.2
 
-> **Mandate**: Consolidates `ux_lead.mdc` + `ui_ux_mastery.mdc`. One rule, absolute authority. All UIs must adhere to the Liquid Glass aesthetic and rigorous accessibility standards.
+> **Mandate**: Absolute authority over UI physics and accessible state management.
 
 ## 1. LIQUID GLASS AESTHETIC (Tailwind & Framer Motion)
 ```tsx
@@ -28,40 +28,36 @@ export const GlassCard = ({ children }: { children: React.ReactNode }) => (
 
 ## 2. STAGGERED LIST ANIMATIONS
 ```tsx
-// ✅ REQUIRED: Use variants for staggered list rendering
-const container = {
+// ✅ REQUIRED: Use variants for staggered UI rendering (Page Loads)
+const containerConfig = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 }
   }
 };
 
-const item = {
+const itemConfig = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" } }
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
-// Usage: <motion.ul variants={container} initial="hidden" animate="show">
-//          <motion.li variants={item} />
+// Usage: <motion.ul variants={containerConfig} initial="hidden" animate="show">
+//          <motion.li variants={itemConfig} />
 //        </motion.ul>
 ```
 
 ## 3. MOBILE SOVEREIGNTY
-- **Touch targets**: Minimum 44×44px. Non-negotiable.
-- **Safe area**: Always `safe-area-inset-*` for notched devices via Tailwind (`pt-safe`, `pb-safe`).
-- **Mobile-first**: Design for `375px` first. Scale up with `md:` / `lg:`.
-- **Gestures**: Support swipe-to-back and pull-to-refresh where applicable.
+- **Touch Targets**: Minimum **44×44px** hit area. Non-negotiable.
+- **Safe Area**: Always `safe-area-inset-*` for notched devices via Tailwind (`pt-safe`, `pb-safe`).
+- **Responsive Scaling**: Design for `375px` strictly first. Scale up using `md:` / `lg:` breakpoint modifiers.
 
-## 4. ACCESSIBILITY (WCAG AA)
-- **Contrast ratio**: ≥ 4.5:1 for body text, ≥ 3:1 for large text.
-- **Focus rings**: Visible for all keyboard-navigable elements. Use `focus-visible:ring-2 focus-visible:ring-primary/50`.
-- **ARIA**: Semantic HTML + `aria-label` on all interactive icon buttons.
-- **Reduced motion**: Honor OS settings via Tailwind `motion-reduce:` utility or Framer Motion's `useReducedMotion()`.
+## 4. ACCESSIBILITY (WCAG AA & VESTIBULAR DEFENSE)
+- **Focus Sovereignty**: Visible `focus-visible:ring-2 focus-visible:ring-primary/50` required for all keyboard-navigable elements. No `outline-none` without custom ring replacements.
+- **ARIA Labeling**: Semantic HTML + `aria-label` required on all interactive icon buttons (`<button aria-label="Close modal"> <XIcon /> </button>`).
+- **Reduced Motion**: If using `framer-motion`, you MUST import and utilize `useReducedMotion()` to fallback to `opacity` shifts rendering complex y/x axis physics inert for vestibular safety.
 
-## 5. DESIGN SYSTEM SOVEREIGNTY & ANTI-PATTERNS
-- ❌ `style={{}}` inline styles — use Tailwind classes exclusively.
-- ❌ Generic color names (`gray-500`) without a mapped design token variable.
-- ❌ `linear` easing — use `spring` physics to make the UI feel alive, not mechanical.
-- ❌ Animations > 500ms for critical path UI feedback.
-- Before replicating a design reference: analyze **light source**, **shadow depth**, and **corner smoothing** — replicate the *feeling*, not just metrics.
+## 5. ANTI-PATTERNS (Instant Reject)
+- ❌ `style={{}}` inline styling hacks. Use Tailwind.
+- ❌ `linear` or standard `ease-in-out` easing. Utilize `spring` physics to make the UI feel reactive and alive.
+- ❌ Animations > 400ms. UI feedback must feel crisp and instantaneous.

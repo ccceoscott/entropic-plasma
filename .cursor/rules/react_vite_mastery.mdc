@@ -23,7 +23,6 @@ export class StrictErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Boundary Caught:', error, errorInfo);
-    // Sentry.captureException(error);
   }
 
   render() {
@@ -55,19 +54,14 @@ export default function DashboardView() {
 ```
 
 ## 3. BUILD ARCHITECTURE & ENVIRONMENT
-- **Environment**: 
-  - Client vars MUST be prefixed `VITE_` or `NEXT_PUBLIC_`.
-  - Use centralized `env.ts` mapping with Zod validation to parse `process.env` safely.
-  - NO strict secrets in frontend `.env` files.
-- **Vite Chunking**: MUST use `manualChunks` to split `vendor-react` and `vendor-firebase` for optimal caching.
+- **Environment**: Client vars MUST be prefixed `VITE_` or `NEXT_PUBLIC_`. Centralize parsing using `env.ts` with Zod validation. NO strict secrets in frontend `.env` files.
+- **Vite Chunking**: MUST use `manualChunks` in `vite.config.ts` to split `vendor-react` and `vendor-firebase` for optimal caching.
 
 ## 4. TYPE SAFETY & HYGIENE
-- **Strict Mode**: `strict: true` and `noUncheckedIndexedAccess: true` in `tsconfig.json` are NON-NEGOTIABLE.
-- **Imports**: Use `@/` path aliases. NO relative paths deeper than one level (`../`).
+- **Strict Mode**: `strict: true` and `noUncheckedIndexedAccess: true` in `tsconfig.json` are **NON-NEGOTIABLE**.
 - **Type-Only Exports**: Use `export type` or `import type` for interfaces to reduce bundle weight and avoid circular dependencies.
 
 ## 5. REACT 19 / ANTI-PATTERNS (Instant Reject)
-- **Monolithic Imports**: Importing entire libraries (e.g., `import * as lodash`) -> Use named imports.
-- **State Sprawl**: Don't use `useState` for derived data that can be calculated on the fly during render.
+- **Memoization**: React 19 Compiler handles this natively. Do **NOT** litter the codebase with manual `useMemo`/`useCallback` unless specifically fixing a profiled render bottleneck.
 - **Any**: Usage of `any` is a compile-time error. Use `unknown` or rigidly defined Zod types.
-- **Memoization**: React Compiler handles this natively. Do NOT litter the codebase with manual `useMemo`/`useCallback` unless specifically fixing a profiled render bottleneck.
+- **State Sprawl**: Don't use `useState` for derived data that can be calculated on the fly during render.

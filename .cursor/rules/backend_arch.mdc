@@ -5,16 +5,75 @@ description: Backend Architect - Database & API Rigor
 
 # Backend Architect: Infinity Protocol v6.2
 
-**Goal**: Absolute data integrity, secure operations, and sub-second performance.
+> **Precision Backend**: Absolute data integrity, secure operations, and sub-second performance.
 
 ## 1. CORE MANDATES
 - **Schema Integrity**: Validate all data mutations against `KNOWLEDGE.md`.
 - **Universal Sync Absolutism**: Optimistically update UI AND reliably sync to Firestore using centralized API calls or `onSnapshot` listeners.
 - **Ironclad CRUD**: Ad-hoc component database logic is FORBIDDEN. Use a unified API layer with explicit Zod validation, EPA (Error Path Analysis), and loading states.
-- **Enterprise E-Commerce**: Implement Webhook Idempotency (prevent double billing), Incremental Static Regeneration (ISR) caching (sub-second LCP), and precise checkout Rate Limiting (block card testing).
 - **Credential Safety**: ZERO hardcoded secrets. Use `.env.local` or Secret Manager.
-- **Resource Efficiency**: Prevent memory/stream leaks. Prioritize performant algorithms.
 
-## 2. EXECUTION PROTOCOL
+## 2. NEXT.JS APP ROUTER (ROUTE HANDLER STANDARD)
+When building backend APIs in Next.js, strictly adhere to this Zod + Firebase Admin blueprint:
+
+**`app/api/webhook/stripe/route.ts`**
+```typescript
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { adminDb } from '@/lib/firebase/admin';
+
+// 1. Strict Boundary
+const WebhookSchema = z.object({
+  type: z.string(),
+  data: z.object({
+    object: z.object({ id: z.string() })
+  })
+});
+
+export async function POST(req: Request) {
+  try {
+    // 2. Parse & Validate
+    const body = await req.json();
+    const event = WebhookSchema.parse(body);
+
+    // 3. Idempotency Check
+    const ref = adminDb.collection('events').doc(event.data.object.id);
+    const snap = await ref.get();
+    if (snap.exists) return NextResponse.json({ received: true });
+
+    // 4. Atomic Execution
+    await ref.set({ type: event.type, processedAt: new Date() });
+    
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    console.error('[API_ERROR] /api/webhook/stripe:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+```
+
+## 3. NEXT.JS SERVER ACTIONS (MUTATION STANDARD)
+For form submissions and direct React 19 mutations, use Server Actions with auth verification:
+
+**`app/actions/user.ts`**
+```typescript
+'use server'
+import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { cookies } from 'next/headers';
+
+export async function updateUserProfile(formData: FormData) {
+  const sessionCookie = cookies().get('session')?.value;
+  if (!sessionCookie) throw new Error('Unauthorized');
+
+  const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+  
+  await adminDb.collection('users').doc(decoded.uid).update({
+    name: formData.get('name'),
+    updatedAt: new Date()
+  });
+}
+```
+
+## 4. EXECUTION PROTOCOL
 - Execute a full dependency side-effect analysis before writing backend code.
 - Run `/env-check` prior to any production database or function deployments.

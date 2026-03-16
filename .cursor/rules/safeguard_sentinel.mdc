@@ -5,53 +5,71 @@ globs: "**/*"
 ---
 # SAFEGUARD SENTINEL: INFINITY PROTOCOL v6.2
 
-> The last line of defense before any output reaches the user. Re-run these checks on EVERY response.
+> **The Alpha Directive**: The last line of defense before modifying files or executing risky commands. 
 
-## 1. HALLUCINATION PREVENTION
-**Before modifying ANY file**: confirm you have READ its current contents in this session.
-```
-❌ Modifying a file you haven't read → STOP. Read it first.
-❌ Referencing a function/class not yet confirmed to exist → STOP. Grep for it first.
-❌ Assuming a field exists in Firestore schema → STOP. Verify via list/get.
-❌ Guessing project IDs, Firebase app names, env var names, or remote URLs → STOP. Query `firebase use` or `git remote -v`.
+## 1. THE CONTEXT BLEED PRE-FLIGHT (`scripts/context-check.sh`)
+When switching projects or initializing a session involving destructive actions (deploys, mass deletions), execute this script to ensure absolute workspace isolation.
+
+**`scripts/context-check.sh`**
+```bash
+#!/bin/bash
+set -e
+
+EXPECTED_PROJECT="infinity-protocol-1"
+
+# 1. Verify Directory
+CURRENT_DIR=$(basename "$PWD")
+if [ "$CURRENT_DIR" != "$EXPECTED_PROJECT" ]; then
+  echo "❌ BLEED DETECTED: Expected $EXPECTED_PROJECT, but in $CURRENT_DIR."
+  exit 1
+fi
+
+# 2. Verify Git Remote
+REMOTE_URL=$(git config --get remote.origin.url)
+if [[ "$REMOTE_URL" != *"ccceoscott/infinity-protocol"* ]]; then
+  echo "❌ BLEED DETECTED: Invalid Git Remote ($REMOTE_URL)."
+  exit 1
+fi
+
+# 3. Verify Firebase Project (if applicable)
+if command -v firebase &> /dev/null && [ -f ".firebaserc" ]; then
+  ACTIVE_FB=$(firebase use)
+  echo "🔥 Active Firebase Project: $ACTIVE_FB"
+  # Add specific checks here if a specific FB project is mandated
+fi
+
+echo "✅ Context Verification Passed. Safe to proceed."
 ```
 
 ## 2. POISON STRING GUARD
-Scan every response for these forbidden strings before submission:
+Scan every response and generated file for these forbidden strings/patterns before submission:
 
-| Category | Forbidden Strings |
+| Category | Forbidden Strings & Anti-Patterns |
 |---|---|
-| Legacy branding | `CareKey`, `SARAH`, `Vast`, `Anti-Gravity Diamond` |
-| Version drift | `v1.x`, `v1.7`, `v1.6`, `v6.1` |
-| Wrong stack | `Supabase`, `HubSpot`, `Salesforce`, `Bootstrap`, `Material UI` |
-| Stale scripts | `sovereign_sync.sh`, `Infinity Protocol v6.2_sync.sh` |
+| **Legacy Branding** | `CareKey`, `SARAH`, `Vast`, `Anti-Gravity Diamond` |
+| **Version Drift** | `v1.x`, `v1.7`, `v1.6`, `v6.1` (We are STRICTLY v6.2) |
+| **Banned Tech** | `Supabase`, `HubSpot`, `Salesforce`, `Bootstrap`, `Material UI` |
+| **Stale Scripts** | `sovereign_sync.sh`, `Infinity Protocol v6.2_sync.sh` |
 
-**If found**: halt output, flag the string, correct before responding.
+**Enforcement:** If found, HALT output, flag the string, and self-correct immediately.
 
-## 3. CONTEXT BLEED CHECK
-When switching between projects mid-session:
-1. Verify workspace root: `pwd` → must match the active project from `MISSION_STATE.md`.
-2. Verify Firebase project: `firebase use` → must NOT be a different client's project.
-3. Verify git remote: `git remote -v` → must match expected repo.
-4. If any mismatch: **HALT and report** before writing a single file.
+## 3. HALLUCINATION PREVENTION (Data Validation)
+Before making architectural assumptions, you **MUST** verify existence:
+1.  **Files**: Do not modify files you haven't read in the current session (`cat` or `view_file`).
+2.  **Functions**: Do not import or call functions unless you have `grep`ped the codebase to confirm their signature.
+3.  **Firestore**: Do not assume schema fields exist. Check `types/` or `interfaces/`.
+4.  **Secrets**: Never assume an environment variable's name. Check `.env.example`.
 
-## 4. REGRESSION AUDIT
-Before finalizing any change to shared/core logic:
-- [ ] Does this break existing TypeScript types? (`tsc --noEmit`)
-- [ ] Does this alter a public function signature? (Check all callers)
-- [ ] Does this change Firestore document shape? (Check security rules + all query sites)
-- [ ] Does this touch auth flow? (Full session lifecycle re-verify)
+## 4. REGRESSION AUDIT (The "Don't Break It" Checklist)
+Before finalizing any change to shared/core logic (`utils/`, `hooks/`, `components/ui/`):
+- [ ] Does this break existing TypeScript types? (Run `npx tsc --noEmit`)
+- [ ] Does this alter a public function signature? (Identify and update all callers)
+- [ ] Does this change Firestore document shape? (Update Security Rules accordingly)
+- [ ] Does this touch auth flow? (Re-verify the session lifecycle)
 
 ## 5. RECURSIVE SELF-AUDIT (Pre-Submission)
-Before every final response, run this internal checklist:
-- [ ] No poison strings in output
-- [ ] No files modified without prior read
-- [ ] No hardcoded secrets or API keys
-- [ ] Commit message follows `type(scope): description` format
-- [ ] `MISSION_STATE.md` updated if files were written
-
-## 6. EVOLUTION PROTOCOL
-After any repeated failure pattern (3+ occurrences):
-1. Identify the root failure pattern
-2. Propose a new or updated `.mdc` rule to prevent recurrence
-3. Add to hub via `dv broadcast`
+Before every final tool submission or user notification:
+- [ ] No poison strings in output.
+- [ ] No hardcoded secrets or API keys (Use `[REDACTED]`).
+- [ ] Commit messages follow `<type>(<scope>): <subject>` format.
+- [ ] `MISSION_STATE.md` represents the true current state.
