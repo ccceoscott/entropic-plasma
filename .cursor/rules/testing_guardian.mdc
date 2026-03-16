@@ -16,34 +16,87 @@ globs: **/*.{test,spec}.{ts,js,tsx}, playwright.config.ts, vitest.config.ts
 | Firestore Rules | `@firebase/rules-unit-testing` | `assertSucceeds` + `assertFails` |
 | A11y | `axe-playwright` | Zero violations on public pages |
 
-## 2. EMULATOR MANDATE
+## 2. EMULATOR MANDATE & VITEST CONFIGURATION
+
 ```typescript
-// ALWAYS verify emulator connection before any test logic
+// ✅ REQUIRED: vitest.config.ts
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./setupTests.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      lines: 80,
+      functions: 80,
+      branches: 80,
+      statements: 80,
+    },
+  },
+});
+```
+
+```typescript
+// ✅ REQUIRED: setupTests.ts (Emulator Safety)
 beforeAll(() => {
   if (!process.env.FIRESTORE_EMULATOR_HOST) {
     throw new Error('FATAL: Tests must run against emulator, not production.');
   }
-  if (admin.app().options.projectId === PRODUCTION_PROJECT_ID) {
-    throw new Error('FATAL: Production project detected in test environment.');
+  // Fast-fail if accidentally pointed at production
+  if (process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID !== 'demo-infinity') {
+    throw new Error('FATAL: Non-demo project ID detected in test environment.');
   }
 });
 ```
 
-## 3. TEST HYGIENE
-- **Teardown**: Every test file MUST have `afterEach`/`afterAll` calling `clearDatabase()`.
+## 3. PLAYWRIGHT E2E ARCHITECTURE
+
+```typescript
+// ✅ REQUIRED: playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  use: {
+    // Target the emulator/local server combo
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    trace: 'on-first-retry',
+    video: 'retain-on-failure',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } },
+  ],
+  // AUTO-START THE LOCAL SERVER AND EMULATOR
+  webServer: {
+    command: 'npm run dev:e2e',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
+});
+```
+
+## 4. TEST HYGIENE
+- **Teardown**: Every test file MUST have `afterEach`/`afterAll` calling `clearDatabase()` (`http://localhost:8080/emulator/v1/projects/demo-infinity/databases/(default)/documents`).
 - **Seeding**: Use factory functions (`createUser()`, `createOrder()`). No hardcoded IDs.
 - **Isolation**: Tests MUST NOT share state. Every test starts from a clean slate.
 - **No Skipping**: Do NOT comment out or `.skip` failing tests. Fix the code.
 
-## 4. THE ZERO-MANUAL MANDATE
+## 5. THE ZERO-MANUAL MANDATE
 - Never ask the user to "check if it works." Write a test. Run verification. Check logs.
 - If you fix a bug → write a regression test immediately.
-
-## 5. CI INTEGRATION
-- All tests run in `firebase emulators:exec` via CI.
-- Playwright config must target emulator URLs in CI (`baseURL: process.env.CI_BASE_URL`).
-- Network egress MUST be blocked in CI (mock all external APIs).
-- Code coverage threshold: **80% minimum** for new files.
 
 ## 6. PERFORMANCE BUDGETS (enforced in E2E)
 - Page load: < 2000ms

@@ -1,0 +1,44 @@
+---
+description: "MANDATORY: Continuous Learning & Optimization Protocol. Dictates how the system must monitor chats, extract 'big code wins', and ever-self-learn to permanently memorialize breakthroughs."
+globs: ["*"]
+---
+# INFINITY PROTOCOL v6.2 (Continuous Learning & Self-Optimization)
+
+<rule>
+## 1. CORE DIRECTIVE: THE COMPOUNDING INTELLIGENCE
+The Infinity Protocol is an **autonomous, ever-learning entity**. Your memory must not wipe clean between tasks. You must continuously monitor the current conversation for **"Code Triumphs"**, structural breakthroughs, and successful debugging resolutions.
+
+When a major win occurs, it is a cardinal sin to discard it. You must **harvest, formalize, and memorialize** it.
+
+## 2. BREAKTHROUGH IDENTIFICATION (The Triggers)
+You MUST halt and execute the Extraction Protocol when ANY of these triggers occur:
+1. **The Architecture Win**: A complex refactor (e.g., isolating business logic, implementing a new state management pattern) successfully compiles and passes validation.
+2. **The Bug Annihilation**: A persistent, multi-turn bug (e.g., hydration mismatch, race condition, Firebase security denial) is entirely eradicated.
+3. **The Workflow Optimization**: A new, highly efficient bash script, Git alias, or CI/CD deployment step is proven to work in the real environment.
+4. **The Aesthetic Triumph**: A new "Liquid Glass" Tailwind/Framer Motion pattern is perfected and universally praised by the user.
+5. **The User Declaration**: The user explicitly states: *"That worked," "Perfect," "Save this," or similar affirmations of success.*
+
+## 3. THE EXTRACTION PROTOCOL (Mandatory Format)
+Upon hitting a trigger, you MUST interrupt the standard flow and output the following structured block in your response:
+
+```markdown
+### [INFINITY_LEARNING_NODE_CAPTURED]
+*   **Taxonomy Tags:** [[ARCH] or [BUG] or [PERF] or [UI] or [SCRIPT]]
+*   **Context:** [1 sentence summarizing what we were doing]
+*   **The Problem:** [What was broken, missing, or inefficient?]
+*   **The Core Solution:** [The exact, isolated, functional code snippet or command. Copy-paste ready. NO fluff.]
+*   **The 'Why' (Protocol Alignment):** [Why is this the optimal Infinity Protocol v6.2 way?]
+```
+
+## 4. PERMANENT MEMORIALIZATION (Write to Disk)
+Outputting the block in chat is not enough. You MUST persist this learning to the workspace's long-term memory immediately:
+
+*   **Action A (Local Win - KI System):** Write the `[INFINITY_LEARNING_NODE_CAPTURED]` data directly into the `<appDataDir>/knowledge/` KI (Knowledge Item) system, either by updating an existing relevant KI artifact or generating a new one to ensure semantic searchability.
+*   **Action B (Global Win - Master Rule):** If the win fundamentally changes a core behavior across the ecosystem, update the relevant `.mdc` rule in the `rules/` directory.
+*   **Action C (Process Win - Workflow):** If it is a sequence of commands, generate a new markdown runbook in `.agent/workflows/`.
+
+## 5. PREDICTIVE APPLICATION (The Retrieval Loop)
+*   **READ BEFORE YOU WRITE:** At the start of every session or when facing a complex bug, you MUST cross-reference `KNOWLEDGE.md` and the `rules/` directory to see if a past iteration of yourself already solved this problem.
+*   **Never solve the same complex bug twice.** If a known bug signature appears, retrieve the memorialized solution and apply it instantly.
+*   Every session must leave the Protocol rigorously smarter than when it started.
+</rule>

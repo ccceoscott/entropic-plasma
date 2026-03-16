@@ -1,36 +1,79 @@
 ---
 alwaysApply: true
 description: BACKEND SOVEREIGNTY - Firebase Cloud Functions, Firestore, Security, Performance
-globs: **/*.ts, functions/**
+globs: **/*.ts, functions/**/*.ts, src/lib/firebase/**/*.ts
 ---
 # BACKEND SOVEREIGNTY: FIREBASE ABSOLUTISM — Infinity Protocol v6.2
 
 > **See Also**: `firebase_mastery.mdc` for implementation patterns. `secret_management_guardian.mdc` for credential rules (MANDATORY).
 
-## 1. ARCHITECTURE
-- **Platform**: Firebase Cloud Functions Gen 2 (`onCall`, `onRequest`, `onSchedule`).
+## 1. CLOUD FUNCTIONS V2 (AppCheck & Zod Validation)
+```typescript
+// ✅ REQUIRED: Gen 2 onCall function with strict boundary validation
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
+import { z } from 'zod';
+
+// 1. Zod Schema
+const PayloadSchema = z.object({
+  documentId: z.string().min(5),
+  action: z.enum(['approve', 'reject']),
+});
+
+export const processAction = onCall(
+  {
+    enforceAppCheck: true, // MANDATORY
+    consumeAppCheckToken: false,
+    region: 'us-central1',
+    cors: true,
+  },
+  async (request) => {
+    // 2. Auth Boundary
+    if (!request.auth?.uid) {
+      throw new HttpsError('unauthenticated', 'Endpoint requires authentication.');
+    }
+
+    // 3. Payload Validation
+    const parsed = PayloadSchema.safeParse(request.data);
+    if (!parsed.success) {
+      logger.warn('Boundary Validation Failed', parsed.error);
+      throw new HttpsError('invalid-argument', 'Malformed payload detected.');
+    }
+
+    try {
+      // 4. Execution Logic...
+      return { success: true, timestamp: Date.now() };
+    } catch (error) {
+      logger.error('Critical Failure:', error);
+      throw new HttpsError('internal', 'Execution failure.');
+    }
+  }
+);
+```
+
+## 2. ARCHITECTURE & SECRETS
+- **Platform**: Firebase Cloud Functions Gen 2 ONLY.
 - **Database**: Firestore (NoSQL). Use Data Connect only for SQL-specific requirements.
-- **Auth**: Firebase Auth with Custom Claims for RBAC.
-- **Secrets**: `defineSecret()` from `firebase-functions/params`. **NEVER** `.env` or `process.env` for secrets. See `secret_management_guardian.mdc`.
+- **Secrets**: Use `defineSecret()` from `firebase-functions/params`. **NEVER** use `process.env` in Cloud Functions for production secrets.
+  ```typescript
+  import { defineSecret } from 'firebase-functions/params';
+  const STRIPE_KEY = defineSecret('STRIPE_SECRET_KEY');
+  // Access via STRIPE_KEY.value() dynamically inside function handler
+  ```
 
-## 2. SECURITY — ZERO-DAY POSTURE
-- **App Check**: Enforce on ALL callable functions via `enforceAppCheck: true`.
-- **Validation**: Zod schema validation for ALL inputs — no raw `request.data` access.
-- **Auth Guard**: Verify `context.auth?.uid` before any data operation; throw `unauthenticated` otherwise.
-- **RBAC**: Verify custom claims server-side. Never trust client-side role checks.
+## 3. PERFORMANCE & CONCURRENCY
+- **Cold Starts**: Set `minInstances: 1` minimum for priority routes (auth, checkout).
+- **Concurrency**: Set `concurrency: 80` (Gen 2 default feature) for parallel request handling to save costs.
+- **Async Efficiency**: Aggressively use `Promise.all()` for independent I/O tasks.
+- **Firestore Denormalization**: Avoid complex multi-collection joins. Denormalize read-heavy views at write-time.
 
-## 3. PERFORMANCE
-- **Cold Starts**: Set `minInstances: 1` for latency-sensitive paths (checkout, auth).
-- **Concurrency**: Use `concurrency: 80` for high-throughput functions (Gen 2).
-- **Async**: Use `Promise.all()` for independent parallel operations.
-- **Firestore**: Denormalize data aggressively for read efficiency. Avoid N+1 reads.
-
-## 4. ERROR HANDLING
-- **Logging**: Structured JSON only to Cloud Logging. ZERO `console.log` in production.
-- **Client Errors**: Throw `HttpsError` with specific codes (`permission-denied`, `not-found`, `internal`). Never generic 500s.
-- **Retries**: Design idempotent functions. Use Firestore transactions for atomic state changes.
-
-## 5. COST CONTROL
-- **Reads**: Use `select()` to fetch only required fields from Firestore.
-- **Writes**: Batch writes for bulk operations (`writeBatch`).
-- **Functions**: Set `timeoutSeconds` and `memory` explicitly. No unbounded loops.
+## 4. ERROR HANDLING & BATCHING
+- **Logging**: ZERO `console.log()` usage. Use `firebase-functions/logger` exclusively.
+- **Idempotence**: Always check if a request has already been processed using a Firestore transaction before mutating.
+- **Batching Writes**:
+  ```typescript
+  const batch = db.batch();
+  batch.set(docRef1, data1);
+  batch.update(docRef2, data2);
+  await batch.commit(); // Max 500 ops
+  ```

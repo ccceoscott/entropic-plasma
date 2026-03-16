@@ -1,20 +1,81 @@
 ---
 alwaysApply: true
-description: AUTH & EMAIL PROTOCOL - Firebase Auth, SES, Security
-globs: **/*.ts, **/*.tsx
+description: AUTH & EMAIL PROTOCOL - Firebase Auth, SES, Security, Middleware
+globs: **/*.ts, **/*.tsx, middleware.ts
 ---
 # AUTH & EMAIL PROTOCOL: INFINITY PROTOCOL v6.2
 
-## 1. AUTHENTICATION (Firebase)
-- **Client**: `onAuthStateChanged` for session listening.
-- **Server**: `admin.auth().verifyIdToken()` for API routes.
-- **Middleware**: Protect private routes in `middleware.ts`.
+> **Mandate**: Absolute security boundaries. Never trust the client. Verify all tokens server-side.
 
-## 2. EMAIL (Amazon SES)
-- **Provider**: AWS SES via `@aws-sdk/client-ses`.
-- **Deliverability**: SPF, DKIM, DMARC records MUST be verified.
-- **Logging**: Log all email attempts (success/fail) to Firestore/Logging.
+## 1. NEXT.JS MIDDLEWARE (Edge-Ready Auth Guard)
+```typescript
+// middleware.ts - Functional Parity Check
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-## 3. SECURITY
-- **Passwords**: NEVER access user passwords directly.
-- **Secrets**: Use Google Secret Manager for AWS Keys.
+export async function middleware(req: NextRequest) {
+  const sessionCookie = req.cookies.get('__session')?.value;
+  const isAuthRoute = req.nextUrl.pathname.startsWith('/auth');
+  const isProtectedRoute = req.nextUrl.pathname.startsWith('/dashboard') || req.nextUrl.pathname.startsWith('/admin');
+
+  if (!sessionCookie && isProtectedRoute) {
+    return NextResponse.redirect(new URL('/auth/login', req.url));
+  }
+
+  if (sessionCookie && isAuthRoute) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/admin/:path*', '/auth/:path*'],
+};
+```
+- **Session Management**: Rely on `__session` cookie for SSR/Middleware verification with Firebase Admin.
+- **Client**: Use `onAuthStateChanged` strictly for React Context hydration, NOT as a security gate.
+
+## 2. API ROUTE VERIFICATION (Server-Side)
+```typescript
+// ✅ REQUIRED: Verify ID token in all Next.js API Routes / Server Actions
+import { adminAuth } from '@/lib/firebase-admin';
+
+export async function verifyUserBoundary(token: string) {
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    if (!decodedToken.uid) throw new Error('Invalid token structure');
+    return decodedToken;
+  } catch (error) {
+    console.error('Auth Boundary Failure:', error);
+    throw new Error('UNAUTHENTICATED');
+  }
+}
+```
+
+## 3. EMAIL (Amazon SES & Nodemailer)
+```typescript
+// ✅ REQUIRED: AWS SES v3 Implementation
+import * as aws from '@aws-sdk/client-ses';
+import nodemailer from 'nodemailer';
+
+const sesClient = new aws.SES({
+  apiVersion: '2010-12-01',
+  region: process.env.AWS_REGION || 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
+export const mailer = nodemailer.createTransport({
+  SES: { ses: sesClient, aws },
+});
+```
+- **Deliverability**: SPF, DKIM, DMARC records MUST be verified in AWS Route53 before production launch.
+- **Logging**: Log all email attempts (success/fail) to a dedicated `logs/email` Firestore collection or DataDog.
+- **HTML Templates**: Use React-Email or compile standard MJML. Never send raw untemplated text logic.
+
+## 4. SECRETS
+- **Passwords**: NEVER access user passwords directly. ALWAYS use Firebase Auth's standard flow.
+- **Keys**: Use GCP Secret Manager for AWS Keys in Cloud Functions (`defineSecret()`). Locally, use `.env.local` ONLY.

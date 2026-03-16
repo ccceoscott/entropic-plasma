@@ -1,57 +1,67 @@
 ---
 alwaysApply: true
 description: UX SOVEREIGNTY - Liquid Glass Design System, Framer Motion, Accessibility, Mobile
-globs: **/*.tsx, **/*.ts, tailwind.config.ts
+globs: **/*.tsx, **/*.ts, tailwind.config.*
 ---
 # UX SOVEREIGNTY: INFINITY PROTOCOL v6.2
 
-> Consolidates `ux_lead.mdc` + `ui_ux_mastery.mdc`. One rule, absolute authority.
+> **Mandate**: Consolidates `ux_lead.mdc` + `ui_ux_mastery.mdc`. One rule, absolute authority. All UIs must adhere to the Liquid Glass aesthetic and rigorous accessibility standards.
 
-## 1. VISUAL LANGUAGE — LIQUID GLASS (Non-Negotiable)
+## 1. LIQUID GLASS AESTHETIC (Tailwind & Framer Motion)
 ```tsx
-// ✅ The standard Liquid Glass card
-<div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-xl">
-```
-- **Glassmorphism**: `backdrop-blur-xl` + `bg-white/5` + `border-white/10`. Always.
-- **Colors**: REJECT generic Tailwind (`zinc`, `slate`, `gray` defaults). Use HSL/variable-driven palettes with deep contrast.
-- **Typography**: Inter or Geist. `tracking-tight` (`-0.02em`). No browser defaults.
-- **Bento Grid**: 12-column. Every element is a cell. No freeform layouts.
+// ✅ REQUIRED: Standard Liquid Glass Card with Framer Motion hover physics
+import { motion } from 'framer-motion';
 
-## 2. MOTION PHYSICS — FRAMER MOTION
-```tsx
-// ✅ Standard spring — feel alive, not mechanical
-<motion.div
-  initial={{ opacity: 0, y: 16 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ type: "spring", stiffness: 100, damping: 15 }}
-/>
+export const GlassCard = ({ children }: { children: React.ReactNode }) => (
+  <motion.div
+    whileHover={{ y: -4, scale: 1.01 }}
+    whileTap={{ scale: 0.98 }}
+    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl p-6"
+  >
+    {/* Subtle gradient overlay for specular highlight */}
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+    <div className="relative z-10">{children}</div>
+  </motion.div>
+);
 ```
-- **60fps mandatory**. Test on real devices, not just localhost.
-- **300ms** is the transition sweet spot. Never exceed 500ms for UI feedback.
-- **`<AnimatePresence>`** for all mount/unmount transitions. No abrupt DOM changes.
-- **Hover**: `scale-105` or glow. **Click**: `scale-95` depress. Both mandatory on interactive elements.
+
+## 2. STAGGERED LIST ANIMATIONS
+```tsx
+// ✅ REQUIRED: Use variants for staggered list rendering
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring" } }
+};
+
+// Usage: <motion.ul variants={container} initial="hidden" animate="show">
+//          <motion.li variants={item} />
+//        </motion.ul>
+```
 
 ## 3. MOBILE SOVEREIGNTY
 - **Touch targets**: Minimum 44×44px. Non-negotiable.
-- **Safe area**: Always `safe-area-inset-*` for notched devices.
+- **Safe area**: Always `safe-area-inset-*` for notched devices via Tailwind (`pt-safe`, `pb-safe`).
 - **Mobile-first**: Design for `375px` first. Scale up with `md:` / `lg:`.
 - **Gestures**: Support swipe-to-back and pull-to-refresh where applicable.
-- **Testing**: Capture UI state with `browser_snapshot` before AND after any UI mutation.
 
 ## 4. ACCESSIBILITY (WCAG AA)
 - **Contrast ratio**: ≥ 4.5:1 for body text, ≥ 3:1 for large text.
-- **Focus rings**: Visible for all keyboard-navigable elements.
-- **ARIA**: Semantic HTML + `aria-label` on all interactive elements.
-- **Reduced motion**: Wrap animations in `@media (prefers-reduced-motion: no-preference)`.
+- **Focus rings**: Visible for all keyboard-navigable elements. Use `focus-visible:ring-2 focus-visible:ring-primary/50`.
+- **ARIA**: Semantic HTML + `aria-label` on all interactive icon buttons.
+- **Reduced motion**: Honor OS settings via Tailwind `motion-reduce:` utility or Framer Motion's `useReducedMotion()`.
 
-## 5. DESIGN SYSTEM SOVEREIGNTY
-- Figma variables → Tailwind CSS custom properties only. No `style={{}}`.
-- Map: `Primary Color` → `text-primary/bg-primary`, `Corner Radius 12` → `rounded-xl`, `Auto Layout` → `flex/gap-x`.
-- Before replicating a Dribbble/Figma reference: analyze **light source**, **shadow depth**, **corner smoothing** — then replicate the *feeling*, not just metrics.
-
-## 6. ANTI-PATTERNS (Instant Reject)
-- ❌ `style={{}}` inline styles — use Tailwind classes
-- ❌ Generic color names (`gray-500`, `zinc-800`) without design token
-- ❌ `linear` easing — use `spring` physics
-- ❌ Animations > 500ms for critical path UI
-- ❌ Missing `alt` on images, missing `aria-label` on icon buttons
+## 5. DESIGN SYSTEM SOVEREIGNTY & ANTI-PATTERNS
+- ❌ `style={{}}` inline styles — use Tailwind classes exclusively.
+- ❌ Generic color names (`gray-500`) without a mapped design token variable.
+- ❌ `linear` easing — use `spring` physics to make the UI feel alive, not mechanical.
+- ❌ Animations > 500ms for critical path UI feedback.
+- Before replicating a design reference: analyze **light source**, **shadow depth**, and **corner smoothing** — replicate the *feeling*, not just metrics.

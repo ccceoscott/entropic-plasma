@@ -1,0 +1,220 @@
+---
+alwaysApply: true
+description: USER ROLE MASTERY - RBAC, Firebase custom claims, ecommerce + SaaS role taxonomy, Firestore rules, Next.js enforcement
+globs: **/*{auth,role,permission,middleware,guard,claim}*.{ts,tsx,js}, middleware.ts, firestore.rules
+---
+# USER ROLE MASTERY: INFINITY PROTOCOL v6.2
+
+> Role-Based Access Control (RBAC) governs every action in the system.
+> Firebase custom claims are the single source of truth. No exceptions.
+
+---
+
+## 1. CANONICAL ROLE TAXONOMY
+
+### General Platform Roles
+| Role | Custom Claim | Description |
+|---|---|---|
+| `superAdmin` | `{ superAdmin: true }` | Full system access; can manage all roles |
+| `admin` | `{ admin: true }` | Manage content, users, settings |
+| `moderator` | `{ moderator: true }` | Content-only admin; no user management |
+| `member` | `{ member: true }` | Authenticated standard user |
+| `guest` | *(no claim)* | Unauthenticated / public access |
+
+### Ecommerce Extension Roles
+| Role | Custom Claim | Description |
+|---|---|---|
+| `vendor` | `{ vendor: true, vendorId: "v_xxx" }` | Manages own store/products |
+| `distributor` | `{ distributor: true, distributorId: "d_xxx" }` | B2B bulk buyer / reseller |
+| `affiliate` | `{ affiliate: true, affiliateId: "a_xxx" }` | Commission-based referral partner |
+| `support` | `{ support: true }` | Read-only across orders/users; no write |
+| `fulfillment` | `{ fulfillment: true }` | Mark orders shipped/fulfilled only |
+| `customer` | `{ customer: true }` | Standard buyer account |
+
+**Rule**: Roles are NOT stored as a string field. They are individual boolean claims to support multi-role users.
+
+---
+
+## 2. FIREBASE CUSTOM CLAIMS — The Source of Truth
+
+```typescript
+// ✅ Admin SDK — server-only (Cloud Function)
+import { auth } from 'firebase-admin';
+
+// GRANT a role
+export async function grantRole(uid: string, role: string, meta?: Record<string, string>) {
+  const user = await auth().getUser(uid);
+  const existing = user.customClaims ?? {};
+  await auth().setCustomUserClaims(uid, {
+    ...existing,
+    [role]: true,
+    ...meta, // e.g. vendorId, distributorId
+  });
+}
+
+// REVOKE a role
+export async function revokeRole(uid: string, role: string) {
+  const user = await auth().getUser(uid);
+  const claims = { ...(user.customClaims ?? {}) };
+  delete claims[role];
+  await auth().setCustomUserClaims(uid, claims);
+}
+```
+
+**Critical rules:**
+- Claims are set server-side ONLY via Admin SDK — never from the client.
+- After `setCustomUserClaims`, user MUST refresh their ID token to get new claims.
+- Force token refresh: `await auth.currentUser?.getIdToken(true)`.
+- Max custom claims payload: **1000 bytes**. Keep payloads lean.
+
+---
+
+## 3. CLIENT — READING ROLES SAFELY
+
+```typescript
+// ✅ Type-safe claims hook
+export function useUserRoles() {
+  const { user } = useAuth();
+  const [claims, setClaims] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    user?.getIdTokenResult().then(({ claims }) => {
+      setClaims(claims as Record<string, boolean>);
+    });
+  }, [user]);
+
+  return {
+    isAdmin: claims.admin === true || claims.superAdmin === true,
+    isVendor: claims.vendor === true,
+    isDistributor: claims.distributor === true,
+    isAffiliate: claims.affiliate === true,
+    isFulfillment: claims.fulfillment === true,
+    isSupport: claims.support === true,
+    isCustomer: claims.customer === true,
+  };
+}
+```
+
+---
+
+## 4. NEXT.JS MIDDLEWARE ENFORCEMENT
+
+```typescript
+// middleware.ts — runs at edge before every request
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+const ROLE_ROUTES: Record<string, string[]> = {
+  '/admin':       ['admin', 'superAdmin'],
+  '/vendor':      ['vendor', 'superAdmin'],
+  '/distributor': ['distributor', 'superAdmin'],
+  '/fulfillment': ['fulfillment', 'admin', 'superAdmin'],
+  '/support':     ['support', 'admin', 'superAdmin'],
+};
+
+export async function middleware(request: NextRequest) {
+  const token = request.cookies.get('__session')?.value;
+  if (!token) return NextResponse.redirect(new URL('/login', request.url));
+
+  // Verify token server-side via Firebase Admin (callable from edge with service account)
+  const claims = await verifySessionCookie(token); // your helper
+  const path = Object.keys(ROLE_ROUTES).find(r => request.nextUrl.pathname.startsWith(r));
+
+  if (path) {
+    const allowed = ROLE_ROUTES[path];
+    const hasRole = allowed.some(role => claims?.[role] === true);
+    if (!hasRole) return NextResponse.redirect(new URL('/unauthorized', request.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/admin/:path*', '/vendor/:path*', '/distributor/:path*', '/fulfillment/:path*', '/support/:path*'],
+};
+```
+
+---
+
+## 5. FIRESTORE SECURITY RULES — Role-Gated Writes
+
+```javascript
+// firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    // Helper functions — read claims from token
+    function isAuth()        { return request.auth != null; }
+    function isSuperAdmin()  { return isAuth() && request.auth.token.superAdmin == true; }
+    function isAdmin()       { return isAuth() && (request.auth.token.admin == true || isSuperAdmin()); }
+    function isVendor()      { return isAuth() && request.auth.token.vendor == true; }
+    function isSupport()     { return isAuth() && request.auth.token.support == true; }
+    function isFulfillment() { return isAuth() && request.auth.token.fulfillment == true; }
+    function isOwner(uid)    { return isAuth() && request.auth.uid == uid; }
+
+    // Orders — customer reads own, admin reads all, fulfillment updates status only
+    match /orders/{orderId} {
+      allow read:   if isOwner(resource.data.customerId) || isAdmin() || isSupport() || isFulfillment();
+      allow create: if isAuth();
+      allow update: if isAdmin()
+        || (isFulfillment() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'metadata.updatedAt']));
+      allow delete: if false; // Soft delete only
+    }
+
+    // Products — vendor manages own, admin manages all, public reads
+    match /products/{productId} {
+      allow read:   if true;
+      allow create: if isAdmin() || (isVendor() && request.resource.data.vendorId == request.auth.uid);
+      allow update: if isAdmin() || (isVendor() && resource.data.vendorId == request.auth.uid);
+      allow delete: if false;
+    }
+
+    // Users — own profile or admin
+    match /users/{userId} {
+      allow read:   if isOwner(userId) || isAdmin() || isSupport();
+      allow write:  if isOwner(userId) || isAdmin();
+      allow delete: if false;
+    }
+  }
+}
+```
+
+---
+
+## 6. ROLE ASSIGNMENT POLICY
+
+| Action | Who Can Do It | Method |
+|---|---|---|
+| Assign `admin` | `superAdmin` only | Admin SDK Cloud Function |
+| Assign `vendor` | `admin`, `superAdmin` | Admin SDK Cloud Function |
+| Assign `affiliate` | `admin`, `superAdmin` | Admin SDK Cloud Function |
+| Assign `customer` | Automatic on registration | `onCreate` Cloud Function trigger |
+| Revoke any role | `superAdmin` only | Admin SDK Cloud Function |
+| Self-assign any role | **NEVER** | Blocked client-side + Firestore rules |
+
+**Default on registration**: All new users receive `{ customer: true }` automatically via `onCreate` trigger.
+
+```typescript
+// ✅ Automatic customer role on signup
+export const onUserCreate = onDocumentCreated('users/{uid}', async (event) => {
+  await auth().setCustomUserClaims(event.params.uid, { customer: true });
+});
+```
+
+---
+
+## 7. ECOMMERCE PERMISSION MATRIX
+
+| Action | superAdmin | admin | vendor | distributor | support | fulfillment | customer |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| View all orders | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| View own orders | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Create order | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
+| Update order status | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Manage products | ✅ | ✅ | own | ❌ | ❌ | ❌ | ❌ |
+| View user list | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Manage users | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Issue refunds | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| View analytics | ✅ | ✅ | own | own | ❌ | ❌ | ❌ |
+| Assign roles | ✅ | limited | ❌ | ❌ | ❌ | ❌ | ❌ |

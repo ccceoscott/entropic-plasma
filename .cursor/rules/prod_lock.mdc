@@ -1,24 +1,60 @@
 ---
-description: PRODUCTION LOCK - Active Firebase Project ID enforcement
-globs: **/*
+description: PRODUCTION LOCK - Active Firebase Project ID enforcement and safeguard script
+globs: **/*deploy*, scripts/safe-deploy-guard.sh, package.json
 alwaysApply: true
 ---
 # PRODUCTION LOCK: INFINITY PROTOCOL v6.2
 
-## MANDATE
-This file enforces project context isolation. The agent MUST verify the active Firebase project
-matches the project declared in `MISSION_STATE.md` before ANY destructive command.
+## 1. THE MANDATE
+This file enforces Project Context Isolation. Before ANY destructive command (`deploy`, `delete`, `drop`), the system MUST verify the active Firebase project mathematically matches the authorized production target.
 
-## ENFORCEMENT STEPS
-1. Run `firebase use` and verify the active project alias.
-2. If the active project does NOT match `MISSION_STATE.md` → **HALT. Do not proceed.**
-3. All `gcloud` and `firebase` commands MUST include explicit `--project=PROJECT_ID`.
-4. `scripts/safe-deploy-guard.sh` MUST pass before any `firebase deploy`.
+## 2. THE `safe-deploy-guard.sh` SCRIPT
+Every project MUST implement this bash script and run it as a `predeploy` hook in `firebase.json` or `package.json`.
 
-## VERIFICATION COMMAND
 ```bash
-firebase use && cat MISSION_STATE.md | grep "Project ID"
+#!/bin/bash
+# scripts/safe-deploy-guard.sh
+
+AUTHORIZED_PROJECT="ccceoscott" # Extracted from MISSION_STATE.md
+
+echo "Checking deployment locks..."
+
+# 1. Get currently active Firebase project
+ACTIVE_PROJECT=$(firebase use)
+
+# 2. Compare against authorized project
+if [[ "$ACTIVE_PROJECT" != *"$AUTHORIZED_PROJECT"* ]]; then
+  echo "❌ CRITICAL: Active Firebase project ($ACTIVE_PROJECT) does not match authorized target ($AUTHORIZED_PROJECT)"
+  echo "HALTING DEPLOYMENT to prevent cross-contamination."
+  exit 1
+fi
+
+# 3. Directory sanity check
+if [[ ! -f "firebase.json" ]]; then
+  echo "❌ CRITICAL: Not in project root. Missing firebase.json."
+  exit 1
+fi
+
+echo "✅ Deployment Locks: PASS. Target: $AUTHORIZED_PROJECT"
+exit 0
 ```
 
-> **Note**: Replace this file's project-specific instructions with your actual Project ID in each workspace.  
-> Template: add `## 🔒 Project Lock` section to `MISSION_STATE.md` with `project_id: your-firebase-project-id`.
+## 3. PACKAGE.JSON ENFORCEMENT
+Tie the lock script to standard NPM verbs to prevent accidental bypasses.
+
+```json
+{
+  "scripts": {
+    "predeploy": "bash scripts/safe-deploy-guard.sh",
+    "deploy": "firebase deploy --only hosting,functions",
+    "deploy:rules": "npm run predeploy && firebase deploy --only firestore:rules"
+  }
+}
+```
+
+## 4. AGENT VERIFICATION COMMAND
+If you are asked to deploy or execute a destructive mutation manually, you MUST run this inline verification first:
+```bash
+firebase use && head -n 10 MISSION_STATE.md | grep "Project ID"
+```
+If you detect a mismatch, HALT immediately and drop execution.
