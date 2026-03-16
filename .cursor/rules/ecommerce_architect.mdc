@@ -26,12 +26,19 @@ export const CartItemSchema = z.object({
 ## 2. THE CHECKOUT & FULFILLMENT HANDSHAKE (Security-First)
 The order lifecycle MUST follow this exact state machine to decouple financial capture from downstream side-effects (ShipStation, QuickBooks):
 
-1. **Phase 1 (Drafting/Initiator)**: Order initialized in Firestore as `'draft'` with `paymentStatus: 'unpaid'`. Secures inventory/logistics parameters *before* payment elements render. Use `createPaymentIntent` (HTTPS Callable v2).
+1. **Phase 1 (Drafting/Initiator)**: Order initialized in Firestore as `'draft'` with `paymentStatus: 'unpaid'`. 
+   - **Atomic Inventory Lock**: You MUST execute an atomic transaction to decrement `hold_stock` or increment `reserved_quantity` to prevent race-condition overselling before payment is even attempted.
 2. **Phase 2 (Payment Handshake/Executor)**: Client consumes `clientSecret` via Stripe Elements to authorize the charge.
 3. **Phase 3 (Confirmation)**: Successful client-side redirect sets order `status: 'processing'` and `paymentStatus: 'paid'`.
-4. **Phase 4 (Automation Trigger)**: A Cloud Function (`onOrderUpdated` equivalent) detects the `'draft' -> 'processing'` transition and initiates the `syncOrderToDownstreamServices` helper.
+4. **Phase 4 (Automation Trigger)**: A Cloud Function (`onOrderUpdated` equivalent) detects the `'draft' -> 'processing'` transition. 
+   - **Partial Refund Support**: State machine MUST support `paymentStatus: 'partially_refunded'` to handle split fulfillment or inventory shortages without killing the entire order object.
+5. **Phase 5 (Resolution)**: Order moved to `'completed'`.
 
-## 3. STRIPE WEBHOOK ARCHITECTURE (Next.js App Router)
+## 3. PORTAL ID & B2B VERIFICATION
+- **X-Portal-ID**: Middleware MUST verify the `X-Portal-ID` header against the `allowed_portals` array in the project config to prevent cross-tenant leakages in cloned storefronts.
+- **Dynamic CSS**: Use `PortalContext` to inject `--theme-accent` based on the verified Portal ID.
+
+## 4. STRIPE WEBHOOK ARCHITECTURE (Next.js App Router)
 ```typescript
 // app/api/webhooks/stripe/route.ts
 import { headers } from "next/headers";
@@ -73,21 +80,21 @@ export async function POST(req: Request) {
 - **Atomic Stock Deductions**: Cloud Functions MUST decrement stock using atomic transactions to prevent race conditions.
 
 ```typescript
-import * as admin from 'firebase-admin';
-
-// ✅ Atomic stock decrement
-export const decrementStock = async (productId: string, quantity: number) => {
+// ✅ Atomic stock hold (Phase 1)
+export const reserveInventory = async (productId: string, quantity: number) => {
   const db = admin.firestore();
   const productRef = db.collection('products').doc(productId);
 
   await db.runTransaction(async (t) => {
     const doc = await t.get(productRef);
     if (!doc.exists) throw new Error('PRODUCT_NOT_FOUND');
+    const data = doc.data()!;
     
-    const newStock = doc.data()!.stock - quantity;
-    if (newStock < 0) throw new Error('OUT_OF_STOCK');
+    // Check against available (stock - reserved)
+    const available = data.stock - (data.reserved || 0);
+    if (available < quantity) throw new Error('OUT_OF_STOCK');
     
-    t.update(productRef, { stock: newStock });
+    t.update(productRef, { reserved: admin.firestore.FieldValue.increment(quantity) });
   });
 };
 ```
