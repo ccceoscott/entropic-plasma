@@ -1,0 +1,47 @@
+---
+alwaysApply: true
+description: RULE CLEANUP - Automatically purge stale, renamed, or superseded rule files from all workspaces
+globs: .cursor/rules/**, **/.cursorrules
+---
+# RULE CLEANUP GUARDIAN: INFINITY PROTOCOL v6.2
+
+## THE PRIME DIRECTIVE
+When a rule is **renamed, merged, or deleted** in the hub, it MUST be removed from **every workspace**. Stale rule files are poison — they create conflicting instructions and protocol drift.
+
+## 1. SUPERSEDED RULES REGISTRY
+These files no longer exist. If found in ANY workspace, DELETE immediately:
+
+| Deleted File | Superseded By |
+|---|---|
+| `backend_governance.mdc` | `backend_sovereignty.mdc` |
+| `seo_governance.mdc` | `seo_sovereignty.mdc` |
+| `testing.mdc` | `testing_guardian.mdc` |
+| `repo_governance.mdc` | `repo_sovereignty.mdc` |
+| `ux_lead.mdc` | `ui_ux_mastery.mdc` |
+
+## 2. AUTOMATED CLEANUP — `dv fix-drift`
+The `dv fix-drift` command and `sovereign_broadcast.sh` MUST use `rsync --delete` (not bare `cp`) to sync `.cursor/rules/`:
+```bash
+# CORRECT — deletes stale files in destination
+rsync -a --delete "$MASTER_MDC/" "$repo/.cursor/rules/"
+
+# FORBIDDEN — leaves old files behind
+cp "$MASTER_MDC"/*.mdc "$repo/.cursor/rules/"
+```
+
+## 3. AGENT ENFORCEMENT
+When the agent detects a file in `.cursor/rules/` that is NOT in the current hub ruleset:
+1. Flag it: `"STALE RULE DETECTED: [filename] — not in hub"`
+2. Delete it: `rm .cursor/rules/[filename]`
+3. Log in `MISSION_STATE.md`: `## 🔄 Rule Cleanup: removed [filename]`
+
+## 4. RULE RENAMING PROTOCOL
+When renaming or merging rules:
+1. Write the new consolidated rule first
+2. Add the old filename to the **Superseded Rules Registry** above
+3. `git rm rules/old_name.mdc` from the hub
+4. Run `dv broadcast` — rsync --delete propagates the deletion everywhere
+5. Verify: `find ~/Developer -name "old_name.mdc"` should return empty
+
+## 5. LOCKSHEET INTEGRITY
+`dv locksheet` regenerates `SOVEREIGN_LOCK` after cleanup to confirm all workspace checksums match the hub exactly.
