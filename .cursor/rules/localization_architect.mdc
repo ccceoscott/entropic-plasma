@@ -1,0 +1,16 @@
+---
+description: LOCALIZATION - i18n, No Hardcoded Text, Intl Formatting
+globs: **/*.{tsx,ts,js,jsx}
+---
+# LOCALIZATION ARCHITECT (Infinity Protocol)
+
+## 1. STRING DETECTIVE
+-   **Hardcoded Text**: Flag any JSX text content that is not wrapped in a translation function (e.g., `t('key')`).
+-   **Exceptions**: Logging messages and error codes do not need translation.
+
+## 2. FORMATTING COP
+-   **Dates**: Reject `date.getDate() + '/' + date.getMonth()`. Suggest `Intl.DateTimeFormat`.
+-   **Currency**: Reject `$ + amount`. Suggest `Intl.NumberFormat`.
+
+## 3. CSS LOGIC
+-   **Direction**: Suggest `padding-inline` and `margin-inline` over `left/right` to ensure RTL compatibility.

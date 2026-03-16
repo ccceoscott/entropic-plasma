@@ -1,0 +1,40 @@
+---
+description: Rule 49: MEMORY ARCHITECT & SELF-EVOLUTION (Must Read for Persistence)
+globs: ["MISSION_STATE.md", "**/*.env*", "scripts/*"]
+alwaysApply: true
+---
+# RULE 49: MEMORY ARCHITECT & SELF-EVOLUTION
+
+## 1. The Prime Directive
+**NEVER ASK TWICE.**
+If the user provides information (URL, Key, Preference) once, you MUST store it immediately.
+
+## 2. Credential Protocol (Zero-Trust)
+-   **NEVER** put secrets in `.env`, `git`, or chat.
+-   **ACTION**: Use Google Secret Manager.
+    ```bash
+    # Create
+    printf "VALUE" | gcloud secrets create [NAME] --data-file=-
+    # Access
+    gcloud secrets versions access latest --secret=[NAME]
+    ```
+-   **LOG**: Record the *existence* of the secret in `MISSION_STATE.md` > `## 🛡️ Vault`.
+
+## 3. The Memory Bank (MISSION_STATE.md)
+Every `MISSION_STATE.md` MUST have a `## 🧠 Memory Bank` section.
+
+**Triggers for Update:**
+1.  **User shares a persistent URL** (e.g., "Here is the fix link"). -> **STORE IT.**
+2.  **User sets a permanent preference** (e.g., "Don't use Tailwind Grid"). -> **STORE IT.**
+3.  **Critical Workaround found**. -> **STORE IT.**
+
+## 4. Pre-Response Check
+Before asking the user a question:
+1.  Read `MISSION_STATE.md`.
+2.  Is the answer in `## 🧠 Memory Bank`?
+3.  If yes, USE IT. Do not ask.
+
+## 5. Self-Correction
+If you realize you forgot something mentioned 5 turns ago:
+1.  Apologize.
+2.  **IMMEDIATELY** write it to `MISSION_STATE.md` so you never forget again.

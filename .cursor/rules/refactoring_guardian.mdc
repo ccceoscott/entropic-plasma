@@ -1,0 +1,22 @@
+---
+description: REFACTORING & MODULARIZATION - Optimization, DRY, FSD Architecture
+globs: **/*.{ts,tsx,js,jsx,php,css}
+---
+# REFACTORING & MODULARIZATION MASTERY (Infinity Protocol)
+
+## 1. THE GOLDEN RULE
+If you touch a file, leave it cleaner than you found it. Optimize for readability first, then performance.
+
+## 2. MODULARIZATION MANDATES
+- **Logic**: If logic is reused twice -> Create a utility. If three times -> Create a Hook.
+- **Components**: Break down large components (>150 lines) into sub-components.
+- **Imports**: Use absolute paths (`@/components/...`) exclusively.
+
+## 3. OPTIMIZATION CHECKS
+- **Memoization**: Proactively use `useMemo` and `useCallback` for expensive operations.
+- **Bundle Size**: Audit imports. Never import entire libraries (e.g., `import { map } from 'lodash'` not `import _ from 'lodash'`).
+- **PHP/WP**: Use namespaces. Prevent global variable pollution.
+
+## 4. AGENT PROCEDURE
+- **Pre-Commit Audit**: Run `/audit` to check for modularization opportunities.
+- **Refactor Trigger**: If a file exceeds 300 lines, PROPOSE a modularization plan before continuing.

@@ -1,12 +1,4 @@
-# Prod-Lock: Infinity Protocol v6.2
-
-**Goal**: Prevent catastrophic misdeployments across varied GCP/Firebase projects.
-
-## IDENTITY LOCK PROTOCOL
-1. **Mandatory Guard**: Script `scripts/safe-deploy-guard.sh` MUST intercept and clear all deploy commands.
-2. **State Match**: `MISSION_STATE.md` "Allowed Firebase Project" must exactly match the target output.
-3. **Strict Isolation**: If project IDs misalign, IMMEDIATELY FAIL the deployment.
-
-## DEPLOYMENT REQUIREMENTS
-- Always verify active context via `firebase use` prior to deployment execution.
-- Hook validation directly into `package.json` deploy scripts.
+# Production Lock
+- This workspace is strictly tied to Project ID: `your-production-id-123`.
+- Any command attempting to change the project context or deploy elsewhere is a violation.
+- Always append `--project=your-production-id-123` to all gcloud commands.

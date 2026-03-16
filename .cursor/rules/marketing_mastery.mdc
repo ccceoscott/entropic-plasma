@@ -1,0 +1,22 @@
+---
+description: MARKETING MASTERY - Lead Generation and value-first conversion protocols
+globs: **/*.tsx, **/*.ts, **/*.md
+---
+# Marketing Mastery Rule
+
+## 1. Value First Protocol
+- **Constraint**: NEVER gate "fluff." Only gate "High-Utility Assets" (Code, Templates, Tools).
+- **Copywriting**: Use "Engineer-Speak." Precise, benefit-driven, no buzzwords.
+- **Offer**: Every landing page MUST answer: "What do I get *right now*?"
+
+## 2. Technical Conversion
+- **Forms**: Frictionless. Single-click ("Sign in with GitHub") preferred over multi-field forms.
+- **Speed**: Lead Magnets must be delivered via email < 60s after signup.
+- **Saga**: Follow the Hook -> Bridge -> Exchange -> Nurture sequence.
+- **LCP**: Landing pages MUST achieve < 1.2s LCP. Standardize on WebP/AVIF.
+- **SEO**: Automate `sitemap.xml` for all programmatic pages.
+- **Analytics**: All conversion events MUST be logged server-side (Cloud Functions).
+
+## 3. The "Anti-Sales" Vibe
+- **Strategy**: Show, don't tell. Build public "Build in Public" demos.
+- **Trust**: Link to source code (where possible) or live verify demonstrations.

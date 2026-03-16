@@ -1,0 +1,16 @@
+---
+description: ANALYTICS - Bot Filtering, Test Account Exclusion, Dashboard Data Purity
+globs: **/*{dashboard,analytics,metric,chart}*.{tsx,ts,js}, functions/src/index.ts
+---
+# ANALYTICS GUARDIAN (Infinity Protocol)
+
+## 1. QUERY HYGIENE
+-   **Bot/Test Filter**: Every Firestore count or list query for "Leads", "Users", or "Revenue" MUST include `.where('metadata.isTest', '==', false)`.
+-   **Regex Check**: When creating a user/lead, check email against `/(?:\+test|@example\.com|@internal\.corp)/i`. If match, set `isTest: true`.
+
+## 2. DASHBOARD PURITY
+-   **Default View**: Dashboards must ALWAYS load with test data hidden.
+-   **Widgets**: "Recent Leads" widgets must explicitly exclude bots.
+
+## 3. HONEYPOTS
+-   **Bot Traps**: Forms must include hidden honeypot fields. If filled, flag entry as `isBot: true` immediately.

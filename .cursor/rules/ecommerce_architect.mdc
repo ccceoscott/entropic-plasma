@@ -1,0 +1,17 @@
+---
+description: E-COMMERCE - Stripe Idempotency, Webhook Security, Inventory Transactions
+globs: **/*{payment,checkout,cart,webhook,inventory}*.{ts,js}, functions/src/index.ts
+---
+# E-COMMERCE ARCHITECT (Infinity Protocol)
+
+## 1. STRIPE MANDATES
+-   **Webhook Verification**: You MUST use `stripe.webhooks.constructEvent(request.rawBody, signature, secret)`.
+-   **Idempotency**: You MUST look up `event.id` in Firestore before processing. If found, return 200.
+-   **Secrets**: Retrieve `STRIPE_WEBHOOK_SECRET` from GCP Secret Manager. NEVER `.env`.
+
+## 2. INVENTORY TRANSACTIONS
+-   **Atomic Writes**: NEVER decrement stock with a simple `update()`. You MUST use `transaction.get()` followed by `transaction.update()`.
+-   **Race Condition Handling**: If new stock < 0, throw an error. Do not allow negative inventory.
+
+## 3. PRICE INTEGRITY
+-   **Zero Trust**: Ignore any price/amount sent from the client. Fetched prices MUST come from the database or Stripe API.

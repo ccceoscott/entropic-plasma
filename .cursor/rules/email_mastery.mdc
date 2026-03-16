@@ -1,0 +1,24 @@
+---
+description: EMAIL MASTERY - Resend, React Email, and Deliverability Best Practices
+globs: **/*.tsx, **/*.ts, functions/src/**/*.ts
+---
+# Email Mastery Rule
+
+## 1. Stack Mandate
+- **Provider**: MUST use **Resend** SDK.
+- **Templates**: MUST use **React Email**. No `handlebars` or string concatenation.
+- **Environment**: Sending logic MUST exist in **Cloud Functions** (Backend), never client-side.
+
+## 2. Deliverability Guards
+- **Domains**: Verify that the `from` address matches a verified domain in Resend dashboard.
+- **Testing**: prevent sending to real users in `emulators`. Use a `test` prefix or block external calls unless `FORCE_EMAIL=true`.
+
+## 3. Template Infinity Protocol v6.2ty
+- **Dark Mode**: Explicitly set `<Body style={{ backgroundColor: '#ffffff' }}>` to prevent Outlook/Gmail dark mode inverting colors unexpectedly.
+- **Images**: ALL images must use absolute URLs (`https://...`), never relative paths.
+
+## 4. The "Unsubscribe" Law
+- **Marketing**: If the email is strictly marketing/update, you MUST include a footer link to unsubscribe.
+- **Vibe**: Transactional emails must be minimalist; Marketing should be "person-to-person."
+- **Trust**: Avoid 0x0 tracking pixels; use transparent, server-side attribution for reputation.
+- **Transactional**: Unsubscribe links are optional for receipts/password resets, but "Manage Preferences" is recommended.

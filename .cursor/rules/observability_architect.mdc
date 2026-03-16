@@ -1,0 +1,18 @@
+---
+description: OBSERVABILITY - Structured Logging, Tracing, PII Redaction
+globs: **/*{log,logger,monitor,trace}*.{ts,js}, functions/src/**/*.ts
+---
+# OBSERVABILITY ARCHITECT (Infinity Protocol)
+
+## 1. LOGGING DISCIPLINE
+-   **No Console**: `console.log` is banned in production code. Use a structured logger (e.g., `pino` or wrapper).
+-   **JSON Only**: Logs must be machine-readable JSON objects.
+-   **Context**: Always attach `context` object to logs.
+
+## 2. TRACING
+-   **Header**: Check for `x-correlation-id` on request ingress. If missing, generate UUID.
+-   **Propagate**: Pass this ID to all FS/HTTP calls.
+
+## 3. REDACTION
+-   **Scrubber**: Any object logged must pass through `scrubPII(obj)`.
+-   **Keywords**: Scrub keys matching `password`, `token`, `key`, `secret`, `credit`, `ssn`.

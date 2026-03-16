@@ -1,0 +1,26 @@
+---
+description: REACT + VITE MASTERY - Build, Performance, and Strict Types
+globs: vite.config.ts, tsconfig.json, **/*.tsx, **/*.ts
+---
+# React + Vite Mastery Rule
+
+## 1. Build Architecture (Vite 6+)
+- **Chunking**: MUST use `manualChunks` to split `vendor-react` and `vendor-firebase` for cache optimization.
+- **Environment**: 
+  - Client vars MUST be prefixed `VITE_`.
+  - Config vars via `loadEnv`.
+  - NO strict secrets in frontend `.env` files.
+
+- **Concurrent**: Use `useTransition` and `useOptimistic` (React 19) for complex UI states.
+- **Preloading**: Use `prefetchDNS`, `preconnect`, and `preload` in the app entry point.
+- **Lazy**: Route-level code splitting via `React.lazy` and `Suspense`.
+
+## 3. Type Infinity Protocol v6.2ty
+- **Strict Mode**: `strict: true` and `noUncheckedIndexedAccess: true` are NON-NEGOTIABLE.
+- **Imports**: Use `@/` path aliases. NO relative paths deeper than one level (`../`).
+- **Type-Only**: Use `import type` for interfaces to reduce bundle weight.
+
+## 4. Anti-Patterns (Instant Reject)
+- **Monolithic Imports**: Importing entire libraries (e.g., `import * as lodash`) -> Use named imports.
+- **Inline Styles**: NO `style={{}}`. Use Tailwind classes.
+- **Any**: Usage of `any` is a compile-time error. Use `unknown` or strictly defined types.

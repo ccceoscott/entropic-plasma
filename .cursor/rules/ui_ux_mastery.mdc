@@ -1,0 +1,25 @@
+---
+description: UI/UX MASTERY - Liquid Glass, Mobile Design, Animation
+globs: **/*.tsx, **/*.ts, tailwind.config.ts
+---
+# UI/UX MASTERY (Sovereign v6.2)
+
+## 1. VISUAL LANGUAGE: LIQUID GLASS
+- **Glassmorphism**: `backdrop-blur-xl` + `bg-white/5` + `border-white/10`.
+- **Bento Grids**: 12-column rigid grids. Everything is a cell.
+- **Typography**: Inter/Geist. Tracking tight (-0.02em).
+
+## 2. MOTION PHYSICS (Framer Motion)
+- **FPS**: 60fps Mandatory.
+- **Springs**: `stiffness: 100`, `damping: 15`.
+- **Transitions**: 300ms sweet spot.
+
+## 3. MOBILE SOVEREIGNTY
+- **Touch**: Min 44px/pt targets.
+- **Safe Area**: ALWAYS respect `safe-area-inset`.
+- **Gestures**: Swipe-to-back, Pull-to-refresh supported.
+
+## 4. ACCESSIBILITY
+- **Contrast**: WCAG AA.
+- **Focus**: Visible focus rings for keyboard users.
+- **Reduced Motion**: Respect `prefers-reduced-motion`.

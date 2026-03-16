@@ -1,0 +1,29 @@
+---
+description: ERROR RESILIENCE PROTOCOL - Handling Console, Build, and Runtime Errors
+globs: **/*.ts, **/*.tsx
+---
+# ERROR RESILIENCE PROTOCOL: INFINITY PROTOCOL v6.2
+
+## 1. CONSOLE IS SACRED
+- **No Warnings**: Treat console warnings as errors. Fix them immediately.
+- **Keys**: Always provide unique `key` props in lists.
+- **Hooks**: Never suppress dependency arrays. Fix the logic.
+
+## 2. BUILD FIRST
+- **Check**: Run `tsc --noEmit` frequently.
+- **Types**: Do not use `any` or `ts-ignore`.
+
+## 3. SAFE ASYNC
+- **Pattern**:
+  ```typescript
+  try {
+    await riskyOperation();
+  } catch (error) {
+    console.error("Operation failed:", error);
+    toast.error("Something went wrong");
+    Sentry.captureException(error);
+  }
+  ```
+
+## 4. ZOD EVERYTHING
+- validate all inputs and outputs.

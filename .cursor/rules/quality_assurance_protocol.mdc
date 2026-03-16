@@ -1,0 +1,24 @@
+---
+description: QUALITY ASSURANCE PROTOCOL - Testing & QC Standards
+globs: **/*.ts, **/*.tsx, **/*.php
+---
+# QUALITY ASSURANCE PROTOCOL: INFINITY PROTOCOL v6.2
+
+## 1. THE ZERO-MANUAL MANDATE
+- **Stop**: Do not ask the user to "check if it works".
+- **Action**: Write a test, run verification script, or check logs.
+- **Regression**: If you fix a bug, write a test to ensure it never returns.
+
+## 2. CORE STANDARDS
+- **Web**: Playwright for E2E. Vitest for Logic.
+- **Mobile**: Maestro flows.
+- **WordPress**: PHPStan + Smoke Tests.
+
+## 3. BEFORE DEPLOYING
+- You MUST run the "Release Gauntlet":
+  - Linting
+  - Type Checking
+  - Build Verification
+
+## 4. ERROR HANDLING
+- If a test fails, DO NOT comment it out. Fix the code.

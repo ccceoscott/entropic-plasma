@@ -1,0 +1,25 @@
+---
+description: EFFICIENCY MASTERY - Resource Optimization for 16GB Environments
+globs: **/*
+---
+# Efficiency Mastery Rule
+
+## 1. Context Economy
+- **Constraint**: DO NOT read more than 3 files in a single turn unless absolutely critical.
+- **Constraint**: DO NOT read "lockfiles" (`package-lock.json`, `yarn.lock`) unless debugging exact dependency version mismatches.
+- **Strategy**: Use `ls` or `grep` to locate files first. Do not "browse" via `read`.
+
+## 2. Sequential Operations
+- **Trigger**: If the user asks for multi-step complex tasks (Build + Test + Deploy).
+- **Action**: Execute sequentially. Do not spawn background processes for all 3 simultaneously.
+- **Check**: Verify system load (feel) before launching heavy compiles.
+
+## 3. Terminal Discipline
+- **Output**: When running commands with long output (logs, builds), always pipe to a file or use generic status checks.
+- **Anti-Pattern**: Flooding the chat context with 500 lines of success logs.
+
+- **Mandate**: If you start a temporary process, YOU are responsible for killing it.
+
+## 5. Bundle Infinity Protocol v6.2ty
+- **Analyze**: Use `rollup-plugin-visualizer` to monitor bundle health.
+- **Budgets**: Enforce 200KB limit for initial JS. Use dynamic imports for heavy modules.

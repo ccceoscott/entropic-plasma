@@ -1,0 +1,16 @@
+---
+description: ACCESSIBILITY - WCAG 2.1 AA, Semantic HTML, ARIA, Keyboard Nav
+globs: **/*.{tsx,jsx}
+---
+# ACCESSIBILITY GUARDIAN (Infinity Protocol)
+
+## 1. SEMANTIC CHECKS
+-   **Div Buttons**: Reject any `div` or `span` with `onClick` unless it has `role="button"` AND `tabIndex="0"` AND `onKeyDown`.
+-   **Images**: Reject `<img>` without `alt` attribute.
+
+## 2. ARIA CHECKS
+-   **Icon Buttons**: Require `aria-label` or `aria-labelledby`.
+-   **Inputs**: Require `id` matching a `label`'s `htmlFor`.
+
+## 3. COLOR CHECKS
+-   **Contrast**: Warn if text colors seem low contrast (though this is hard to static check, offer warnings).

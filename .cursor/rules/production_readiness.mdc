@@ -1,0 +1,22 @@
+---
+description: PRODUCTION READINESS - Observability, Security, Performance
+globs: **/*.tsx, **/*.ts, next.config.mjs
+---
+# PRODUCTION READINESS: INFINITY PROTOCOL v6.2
+
+## 1. OBSERVABILITY (Sentry & GA4)
+- **Error Tracking**: Sentry MUST be initialized in client (`sentry.client.config.ts`), server, and edge.
+- **Analytics**: Google Analytics 4 via `@next/third-parties`.
+- **Logs**: No `console.log` in production. Use structured logging.
+
+## 2. SECURITY HEADERS (CSP)
+- **Strict CSP**: Nonce-based. No `unsafe-inline`.
+- **Headers**:
+  - `X-Content-Type-Options: nosniff`
+  - `X-Frame-Options: DENY`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+
+## 3. SEO & METADATA
+- **Metadata API**: Use `generateMetadata` exports.
+- **Sitemap**: `sitemap.ts` dynamic generation.
+- **Robots**: `robots.ts` configuration.

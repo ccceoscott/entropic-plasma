@@ -1,0 +1,24 @@
+---
+description: BACKEND SOVEREIGNTY - Firebase, Security, Performance
+globs: **/*.ts, functions/**
+---
+# BACKEND SOVEREIGNTY: FIREBASE ABSOLUTISM
+
+## 1. ARCHITECTURE
+- **Platform**: Firebase Cloud Functions (Gen 2).
+- **Database**: Firestore (NoSQL).
+- **Auth**: Firebase Auth (Custom Claims management).
+
+## 2. SECURITY "ZERO-DAY"
+- **App Check**: Enforce on ALL callable functions.
+- **Validation**: Zod schema validation for ALL inputs.
+- **Secrets**: Use `defineSecret()` / Google Secret Manager. NEVER `.env` for secrets.
+
+## 3. PERFORMANCE
+- **Cold Starts**: Use `minInstances` for critical paths.
+- **Async**: Use `Promise.all` for parallel execution.
+- **Data**: Denormalize data in Firestore for read efficiency.
+
+## 4. ERROR HANDLING
+- **Observability**: Log strictly to Cloud Logging (structured JSON).
+- **Client**: Throw `HttpsError` with specific codes (not generic 500s).

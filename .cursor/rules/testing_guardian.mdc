@@ -1,0 +1,17 @@
+---
+description: TESTING - Firebase Emulator, Data Teardown, Mocking, Hermetic Environment
+globs: **/*.{test,spec}.{ts,js,tsx}
+---
+# TESTING GUARDIAN (Infinity Protocol)
+
+## 1. EMULATOR MANDATE
+-   **Connection Check**: Before running logic, verify `process.env.FIRESTORE_EMULATOR_HOST` is set. If not, HALT.
+-   **Production Stop**: If `admin.app().options.projectId` matches the production ID, THROW FATAL ERROR.
+
+## 2. HYGIENE PROTOCOLS
+-   **Teardown**: Every test file MUST include an `afterAll` or `afterEach` block that calls a `clearDatabase()` utility.
+-   **Seeding**: Use a `seedUser()` factory pattern. Do not hardcode user IDs across files.
+
+## 3. MOCKING DISCIPLINE
+-   **Network Block**: CI environments should block egress traffic to ensure external APIs are mocked.
+-   **Stripe**: Use `jest.mock('stripe')` or wait for webhook simulation.

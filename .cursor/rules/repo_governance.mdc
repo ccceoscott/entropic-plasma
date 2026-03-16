@@ -1,0 +1,15 @@
+---
+description: REPO Sovereignty - Automated Pushes, Sync, and Backups
+globs: .git/**/*, scripts/Infinity Protocol v6.2_sync.sh
+---
+# REPO Sovereignty RULE (Infinity Protocol)
+
+## 1. SYNC MANDATE
+- Always verify the remote URL matches `Infinity Protocol` before pushing.
+- Execute `git push` after every major task completion.
+
+## 2. BACKUP ALERT
+- Identify if a project lacks a secondary backup strategy and PROPOSE one.
+
+## 3. CLEANING
+- Purge `.bak`, `tmp*`, and unused files before every sync.

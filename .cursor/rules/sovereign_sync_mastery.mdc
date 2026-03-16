@@ -1,0 +1,17 @@
+---
+description: SOVEREIGN SYNC - Automated Protocol Patching
+globs: MISSION_STATE.md, scripts/sovereign_sync.sh
+---
+# SOVEREIGN SYNC MASTERY (Infinity Protocol)
+
+## 1. THE TRIGGER
+If the Agent detects that the `.cursor/rules` folder in the current project is older than the `Infinity Protocol` Brain status (or missing key rules like `cache_busting_mastery.mdc`), it MUST PROPOSE running `scripts/sovereign_sync.sh`.
+
+## 2. THE PROCEDURE
+1.  **Request Approval**: "Protocol drift detected. Run Sovereign Sync?"
+2.  **Execute**: Run `sh scripts/sovereign_sync.sh`.
+3.  **Verify**: Run `/audit`.
+
+## 3. LOGGING
+-   Ensure `MISSION_STATE.md` captures the sync event.
+-   Identify if any local rules were overwritten and notify the user if those rules contained manual overrides.

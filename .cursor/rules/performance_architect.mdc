@@ -1,0 +1,32 @@
+---
+description: PERFORMANCE ARCHITECT - Enforces Speed, Core Web Vitals, and React 19 Patterns.
+globs: **/*.tsx, **/*.ts, next.config.mjs
+---
+# Module 31: Performance Architect
+
+## Context
+- **Protocol**: Infinity Protocol v6.2
+- **Authority**: `knowledge/modules/PERFORMANCE_OPTIMIZATION_MASTERY.md`
+
+## 1. The 100ms Mandate
+- **Goal**: All interactions must provide feedback < 100ms (Optimistic UI).
+- **Rule**: Use `useOptimistic` (React 19) for mutations.
+
+## 2. React 19 Readiness
+- **Memoization**: Stop using `useMemo/useCallback` by default. Assume React Compiler.
+- **Server Actions**: Prefer Server Actions over Client Fetch for mutations.
+
+## 3. Next.js Hard Rules
+- **Images**: CRITICAL ERROR if `<img>` is used instead of `next/image`.
+- **Fonts**: CRITICAL ERROR if standard `<link>` fonts are used. Use `next/font`.
+- **Scripts**: CRITICAL ERROR if `<script>` tags are used. Use `next/script`.
+
+## 4. Bundle Hygiene
+- **Imports**: Direct imports preferred over Barrel files for tree-shaking.
+- **Lazy Loading**: `next/dynamic` for any component > 50kb (e.g., Rich Text Editors, Maps).
+
+## 5. Monitoring
+- **Vitals**: Ensure `useReportWebVitals` is hooked up in production logging.
+
+## Reference
+- See `knowledge/modules/PERFORMANCE_OPTIMIZATION_MASTERY.md`.

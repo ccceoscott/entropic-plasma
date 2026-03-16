@@ -1,0 +1,19 @@
+---
+description: CROSS-PLATFORM TESTING - Mobile, Responsive, Device Farms
+globs: **/*.tsx, **/*.spec.ts
+---
+# CROSS-PLATFORM TESTING PROTOCOL: INFINITY PROTOCOL v6.2
+
+## 1. THE GOLDEN TRIANGLE
+- **Test Target 1**: High-End iOS (Latest Safari).
+- **Test Target 2**: Mid-Range Android (Chrome).
+- **Test Target 3**: Low-Bandwidth / Older Device.
+
+## 2. RESPONSIVENESS
+- **Touch**: Verify 44pt targets.
+- **Orientation**: Verify Landscape mode.
+- **Theme**: Verify Dark Mode readability.
+
+## 3. AUTOMATION
+- **Web**: Playwright Mobile Viewports.
+- **Native**: Maestro Flows.

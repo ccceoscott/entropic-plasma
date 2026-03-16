@@ -1,0 +1,29 @@
+---
+description: UX FEEDBACK LOOPS - Toasts, Notifications, and Real-Time Feedback Standards
+globs: **/*.tsx, **/*.ts
+---
+# Module 25: UX Feedback Loops
+
+## Context
+- **Protocol**: Infinity Protocol v6.2
+- **Authority**: `knowledge/modules/UX_FEEDBACK_LOOPS.md`
+- **Goal**: The system must always acknowledge user intent.
+
+## 1. The "Zero-Latency" Illusion
+- **Principle**: UI updates immediately; Server syncs in background.
+- **Mechanism**: **Optimistic UI** (TanStack Query / SWR).
+- **Requirement**: ALL mutations must have an optimistic update.
+
+## 2. Notification Standards
+- **Success**: `toast.success("Action Completed")` (Green/Teal).
+- **Error**: `toast.error("Action Failed")` (Red/Rose).
+- **Loading**: `toast.loading("Processing...")` OR Skeleton Screen.
+- **Library**: `sonner` is the standard for toasts.
+
+## 3. Micro-Interactions
+- **Hover**: Buttons must scale (`scale-105`) or glow on hover.
+- **Click**: Buttons must depress (`scale-95`) on click.
+- **Transition**: No abrupt DOM changes. Use `<AnimatePresence>`.
+
+## 4. Reference
+- Refer to `knowledge/modules/UX_FEEDBACK_LOOPS.md` for implementation details.

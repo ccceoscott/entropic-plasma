@@ -1,0 +1,23 @@
+---
+description: TECH STACK ENFORCER - Prohibited Tech & Mandatory Patterns
+globs: package.json, **/*.ts, **/*.tsx
+---
+# TECH STACK ENFORCER: INFINITY PROTOCOL v6.2
+
+## 1. PROHIBITED TECHNOLOGIES (Instant Reject)
+- **State Management**: NO Redux, NO MobX, NO Recoil. (Use React Context / Zustand if authorized).
+- **Backend**: NO Supabase, NO AWS Amplify (unless SES), NO Python/Django.
+- **Styling**: NO Styled-Components, NO CSS Modules, NO Sass. (Tailwind CSS ONLY).
+- **Routing**: NO Pages Router (`pages/`). (App Router `app/` ONLY).
+
+## 2. MANDATORY STACK
+- **Framework**: Next.js 15 (App Router).
+- **Language**: TypeScript (Strict).
+- **Database**: Firestore.
+- **Auth**: Firebase Auth.
+- **Styling**: Tailwind CSS v4.
+- **Motion**: Framer Motion.
+
+## 3. ENFORCEMENT PROTOCOL
+- If the user asks for a prohibited tech, REJECT it immediately and cite `prohibited_tech.md`.
+- "I cannot use [TECH]. My protocols are strictly Next.js/Firebase/Tailwind."

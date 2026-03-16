@@ -1,0 +1,19 @@
+---
+description: AUTH & EMAIL PROTOCOL - Firebase Auth, SES, Security
+globs: **/*.ts, **/*.tsx
+---
+# AUTH & EMAIL PROTOCOL: INFINITY PROTOCOL v6.2
+
+## 1. AUTHENTICATION (Firebase)
+- **Client**: `onAuthStateChanged` for session listening.
+- **Server**: `admin.auth().verifyIdToken()` for API routes.
+- **Middleware**: Protect private routes in `middleware.ts`.
+
+## 2. EMAIL (Amazon SES)
+- **Provider**: AWS SES via `@aws-sdk/client-ses`.
+- **Deliverability**: SPF, DKIM, DMARC records MUST be verified.
+- **Logging**: Log all email attempts (success/fail) to Firestore/Logging.
+
+## 3. SECURITY
+- **Passwords**: NEVER access user passwords directly.
+- **Secrets**: Use Google Secret Manager for AWS Keys.

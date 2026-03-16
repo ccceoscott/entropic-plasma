@@ -1,0 +1,32 @@
+---
+description: MOBILE MASTERY - Expo, React Native, and Mobile-First Protocols
+globs: **/*.tsx, **/*.ts, app.json, babel.config.js
+---
+# Mobile Mastery Rule
+
+## 1. Stack Infinity Protocol v6.2ty
+- **Constraint**: MUST use **Expo Router** for navigation. No `react-navigation` boilerplate.
+- **Styling**: MUST use **NativeWind** (`className`). No `StyleSheet.create`.
+- **Imports**: Use `import { View, Text, Pressable } from 'react-native'`.
+
+## 2. The "Touch" Mandate
+- **Interaction**: All pressable elements MUST have feedback.
+  - **Feedback**: Use `Pressable` with visual feedback states and Haptics (`expo-haptics`).
+- **Haptics**: Critical actions (Success, Error, Delete) MUST trigger `Haptics`.
+
+## 5. Mobile Performance
+- **Preloading**: Use `Asset.loadAsync` for critical UI assets during splash screen.
+- **Updates**: Leverage EAS Update for hotfixes to bypass app store friction.
+
+## 3. Scroll Infinity Protocol v6.2ty
+- **Lists**: NEVER use `.map()` inside a `ScrollView` for data lists.
+- **Mandate**: ALWAYS use `FlashList` (Shopify) or `FlatList` for performance.
+
+## 4. Platform Diversity
+- **Guardrails**: Handle Platform differences gracefully.
+  - Use `Platform.OS === 'ios'` or 'android' for specific tweaks.
+  - Use `KeyboardAvoidingView` with `behavior={Platform.OS === 'ios' ? 'padding' : 'height'}`.
+
+## 5. Safe Area Discipline
+- **Layout**: Never assume the screen is a rectangle.
+- **Constraint**: Wrap root screens in `SafeAreaView` or use valid safe-area insets from `react-native-safe-area-context`.

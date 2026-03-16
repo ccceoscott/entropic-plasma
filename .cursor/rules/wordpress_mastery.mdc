@@ -1,0 +1,18 @@
+---
+description: WORDPRESS SOVEREIGNTY - Headless, Security, GraphQL
+globs: **/*.php, **/*.tsx
+---
+# WORDPRESS SOVEREIGNTY: INFINITY PROTOCOL v6.2
+
+## 1. HEADLESS MANDATE
+- **Architecture**: WordPress is a CMS ONLY. The frontend MUST be Next.js.
+- **Communication**: WPGraphQL Only. REST API disabled (unless RankMath).
+
+## 2. SECURITY HARDENING
+- **XML-RPC**: Disabled (`add_filter('xmlrpc_enabled', '__return_false')`).
+- **Auth**: Application Passwords / JWT for API access.
+- **Updates**: Auto-updates enabled for minor versions.
+
+## 3. PERFORMANCE
+- **Caching**: Object Cache Pro + Redis mandatory.
+- **Queries**: Optimize WP_Query. Avoid `post__not_in` on large datasets.

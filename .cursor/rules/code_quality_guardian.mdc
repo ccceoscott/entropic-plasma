@@ -1,0 +1,23 @@
+---
+description: CODE QUALITY GUARDIAN - Strict Types, Validation, patterns
+globs: **/*.ts, **/*.tsx
+---
+# CODE QUALITY GUARDIAN: INFINITY PROTOCOL v6.2
+
+## 1. TYPE SOVEREIGNTY
+- **No `any`**: Explicitly type EVERYTHING. Use `unknown` if necessary, then narrow.
+- **Zod Validation**: specific runtime validation for all API inputs/outputs.
+- **Return Types**: Explicit return types for ALL functions.
+
+## 2. COMPONENT PURITY
+- **Server Components**: Default. Use `"use client"` only when interactive.
+- **Props**: Use `interface` over `type` for Props.
+- **Destructuring**: Destructure props for cleaner signatures.
+
+## 3. ERROR RESILIENCE
+- **Try/Catch**: Wrap all async operations.
+- **Graceful UI**: Use Error Boundaries (`error.tsx`) in Next.js App Router.
+- **Toast**: Use `sonner` or `toast` for user feedback on error.
+
+## 4. AI-SPECIFIC
+- **Context Anchoring**: Always reference `MISSION_STATE.md` logic before writing complex logic.

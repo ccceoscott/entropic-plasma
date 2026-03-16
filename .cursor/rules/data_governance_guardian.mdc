@@ -1,0 +1,16 @@
+---
+description: DATA GOVERNANCE - Trash Protocol, Soft Deletes, Dual Admin Check
+globs: **/*{service,controller,action}.{ts,js}, **/*.rules
+---
+# DATA GOVERNANCE GUARDIAN (Infinity Protocol)
+
+## 1. DELETE PROHIBITION
+The Agent is PROHIBITED from writing code that executes `delete()` or `remove()` on a database record unless it is inside a dedicated `TrashService` that implements the Dual Admin Protocol.
+
+## 2. SOFT DELETE ENFORCEMENT
+-   **Update**: Convert all `delete` operations to `update({ metadata: { isDeleted: true, deletedAt: now() } })`.
+-   **Read**: Ensure `findAll` methods implicitly filter out deleted items.
+
+## 3. FIREBASE RULES
+-   Verify `.write` rules prevent `request.auth.token.admin != true` from setting `isDeleted` to true.
+-   Strictly block `.remove` operations in security rules rules for Client SDKs.

@@ -1,0 +1,32 @@
+---
+description: CRM MASTERY - Infinity Protocol v6.2 Rolodex, Firestore Schema, and Liquid Glass UI standards.
+globs: **/*.ts, **/*.tsx, **/*.json
+---
+# Module 48: CRM Mastery (The Infinity Protocol v6.2 Rolodex)
+
+## Context
+- **Protocol**: Infinity Protocol v6.2
+- **Authority**: `knowledge/modules/CRM_MASTERY.md`
+- **Goal**: Full Data Infinity Protocol v6.2ty. No Salesforce. No HubSpot. We own the graph.
+
+## 1. The Schema (Firebase-First)
+- **Users**: Core identity (`uid`, `role`, `metadata`).
+- **Leads**: Pre-auth prospects (`email`, `source`, `status`).
+- **Activities**: Immutable event stream (`actorId`, `action`, `timestamp`).
+
+## 2. The UX (Liquid Glass)
+- **Engine**: **TanStack Table v8** (Headless).
+- **UI**: Shadcn/UI `DataTable` with "Liquid Glass" styling (blur, translucency).
+- **Features**: Faceted Filtering, Row Actions, Bulk Operations.
+
+## 3. Automation
+- **Triggers**: Cloud Functions (`onResultCreated`, `onUserCreated`).
+- **Actions**: Stripe Customer Creation, Resend Email sequences.
+
+## 4. Anti-Patterns (BANNED)
+- **No Third-Party CRMs**: Do not suggest Salesforce or HubSpot integrations.
+- **No Client-Side Filtering**: Use Firestore Indexes for generic queries.
+- **No Legacy UI**: Material UI / Bootstrap tables are PROHIBITED.
+
+## 5. Reference
+- Always refer to `knowledge/modules/CRM_MASTERY.md` for the full schema and implementation details.

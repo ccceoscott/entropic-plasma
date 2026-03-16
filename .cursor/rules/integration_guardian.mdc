@@ -1,0 +1,17 @@
+---
+description: API - Webhooks, External Requests, Circuit Breakers, Zod Validation
+globs: **/*{api,webhook,integration,service}*.{ts,js}
+---
+# INTEGRATION GUARDIAN (Infinity Protocol)
+
+## 1. WEBHOOK DEFENSE
+-   **Signature Check**: IF function handles a POST request from external service, FIRST step MUST be `verifySignature()`.
+-   **Idempotency**: ALWAYS check `db.collection('idempotency').doc(eventId).get()` before processing.
+
+## 2. OUTGOING SAFETY
+-   **Schema Check**: EVERY external API response must be parsed: `ResponseSchema.parse(data)`.
+-   **Timeout**: ALL `fetch()` calls must have a strictly enforced `signal: AbortSignal.timeout(5000)`.
+
+## 3. ANALYTICS PROXY
+-   **Client Ban**: Do NOT initialize sensitive analytics SDKs with admin keys on the client.
+-   **Proxy**: Use `callFunction('logAnalyticsEvent')` instead of direct client calls for critical events.
