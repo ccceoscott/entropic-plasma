@@ -1,7 +1,7 @@
 ---
 alwaysApply: true
 description: REPO SOVEREIGNTY - Git hygiene, sync protocol, branch governance, and automation
-globs: .git/**/*, .gitignore, scripts/*.sh
+globs: .git/**/*, .gitignore, scripts/*.sh, package.json
 ---
 # REPO SOVEREIGNTY: INFINITY PROTOCOL v6.2
 
@@ -27,9 +27,40 @@ git push origin main
 ## 3. BRANCH & CLEANLINESS GOVERNANCE
 - **Never commit**: `node_modules/`, `.env*` (except `.env.example`), `dist/`, `.next/`, `*.log`
 - **Purge before sync**: `.bak`, `tmp*`, `*.orig` files
-- **Gitignore**: Verify `.gitignore` is complete before first commit in any new workspace
+- **Gitignore Blueprint**:
+```text
+# .gitignore (Infinity Protocol v6.2 Baseline)
+node_modules/
+.next/
+dist/
+out/
+build/
+.env*
+!.env.example
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vercel
+.firebase
+firebase-debug.log
+.cursor/
+```
 
-## 4. ERROR RECOVERY
+## 4. AUTOMATED DRIFT & SECRET DEFENSE (Husky + lint-staged)
+```json
+// package.json (Pre-commit hook enforcement)
+"lint-staged": {
+  "*.{ts,tsx}": [
+    "eslint --fix",
+    "prettier --write",
+    "bash scripts/scan-secrets.sh"
+  ]
+}
+```
+
+## 5. ERROR RECOVERY
 | Symptom | Action |
 |---|---|
 | `index.lock` exists | `rm -f .git/index.lock` |
@@ -37,11 +68,11 @@ git push origin main
 | `git push --force` | ONLY if 100% certain this is the sovereign state |
 | Hung process | Kill, check `git status`, never blindly retry |
 
-## 5. BACKUP MANDATE
+## 6. BACKUP MANDATE
 - Every project MUST have at least one remote (GitHub `ccceoscott/*`).
 - For critical projects: configure secondary backup (Bitbucket, GCS bucket, or automated clone).
 
-## 6. AUTOMATION
+## 7. AUTOMATION
 - `dv broadcast` — propagate rules to all workspaces
 - `dv doctor` — workspace health check
 - `dv locksheet` — regenerate SOVEREIGN_LOCK checksums

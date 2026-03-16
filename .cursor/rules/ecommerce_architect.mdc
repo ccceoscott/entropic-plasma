@@ -12,32 +12,73 @@ globs: **/*{payment,checkout,cart,webhook,inventory,shop,order,product}*.{ts,js,
 - **No Negatives**: Final price MUST invoke `Math.max(0, total)` before PaymentIntent creation.
 - **Client Data**: Ignore ALL price/amount from client. Recalculate server-side every time.
 
-## 2. STRIPE MANDATES
 ```typescript
-// ✅ Webhook verification — FIRST line of any webhook handler
-const event = stripe.webhooks.constructEvent(
-  request.rawBody, signature, STRIPE_WEBHOOK_SECRET.value()
-);
+// ✅ Zod Server-Side Cart Validation
+import { z } from "zod";
 
-// ✅ Idempotency check — BEFORE any processing
-const processed = await db.collection('webhook_events').doc(event.id).get();
-if (processed.exists) return response.status(200).send('Already processed');
-```
-- **Secret**: `STRIPE_WEBHOOK_SECRET` via `defineSecret()`. NEVER `.env`.
-- **Double-billing**: Forbidden. Check `event.id` in Firestore before every webhook action.
-
-## 3. INVENTORY — Atomic Transactions
-```typescript
-// ✅ Atomic stock decrement
-await db.runTransaction(async (t) => {
-  const doc = await t.get(productRef);
-  const newStock = doc.data().stock - quantity;
-  if (newStock < 0) throw new Error('OUT_OF_STOCK');
-  t.update(productRef, { stock: newStock });
+export const CartItemSchema = z.object({
+  productId: z.string().min(1),
+  quantity: z.number().int().positive(),
+  // NOTE: Price is explicitly absent. The server fetches price via productId.
 });
 ```
-- **Never** use plain `update()` for stock. Always `runTransaction()`.
-- If stock < 0: throw immediately, never allow negative inventory.
+
+## 2. STRIPE WEBHOOK ARCHITECTURE (Next.js App Router)
+```typescript
+// app/api/webhooks/stripe/route.ts
+import { headers } from "next/headers";
+import { NextResponse } from "next/response";
+import Stripe from "stripe";
+import { adminDb } from "@/lib/firebase-admin";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2023-10-16" });
+
+export async function POST(req: Request) {
+  const body = await req.text();
+  const signature = headers().get("Stripe-Signature") as string;
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
+  } catch (error: any) {
+    return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
+  }
+
+  // ✅ Idempotency guard using Firebase Admin
+  const eventRef = adminDb.collection("webhook_events").doc(event.id);
+  const doc = await eventRef.get();
+  if (doc.exists) return NextResponse.json({ received: true, status: "already_processed" });
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    // Process order fulfillment...
+  }
+
+  await eventRef.set({ processedAt: new Date().toISOString(), type: event.type });
+  return NextResponse.json({ received: true });
+}
+```
+
+## 3. INVENTORY — Atomic Transactions (Cloud Functions)
+```typescript
+import * as admin from 'firebase-admin';
+
+// ✅ Atomic stock decrement
+export const decrementStock = async (productId: string, quantity: number) => {
+  const db = admin.firestore();
+  const productRef = db.collection('products').doc(productId);
+
+  await db.runTransaction(async (t) => {
+    const doc = await t.get(productRef);
+    if (!doc.exists) throw new Error('PRODUCT_NOT_FOUND');
+    
+    const newStock = doc.data()!.stock - quantity;
+    if (newStock < 0) throw new Error('OUT_OF_STOCK');
+    
+    t.update(productRef, { stock: newStock });
+  });
+};
+```
 
 ## 4. CHECKOUT UX RULES (Rule 19 Enforcement)
 - Checkout buttons MUST survive Z-index traps on mobile — no `backdrop-blur` parent clipping.

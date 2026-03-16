@@ -14,18 +14,77 @@ globs: **/*.ts, **/*.tsx, **/*.json
 - **Leads**: Pre-auth prospects (`email`, `source`, `status`).
 - **Activities**: Immutable event stream (`actorId`, `action`, `timestamp`).
 
-## 2. The UX (Liquid Glass)
-- **Engine**: **TanStack Table v8** (Headless).
-- **UI**: Shadcn/UI `DataTable` with "Liquid Glass" styling (blur, translucency).
-- **Features**: Faceted Filtering, Row Actions, Bulk Operations.
+## 2. The UX (Liquid Glass + TanStack Table v8)
+```tsx
+// ✅ Liquid Glass DataTable Architecture
+"use client";
 
-## 3. Automation
-- **Triggers**: Cloud Functions (`onResultCreated`, `onUserCreated`).
-- **Actions**: Stripe Customer Creation, Resend Email sequences.
+import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
+import { cn } from "@/lib/utils";
+
+export function CrmDataTable({ data, columns }: { data: any[], columns: any[] }) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/40 backdrop-blur-3xl overflow-hidden shadow-2xl">
+      <table className="w-full text-sm text-left">
+        <thead className="bg-white/5 border-b border-white/10 text-white/70">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th key={header.id} className="px-6 py-4 font-medium tracking-wider">
+                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody className="divide-y divide-white/5">
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id} className="hover:bg-white/[0.02] transition-colors">
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id} className="px-6 py-4 text-white/90">
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+```
+
+## 3. Automation (Event-Driven Cloud Functions)
+```typescript
+// ✅ Immutable Activity Stream Trigger
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import * as admin from "firebase-admin";
+
+export const onLeadCreated = onDocumentCreated("leads/{leadId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const lead = snapshot.data();
+
+  // 1. Log to immutable stream
+  await admin.firestore().collection("activities").add({
+    action: "LEAD_CAPTURED",
+    targetId: event.params.leadId,
+    targetType: "lead",
+    metadata: { source: lead.source, email: lead.email },
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  // 2. Trigger external hooks downstream (e.g., Stripe, Resend)
+});
+```
 
 ## 4. Anti-Patterns (BANNED)
 - **No Third-Party CRMs**: Do not suggest Salesforce or HubSpot integrations.
 - **No Client-Side Filtering**: Use Firestore Indexes for generic queries.
 - **No Legacy UI**: Material UI / Bootstrap tables are PROHIBITED.
-
-## 5. Reference
