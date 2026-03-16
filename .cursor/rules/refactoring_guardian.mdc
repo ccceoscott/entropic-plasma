@@ -14,7 +14,7 @@ If you touch a file, leave it cleaner than you found it. Optimize for readabilit
 - **Imports**: Use absolute paths (`@/components/...`) exclusively.
 
 ## 3. OPTIMIZATION CHECKS
-- **Memoization**: Proactively use `useMemo` and `useCallback` for expensive operations.
+- **Memoization**: React Compiler (React 19) handles memoization automatically. Do NOT add `useMemo`/`useCallback` by default — only for provably expensive pure computations.
 - **Bundle Size**: Audit imports. Never import entire libraries (e.g., `import { map } from 'lodash'` not `import _ from 'lodash'`).
 - **PHP/WP**: Use namespaces. Prevent global variable pollution.
 

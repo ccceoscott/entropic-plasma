@@ -11,6 +11,6 @@ alwaysApply: true
 ## EXECUTION STEPS
 1. **Forge The Brain**: Generate `KNOWLEDGE.md` to map Product Vision, User Journeys, Permissions, and Data Schemas.
 2. **Establish Trajectory**: Create/Update `MISSION_STATE.md` to track current sprint status and context.
-3. **Modular Deployment**: Ensure `ux_lead.mdc`, `backend_arch.mdc`, and `safeguard_sentinel.mdc` exist in `.cursor/rules/`.
+3. **Modular Deployment**: Ensure `ui_ux_mastery.mdc`, `backend_arch.mdc`, and `safeguard_sentinel.mdc` exist in `.cursor/rules/`.
 4. **Roadmap Initialization**: Generate `task.md` with explicit, actionable checkboxes.
 5. **Architectural Blueprint**: Execute a Deep Architectural Analysis (DAA) and output a Goal/Data/Action/Edge blueprint before active coding begins.

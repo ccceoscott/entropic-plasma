@@ -12,9 +12,12 @@ globs: vite.config.ts, tsconfig.json, **/*.tsx, **/*.ts
   - Config vars via `loadEnv`.
   - NO strict secrets in frontend `.env` files.
 
-- **Concurrent**: Use `useTransition` and `useOptimistic` (React 19) for complex UI states.
-- **Preloading**: Use `prefetchDNS`, `preconnect`, and `preload` in the app entry point.
-- **Lazy**: Route-level code splitting via `React.lazy` and `Suspense`.
+## 2. COMPONENT PATTERNS (React 19)
+- **Transitions**: `useTransition` for non-urgent state updates. `useOptimistic` for mutations.
+- **Lazy Loading**: `React.lazy` + `Suspense` for route-level code splitting.
+- **Preloading**: `prefetchDNS`, `preconnect`, and `preload` in app entry point.
+- **Memoization**: React Compiler handles this — do NOT add `useMemo`/`useCallback` by default.
+
 
 ## 3. Type Safety
 - **Strict Mode**: `strict: true` and `noUncheckedIndexedAccess: true` are NON-NEGOTIABLE.

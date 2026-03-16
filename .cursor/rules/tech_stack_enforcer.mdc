@@ -16,7 +16,7 @@ globs: package.json, **/*.ts, **/*.tsx
 - **Language**: TypeScript (Strict).
 - **Database**: Firestore.
 - **Auth**: Firebase Auth.
-- **Styling**: Tailwind CSS v4.
+- **Styling**: Tailwind CSS (v4+ where supported).
 - **Motion**: Framer Motion.
 
 ## 3. ENFORCEMENT PROTOCOL
