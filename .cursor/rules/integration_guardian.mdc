@@ -3,15 +3,47 @@ alwaysApply: true
 description: API - Webhooks, External Requests, Circuit Breakers, Zod Validation
 globs: **/*{api,webhook,integration,service}*.{ts,js}
 ---
-# INTEGRATION GUARDIAN (Infinity Protocol)
+# INTEGRATION GUARDIAN: INFINITY PROTOCOL v6.2
 
-## 1. WEBHOOK DEFENSE
--   **Signature Check**: IF function handles a POST request from external service, FIRST step MUST be `verifySignature()`.
--   **Idempotency**: ALWAYS check `db.collection('idempotency').doc(eventId).get()` before processing.
-
-## 2. OUTGOING SAFETY
+## 1. OUTGOING SAFETY (The Fetch Wrapper)
 -   **Schema Check**: EVERY external API response must be parsed: `ResponseSchema.parse(data)`.
 -   **Timeout**: ALL `fetch()` calls must have a strictly enforced `signal: AbortSignal.timeout(5000)`.
+
+```typescript
+import { z } from "zod";
+
+// ✅ The Infinity Fetch Pattern
+export async function safeFetch<T>(
+  url: string,
+  schema: z.ZodType<T>,
+  options: RequestInit = {},
+  timeoutMs = 5000
+): Promise<T> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    // Enforce Zod schema exactly
+    return schema.parse(data);
+  } finally {
+    clearTimeout(id);
+  }
+}
+```
+
+## 2. WEBHOOK DEFENSE
+-   **Signature Check**: IF function handles a POST request from external service, FIRST step MUST be `verifySignature()`.
+-   **Idempotency**: ALWAYS check `db.collection('idempotency').doc(eventId).get()` before processing to prevent duplicate webhooks triggering dual-actions.
 
 ## 3. ANALYTICS PROXY
 -   **Client Ban**: Do NOT initialize sensitive analytics SDKs with admin keys on the client.

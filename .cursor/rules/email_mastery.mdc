@@ -3,22 +3,50 @@ alwaysApply: true
 description: EMAIL MASTERY - Resend, React Email, and Deliverability Best Practices
 globs: **/*.tsx, **/*.ts, functions/src/**/*.ts
 ---
-# Email Mastery Rule
+# EMAIL MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. Stack Mandate
+## 1. STACK MANDATE
 - **Provider**: MUST use **Resend** SDK.
 - **Templates**: MUST use **React Email**. No `handlebars` or string concatenation.
 - **Environment**: Sending logic MUST exist in **Cloud Functions** (Backend), never client-side.
 
-## 2. Deliverability Guards
-- **Domains**: Verify that the `from` address matches a verified domain in Resend dashboard.
-- **Testing**: prevent sending to real users in `emulators`. Use a `test` prefix or block external calls unless `FORCE_EMAIL=true`.
+```typescript
+// ✅ Standardized Resend + React Email Template
+import { Resend } from "resend";
+import { defineSecret } from "firebase-functions/params";
+import { render } from "@react-email/render";
+import { WelcomeEmail } from "./emails/WelcomeEmail";
 
-## 3. Template Integrity
+const RESEND_API_KEY = defineSecret("RESEND_API_KEY");
+
+export const sendWelcomeEmail = async (to: string, name: string) => {
+  if (process.env.FUNCTIONS_EMULATOR === "true") {
+    console.log(`[EMULATOR] Skipped email to ${to}`);
+    return;
+  }
+
+  const resend = new Resend(RESEND_API_KEY.value());
+  const html = render(WelcomeEmail({ name }));
+
+  await resend.emails.send({
+    from: "Infinity Protocol <onboarding@yourdomain.com>",
+    to,
+    subject: "Welcome to the ecosystem",
+    html,
+  });
+};
+```
+
+## 2. DELIVERABILITY GUARDS
+- **Domains**: Verify that the `from` address matches a verified domain in Resend dashboard.
+- **Testing**: prevent sending to real users in `emulators`. Use a `test` prefix or block external calls unless `FORCE_EMAIL=true` (as shown in the snippet above).
+
+## 3. TEMPLATE INTEGRITY
 - **Dark Mode**: Explicitly set `<Body style={{ backgroundColor: '#ffffff' }}>` to prevent Outlook/Gmail dark mode inverting colors unexpectedly.
 - **Images**: ALL images must use absolute URLs (`https://...`), never relative paths.
+- **Responsive**: Use `<Container>` and `<Section>` from `@react-email/components`.
 
-## 4. The "Unsubscribe" Law
+## 4. THE "UNSUBSCRIBE" LAW
 - **Marketing**: If the email is strictly marketing/update, you MUST include a footer link to unsubscribe.
 - **Vibe**: Transactional emails must be minimalist; Marketing should be "person-to-person."
 - **Trust**: Avoid 0x0 tracking pixels; use transparent, server-side attribution for reputation.
