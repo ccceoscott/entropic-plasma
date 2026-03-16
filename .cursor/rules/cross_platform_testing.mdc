@@ -1,46 +1,73 @@
 ---
 alwaysApply: true
 description: CROSS-PLATFORM TESTING - Mobile viewports, responsive, dark mode, Playwright
-globs: **/*.tsx, **/*.spec.ts, playwright.config.ts
+globs: "**/playwright.config.ts, **/*.spec.ts, **/*.e2e.ts"
 ---
 # CROSS-PLATFORM TESTING PROTOCOL: INFINITY PROTOCOL v6.2
+
+> **VIEWPORT SOVEREIGNTY**: The application must remain uncompromised and fully functional across ALL viewports and accessibility boundaries. Broken mobile layouts are critical deployment blockers.
 
 ## 1. THE GOLDEN TRIANGLE — Required Test Targets
 | Device | Browser | Viewport | Priority |
 |---|---|---|---|
-| iPhone 15 Pro | Safari (iOS latest) | 393×852 | P0 |
+| iPhone 15 Pro | Mobile Safari | 393×852 | P0 |
 | Samsung Galaxy S23 | Chrome Android | 360×780 | P0 |
-| iPad Pro 12.9" | Safari | 1024×1366 | P1 |
-| MacBook 13" | Chrome + Safari | 1280×800 | P0 |
-| Low-bandwidth sim | Chrome (throttled 3G) | 375×667 | P1 |
+| MacBook Pro 14" | Desktop Chrome | 1512×982 | P0 |
 
-## 2. PLAYWRIGHT MOBILE CONFIGS
+## 2. PLAYWRIGHT MOBILE CONFIGURATION
+Your `playwright.config.ts` must implicitly define these exact devices.
+
 ```typescript
-// playwright.config.ts — required device matrix
+// ✅ REQUIRED PATTERN: playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+
 export default defineConfig({
   projects: [
-    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'safari-desktop',   use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-ios',       use: { ...devices['iPhone 15 Pro'] } },
-    { name: 'mobile-android',   use: { ...devices['Pixel 7'] } },
+    { name: 'desktop-chrome', use: { ...devices['Desktop Chrome'] } },
+    { name: 'desktop-safari', use: { ...devices['Desktop Safari'] } },
+    { name: 'mobile-ios',     use: { ...devices['iPhone 15 Pro'] } },
+    { name: 'mobile-android', use: { ...devices['Pixel 7'] } },
   ],
 });
 ```
 
-## 3. REQUIRED CHECKS PER VIEWPORT
-- [ ] Touch targets ≥ 44×44pt — `await expect(el).toHaveCSS('min-height', '44px')`
-- [ ] Landscape orientation renders correctly
-- [ ] Dark Mode: `page.emulateMedia({ colorScheme: 'dark' })` — verify all text legible
-- [ ] Safe area insets: no content clipped on notched devices
-- [ ] No horizontal scroll at any breakpoint
+## 3. RESPONSIVE ASSERTION DISCIPLINE
+Do NOT just test state; test *layout breakage*.
 
-## 4. NATIVE — MAESTRO FLOWS
-For React Native / Expo apps:
-```yaml
-# Maestro flow — smoke test on iOS + Android
-- launchApp
-- assertVisible: "Welcome"
-- tapOn: "Sign In"
-- assertVisible: "Dashboard"
+```typescript
+// ✅ REQUIRED PATTERN: Responsive Assertions
+import { test, expect } from '@playwright/test';
+
+test('Mobile navigation remains accessible and does not overflow', async ({ page, isMobile }) => {
+  await page.goto('/');
+
+  // 1. No horizontal scroll allowed at any viewport
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+  expect(scrollWidth).toBe(clientWidth);
+
+  if (isMobile) {
+    // 2. Mobile touch target size validation (WCAG minimum 44x44)
+    const hamburgerBtn = page.getByRole('button', { name: 'Open menu' });
+    const box = await hamburgerBtn.boundingBox();
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+  }
+});
 ```
-Run via: `maestro test flows/smoke.yaml` as part of every PR check.
+
+## 4. THEME & DARK MODE INVERSION
+Test both light and dark systems in Playwright natively.
+
+```typescript
+// ✅ REQUIRED PATTERN: Dark Mode Emulation
+test.use({ colorScheme: 'dark' });
+
+test('Elements invert correctly in dark mode', async ({ page }) => {
+  await page.goto('/dashboard');
+  
+  // Verify glassmorphism background adapted to dark theme
+  const glassPanel = page.locator('.backdrop-blur-md').first();
+  await expect(glassPanel).toHaveCSS('background-color', 'rgba(0, 0, 0, 0.4)'); // Expecting Dark Glass
+});
+```

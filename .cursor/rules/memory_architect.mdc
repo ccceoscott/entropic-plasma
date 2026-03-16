@@ -1,40 +1,51 @@
 ---
-description: Rule 49: MEMORY ARCHITECT & SELF-EVOLUTION (Must Read for Persistence)
-globs: ["MISSION_STATE.md", "**/*.env*", "scripts/*"]
 alwaysApply: true
+description: MEMORY ARCHITECT & SELF-EVOLUTION - Managing MISSION_STATE.md and Context
+globs: ["MISSION_STATE_INFINITY.md", "MISSION_STATE.md"]
 ---
-# RULE 49: MEMORY ARCHITECT & SELF-EVOLUTION
+# RULE 49: MEMORY ARCHITECT & SELF-EVOLUTION (v6.2)
 
-## 1. The Prime Directive
-**NEVER ASK TWICE.**
-If the user provides information (URL, Key, Preference) once, you MUST store it immediately.
+> **PRIME DIRECTIVE**: NEVER ASK TWICE. If the user provides information, logic constraints, or environment details, STORE IT IMMEDIATELY in `MISSION_STATE.md`.
 
-## 2. Credential Protocol (Zero-Trust)
--   **NEVER** put secrets in `.env`, `git`, or chat.
--   **ACTION**: Use Google Secret Manager.
-    ```bash
-    # Create
-    printf "VALUE" | gcloud secrets create [NAME] --data-file=-
-    # Access
-    gcloud secrets versions access latest --secret=[NAME]
-    ```
--   **LOG**: Record the *existence* of the secret in `MISSION_STATE.md` > `## 🛡️ Vault`.
+## 1. THE MEMORY BANK (`MISSION_STATE.md`)
 
-## 3. The Memory Bank (MISSION_STATE.md)
-Every `MISSION_STATE.md` MUST have a `## 🧠 Memory Bank` section.
+Every active project in the Infinity Protocol ecosystem MUST contain a `MISSION_STATE.md` at the root directory.
 
-**Triggers for Update:**
-1.  **User shares a persistent URL** (e.g., "Here is the fix link"). -> **STORE IT.**
-2.  **User sets a permanent preference** (e.g., "Don't use Tailwind Grid"). -> **STORE IT.**
-3.  **Critical Workaround found**. -> **STORE IT.**
+### ✅ REQUIRED TEMPLATE FOR MISSION_STATE.md
+When initializing a new workspace, generate this exact structure:
 
-## 4. Pre-Response Check
-Before asking the user a question:
-1.  Read `MISSION_STATE.md`.
-2.  Is the answer in `## 🧠 Memory Bank`?
-3.  If yes, USE IT. Do not ask.
+```markdown
+# MISSION_STATE: [Project Name]
+**Version**: vX.X | **Updated**: [YYYY-MM-DD]
 
-## 5. Self-Correction
-If you realize you forgot something mentioned 5 turns ago:
-1.  Apologize.
-2.  **IMMEDIATELY** write it to `MISSION_STATE.md` so you never forget again.
+## 🧠 Memory Anchor
+- **Stack**: Next.js 15 (App Router), React 19, Tailwind v4
+- **Database**: Firebase Gen 2 (Firestore)
+- **Repo**: [GitHub URL]
+
+## 🛡️ Vault (Secrets Manifest)
+*DO NOT STORE VALUES HERE. List Key Names ONLY.*
+- `NEXT_PUBLIC_FIREBASE_API_KEY`: Initialized
+- `STRIPE_SECRET_KEY`: Added to Secret Manager
+
+## 🎯 Active Goals
+1. [Goal 1 - e.g. Implement TanStack Table]
+2. [Goal 2 - e.g. Deploy to Firebase Hosting]
+
+## 🔄 Optimization History & Decisions
+- **[YYYY-MM-DD]**: Decision - Chose Resend over Sendgrid due to JSX email templates.
+- **[YYYY-MM-DD]**: Fix - Resolved ESM import error on specific NPM package via `serverComponentsExternalPackages`.
+```
+
+## 2. CONTINUOUS INGESTION TRIGGERS
+
+The agent MUST autonomously append to `MISSION_STATE.md` when:
+1. **The User shares a permanent constraint**: (e.g., "Always use `FlashList` instead of `FlatList` in this app").
+2. **A critical bug is solved**: To prevent the AI from making the same mistake 5 sessions from now.
+3. **Environment setup concludes**: Storing the ports, emulators used, or test user credentials generated.
+
+## 3. CONVERSATION ANCHORING
+
+At the start of EVERY new conversation, or when transitioning tasks, the agent MUST read `MISSION_STATE.md`.
+
+*Self-Correction Protocol*: If the agent realizes it has forgotten a prior constraint, it must instantly apologize and execute a file edit replacing/appending the lost context to `MISSION_STATE.md`.

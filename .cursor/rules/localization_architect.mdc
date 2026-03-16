@@ -1,38 +1,72 @@
 ---
 alwaysApply: true
-description: LOCALIZATION - i18n, No hardcoded text, Intl formatting, RTL support
-globs: **/*.{tsx,ts,js,jsx}
+description: LOCALIZATION - i18n, next-intl, No hardcoded text, Intl formatting, RTL support
+globs: "**/*.{tsx,ts,js,jsx}"
 ---
 # LOCALIZATION ARCHITECT: INFINITY PROTOCOL v6.2
 
-## 1. ZERO HARDCODED TEXT
-```tsx
-// ❌ REJECTED
-<h1>Welcome back, {user.name}!</h1>
+> **LOCALIZATION SOVEREIGNTY**: The system must be geographically unbound. Zero hardcoded text. Native platform formatting.
 
-// ✅ REQUIRED
-<h1>{t('dashboard.welcome', { name: user.name })}</h1>
+## 1. STRING EXTRACTION (next-intl Standard)
+- **Framework**: `next-intl` is the absolute standard for App Router localization.
+- **Rule**: NEVER hardcode English strings in JSX.
+- **Exceptions**: Dev logs, error codes, and console output.
+
+```tsx
+// ❌ REJECTED: Hardcoded English
+export default function Dashboard({ user }) {
+  return <h1>Welcome back, {user.name}!</h1>;
+}
+
+// ✅ REQUIRED: Strict next-intl usage
+import { useTranslations } from 'next-intl';
+
+export default function Dashboard({ user }) {
+  const t = useTranslations('Dashboard');
+  return <h1>{t('welcome', { name: user.name })}</h1>;
+}
 ```
-- **Exceptions**: Dev logs, error codes, and console output do NOT need translation keys.
-- **Scan**: Before any UI PR, grep for JSX string literals not wrapped in `t()`.
 
 ## 2. FORMATTING — Reject Raw JS Date/Number Math
+- **Rule**: NEVER manually concatenate currency symbols or date strings. ALWAYS use native `Intl` APIs or `next-intl` formatters.
+
 ```typescript
 // ❌ REJECTED
 const dateStr = date.getDate() + '/' + date.getMonth();
 const priceStr = '$' + amount.toFixed(2);
 
-// ✅ REQUIRED
-const dateStr = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date);
-const priceStr = new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' }).format(amount);
+// ✅ REQUIRED: Native Intl API (Server Components)
+const dateStr = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
+const priceStr = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+
+// ✅ REQUIRED: next-intl API (Client/Server Views)
+import { useFormatter } from 'next-intl';
+const format = useFormatter();
+const priceStr = format.number(amount, { style: 'currency', currency: 'USD' });
 ```
 
-## 3. RTL SUPPORT
-- **Spacing**: Use `padding-inline-start/end` and `margin-inline-start/end` — NEVER `padding-left/right`.
-- **Tailwind**: Use `ps-*` / `pe-*` / `ms-*` / `me-*` classes (logical properties).
-- **Icons**: Flip directional icons (arrows, chevrons) for RTL — use `dir="rtl"` + CSS `[dir='rtl'] .icon { transform: scaleX(-1) }`.
+## 3. RTL (RIGHT-TO-LEFT) ARCHITECTURE
+- **Spacing**: Use CSS Logical Properties ONLY (`padding-inline-start`, `margin-inline-end`).
+- **Tailwind v4**: Use logical classes (`ps-*` / `pe-*` / `ms-*` / `me-*`). NEVER use `pl-4` or `pr-4`.
+- **Directional Icons**: Manually flip directional icons when `dir="rtl"`.
 
-## 4. STRING EXTRACTION DISCIPLINE
-- All translation keys follow `namespace.component.element` format: `auth.login.submitBtn`.
-- Pluralization: Always use ICU message format: `{count, plural, one {# item} other {# items}}`.
-- Never concatenate translated strings — use interpolation: `t('greeting', { name })`.
+```tsx
+// ✅ REQUIRED: Logical Tailwind Classes for RTL Support
+<div className="flex items-center ps-4 border-s-2 border-white/20">
+  <ChevronRightIcon className="rtl:rotate-180" />
+  <span className="ms-2">{t('continue')}</span>
+</div>
+```
+
+## 4. PLURALIZATION & ICUS
+- Translation files MUST use strict ICU message syntax for plurals.
+- Never concatenate numbers before strings.
+
+```json
+// en.json
+{
+  "Cart": {
+    "items": "{count, plural, =0 {No items} one {1 item} other {# items}} in cart"
+  }
+}
+```

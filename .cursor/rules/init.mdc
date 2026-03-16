@@ -1,16 +1,74 @@
 ---
-description: [Workflow] Initialize Squad Project and Setup Milestone Planning
-globs: **/*
 alwaysApply: true
+description: APPLICATION ROOT INIT - Next.js RootLayout, Providers, and Theme Bootstrapping
+globs: "**/layout.tsx, **/App.tsx, **/_app.tsx"
 ---
+# APPLICATION ROOT INIT: INFINITY PROTOCOL v6.2
 
-# /init - Infinity Protocol v6.2 Workspace Forging
+> **THE FOUNDATION**: The application root must be strictly typed, enforce theme states early to prevent hydration flashes, and wrap the app in the required React 19 / TanStack providers.
 
-**TRIGGER**: Initialize a new environment.
+## 1. NEXT.JS (APP ROUTER) ROOT LAYOUT STANDARD
+- **Constraint**: Must enforce `suppressHydrationWarning` on `<html>` to allow theme providers to inject classes without React hydration mismatch errors.
+- **Typography**: Must inject the primary Sans font (e.g., Inter/Outfit) at the root.
 
-## EXECUTION STEPS
-1. **Forge The Brain**: Generate `KNOWLEDGE.md` to map Product Vision, User Journeys, Permissions, and Data Schemas.
-2. **Establish Trajectory**: Create/Update `MISSION_STATE.md` to track current sprint status and context.
-3. **Modular Deployment**: Ensure `ui_ux_mastery.mdc`, `backend_arch.mdc`, and `safeguard_sentinel.mdc` exist in `.cursor/rules/`.
-4. **Roadmap Initialization**: Generate `task.md` with explicit, actionable checkboxes.
-5. **Architectural Blueprint**: Execute a Deep Architectural Analysis (DAA) and output a Goal/Data/Action/Edge blueprint before active coding begins.
+```tsx
+// ✅ REQUIRED PATTERN: app/layout.tsx
+import { Inter } from 'next/font/google';
+import { Providers } from '@/components/Providers';
+import { Toaster } from 'sonner';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+
+export const metadata = {
+  title: 'Infinity Protocol Sovereign App',
+  description: 'Built on v6.2 Liquid Glass Standards.',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    // suppressHydrationWarning is MANDATORY for next-themes
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} font-sans`}>
+      <body className="antialiased bg-black text-white selection:bg-white/30">
+        <Providers>
+          {children}
+          {/* Universal Sonner Toaster at Root */}
+          <Toaster position="bottom-right" theme="dark" richColors />
+        </Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+## 2. UNIVERSAL PROVIDERS WRAPPER
+- **Constraint**: All context providers must be contained in a dedicated Client Component wrapper to keep `layout.tsx` a Server Component.
+
+```tsx
+// ✅ REQUIRED PATTERN: components/Providers.tsx
+'use client';
+
+import { ThemeProvider } from 'next-themes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  // Lazy initialize QueryClient to avoid sharing cache across requests
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000, // 1 minute
+        retry: 1,
+      },
+    },
+  }));
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        {children}
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
+```

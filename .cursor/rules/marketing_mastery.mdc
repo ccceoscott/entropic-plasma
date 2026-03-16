@@ -1,23 +1,77 @@
 ---
 alwaysApply: true
-description: MARKETING MASTERY - Lead Generation and value-first conversion protocols
-globs: **/*.tsx, **/*.ts, **/*.md
+description: MARKETING MASTERY - Lead Generation, Value-First, Programmatic SEO
+globs: "**/actions.ts, **/*.tsx, **/*.md"
 ---
-# Marketing Mastery Rule
+# MARKETING MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. Value First Protocol
-- **Constraint**: NEVER gate "fluff." Only gate "High-Utility Assets" (Code, Templates, Tools).
-- **Copywriting**: Use "Engineer-Speak." Precise, benefit-driven, no buzzwords.
-- **Offer**: Every landing page MUST answer: "What do I get *right now*?"
+> **VALUE FIRST**: Never gate "fluff." Only gate High-Utility Assets. Architect lead generation for maximum velocity and frictionless conversion.
 
-## 2. Technical Conversion
-- **Forms**: Frictionless. Single-click ("Sign in with GitHub") preferred over multi-field forms.
-- **Speed**: Lead Magnets must be delivered via email < 60s after signup.
-- **Saga**: Follow the Hook -> Bridge -> Exchange -> Nurture sequence.
-- **LCP**: Landing pages MUST achieve < 1.2s LCP. Standardize on WebP/AVIF.
-- **SEO**: Automate `sitemap.xml` for all programmatic pages.
-- **Analytics**: All conversion events MUST be logged server-side (Cloud Functions).
+## 1. HIGH-VELOCITY LEAD CAPTURE (Server Actions)
+- **Constraint**: Forms must execute in < 1.2 seconds.
+- **Pattern**: Use Next.js Server Actions with immediate UI optimistic updates to guarantee instant perceived conversion.
 
-## 3. The "Anti-Sales" Vibe
-- **Strategy**: Show, don't tell. Build public "Build in Public" demos.
-- **Trust**: Link to source code (where possible) or live verify demonstrations.
+```typescript
+// ✅ REQUIRED PATTERN: app/actions/lead-capture.ts
+'use server';
+
+import { z } from 'zod';
+import { adminDb } from '@/lib/firebase-admin';
+
+const LeadSchema = z.object({ email: z.string().email() });
+
+export async function captureLeadAction(formData: FormData) {
+  try {
+    const rawData = { email: formData.get('email') };
+    const validatedData = LeadSchema.parse(rawData);
+
+    // 1. Immutable Server-Side Write
+    await adminDb.collection('leads').add({
+      email: validatedData.email,
+      source: 'lead_magnet',
+      createdAt: new Date().toISOString(),
+    });
+
+    return { success: true, message: 'Asset sent to your inbox.' };
+  } catch (error) {
+    return { success: false, message: 'Invalid email address.' };
+  }
+}
+```
+
+## 2. THE FRICTIONLESS UI PATTERN
+- **UX**: Use a single input field. Eliminate unnecessary first/last name fields for top-of-funnel capture.
+
+```tsx
+// ✅ REQUIRED PATTERN: Liquid Glass Frictionless Form
+import { useTransition } from 'react';
+import { captureLeadAction } from '@/actions/lead-capture';
+import { toast } from 'sonner';
+
+export function LeadForm() {
+  const [isPending, startTransition] = useTransition();
+
+  const handleAction = (formData: FormData) => {
+    startTransition(async () => {
+      const result = await captureLeadAction(formData);
+      if (result.success) toast.success(result.message);
+      else toast.error(result.message);
+    });
+  };
+
+  return (
+    <form action={handleAction} className="flex gap-2 w-full max-w-sm">
+      <input 
+        type="email" 
+        name="email"
+        required 
+        placeholder="Engineer@domain.com"
+        className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white" 
+      />
+      <button disabled={isPending} className="bg-white text-black font-semibold px-4 py-2 rounded-lg">
+        {isPending ? 'Sending...' : 'Get Access'}
+      </button>
+    </form>
+  );
+}
+```
