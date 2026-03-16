@@ -1,0 +1,63 @@
+---
+alwaysApply: true
+description: FIRESTORE SCHEMA GUARDIAN - Document modeling, indexes, subcollections, cost control
+globs: **/*{firestore,db,database,schema,model,repository}*.{ts,js}, firestore.rules, firestore.indexes.json
+---
+# FIRESTORE SCHEMA GUARDIAN: INFINITY PROTOCOL v6.2
+
+> Firestore is the backbone. Schema mistakes are permanent and costly. Model once, correctly.
+
+## 1. DOCUMENT MODELING MANDATES
+```typescript
+// ✅ Canonical document shape — ALL Firestore docs following this structure
+interface FirestoreDoc {
+  // Core data fields here...
+  metadata: {
+    createdAt: Timestamp;    // ALWAYS server timestamp
+    updatedAt: Timestamp;    // ALWAYS server timestamp
+    createdBy: string;       // uid
+    isDeleted: boolean;      // Soft-delete flag (default: false)
+    version: number;         // Schema version for migrations
+  };
+}
+```
+- No arrays of objects for frequently mutated data → use subcollections.
+- Document size limit: **1MB hard cap** — never embed full content bodies inline.
+- Timestamps: ALWAYS `FieldValue.serverTimestamp()`. Never `new Date()` or `Date.now()`.
+
+## 2. COLLECTION ARCHITECTURE
+| Pattern | Use When | Avoid When |
+|---|---|---|
+| Root collection | Independent entities (users, orders) | Deeply nested relationships |
+| Subcollection | Entity has many owned children (user/orders) | Data needed across parents |
+| Denormalization | Read-heavy, write-rare data | High write frequency data |
+| `_cache/` doc | Aggregations (counts, totals) | — |
+
+## 3. QUERY & INDEX DISCIPLINE
+- Composite indexes go in `firestore.indexes.json` — NEVER created ad-hoc in console.
+- Avoid `array-contains-any` + `in` in same query (not supported).
+- Pagination: ALWAYS use `startAfter(lastDoc)` cursor — never `offset()`.
+- Default query limit: **25 docs**. Max: **500**. Never unbounded `.get()` on large collections.
+
+## 4. COST CONTROL
+```typescript
+// ✅ Aggregation via cached counter (NOT counting documents on every read)
+const cache = await db.doc('_cache/analytics').get();
+const totalUsers = cache.data()?.totalUsers ?? 0;
+
+// ❌ EXPENSIVE — reads every document to count
+const count = (await db.collection('users').get()).size;
+```
+- Count operations: use `_cache/` aggregation docs updated by Cloud Function triggers.
+- Batch writes: max **500 operations** per `writeBatch()`.
+- Firestore read budget alerts: set GCP budget alert at **$5 increments**.
+
+## 5. SECURITY RULES SOVEREIGNTY
+```javascript
+// ✅ Required pattern — server timestamp validation in rules
+allow create: if request.resource.data.metadata.createdAt == request.time
+  && request.resource.data.metadata.isDeleted == false
+  && request.auth != null;
+```
+- Rules MUST validate: data types, required fields, value ranges, and `isDeleted == false` on creates.
+- Test rules with Firebase Emulator. Never deploy untested rules to production.

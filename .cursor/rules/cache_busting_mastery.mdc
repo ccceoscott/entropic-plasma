@@ -1,17 +1,44 @@
 ---
 alwaysApply: true
-description: CACHE BUSTING MASTERY - Versioning, Headers, Service Workers
-globs: package.json, next.config.mjs, **/*.tsx
+description: CACHE BUSTING MASTERY - Versioning, headers, CDN invalidation, Firebase deploy
+globs: package.json, next.config.mjs, vite.config.ts, **/*.tsx
 ---
 # CACHE BUSTING MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. VERSIONING
-- **Manifest**: `package.json` version MUST increment on deploy.
-- **Assets**: Use `src="/img/logo.png?v=${process.env.NEXT_PUBLIC_APP_VERSION}"`.
+## 1. VERSIONING — Increment on Every Deploy
+- `package.json` `version` MUST increment before `npm run build`. Automate via `npm version patch`.
+- Expose as `NEXT_PUBLIC_APP_VERSION` / `VITE_APP_VERSION` for runtime cache-busting.
 
-## 2. HEADERS (Next.js config)
-- **HTML**: `Cache-Control: no-store, max-age=0` (Always fresh).
-- **JS/CSS**: `Cache-Control: public, max-age=31536000, immutable` (Hashed).
+```typescript
+// ✅ Asset URL with version query — prevents stale CDN cache
+<img src={`/img/logo.webp?v=${process.env.NEXT_PUBLIC_APP_VERSION}`} />
+```
 
-## 3. DEPLOY CHECK
-- **Script**: `safe-deploy-guard` MUST verify that `APP_VERSION` matches `package.json`.
+## 2. HTTP HEADERS (next.config.mjs)
+```javascript
+// ✅ Required headers configuration
+headers: async () => [
+  {
+    source: '/(.*)',
+    headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }], // HTML: always fresh
+  },
+  {
+    source: '/_next/static/(.*)',
+    headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }], // Hashed assets
+  },
+],
+```
+
+## 3. FIREBASE HOSTING HEADERS
+```json
+// firebase.json — enforce same contract at CDN layer
+"headers": [
+  { "source": "/**", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+  { "source": "/_next/static/**", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+]
+```
+
+## 4. DEPLOY GUARD
+- `safe-deploy-guard.sh` MUST verify `APP_VERSION` matches `package.json` before deploy.
+- After every `firebase deploy --only hosting`, validate new version is live: `curl -s https://[domain] | grep APP_VERSION`.
+- If version mismatch post-deploy → rollback immediately.

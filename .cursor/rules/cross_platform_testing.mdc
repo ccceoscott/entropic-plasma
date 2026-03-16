@@ -1,20 +1,46 @@
 ---
 alwaysApply: true
-description: CROSS-PLATFORM TESTING - Mobile, Responsive, Device Farms
-globs: **/*.tsx, **/*.spec.ts
+description: CROSS-PLATFORM TESTING - Mobile viewports, responsive, dark mode, Playwright
+globs: **/*.tsx, **/*.spec.ts, playwright.config.ts
 ---
 # CROSS-PLATFORM TESTING PROTOCOL: INFINITY PROTOCOL v6.2
 
-## 1. THE GOLDEN TRIANGLE
-- **Test Target 1**: High-End iOS (Latest Safari).
-- **Test Target 2**: Mid-Range Android (Chrome).
-- **Test Target 3**: Low-Bandwidth / Older Device.
+## 1. THE GOLDEN TRIANGLE — Required Test Targets
+| Device | Browser | Viewport | Priority |
+|---|---|---|---|
+| iPhone 15 Pro | Safari (iOS latest) | 393×852 | P0 |
+| Samsung Galaxy S23 | Chrome Android | 360×780 | P0 |
+| iPad Pro 12.9" | Safari | 1024×1366 | P1 |
+| MacBook 13" | Chrome + Safari | 1280×800 | P0 |
+| Low-bandwidth sim | Chrome (throttled 3G) | 375×667 | P1 |
 
-## 2. RESPONSIVENESS
-- **Touch**: Verify 44pt targets.
-- **Orientation**: Verify Landscape mode.
-- **Theme**: Verify Dark Mode readability.
+## 2. PLAYWRIGHT MOBILE CONFIGS
+```typescript
+// playwright.config.ts — required device matrix
+export default defineConfig({
+  projects: [
+    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
+    { name: 'safari-desktop',   use: { ...devices['Desktop Safari'] } },
+    { name: 'mobile-ios',       use: { ...devices['iPhone 15 Pro'] } },
+    { name: 'mobile-android',   use: { ...devices['Pixel 7'] } },
+  ],
+});
+```
 
-## 3. AUTOMATION
-- **Web**: Playwright Mobile Viewports.
-- **Native**: Maestro Flows.
+## 3. REQUIRED CHECKS PER VIEWPORT
+- [ ] Touch targets ≥ 44×44pt — `await expect(el).toHaveCSS('min-height', '44px')`
+- [ ] Landscape orientation renders correctly
+- [ ] Dark Mode: `page.emulateMedia({ colorScheme: 'dark' })` — verify all text legible
+- [ ] Safe area insets: no content clipped on notched devices
+- [ ] No horizontal scroll at any breakpoint
+
+## 4. NATIVE — MAESTRO FLOWS
+For React Native / Expo apps:
+```yaml
+# Maestro flow — smoke test on iOS + Android
+- launchApp
+- assertVisible: "Welcome"
+- tapOn: "Sign In"
+- assertVisible: "Dashboard"
+```
+Run via: `maestro test flows/smoke.yaml` as part of every PR check.

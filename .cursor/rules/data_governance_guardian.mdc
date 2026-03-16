@@ -1,17 +1,47 @@
 ---
 alwaysApply: true
-description: DATA GOVERNANCE - Trash Protocol, Soft Deletes, Dual Admin Check
-globs: **/*{service,controller,action}.{ts,js}, **/*.rules
+description: DATA GOVERNANCE - Soft deletes, GDPR, dual admin check, Firestore backup
+globs: **/*{service,controller,action,repository}.{ts,js}, **/*.rules
 ---
-# DATA GOVERNANCE GUARDIAN (Infinity Protocol)
+# DATA GOVERNANCE GUARDIAN: INFINITY PROTOCOL v6.2
 
-## 1. DELETE PROHIBITION
-The Agent is PROHIBITED from writing code that executes `delete()` or `remove()` on a database record unless it is inside a dedicated `TrashService` that implements the Dual Admin Protocol.
+## 1. DELETE PROHIBITION — No Hard Deletes
+Never write `doc.delete()` or `.remove()` on a Firestore document unless inside `TrashService`:
+```typescript
+// ❌ FORBIDDEN — permanent data loss
+await db.collection('users').doc(uid).delete();
 
-## 2. SOFT DELETE ENFORCEMENT
--   **Update**: Convert all `delete` operations to `update({ metadata: { isDeleted: true, deletedAt: now() } })`.
--   **Read**: Ensure `findAll` methods implicitly filter out deleted items.
+// ✅ REQUIRED — soft delete with audit trail
+await db.collection('users').doc(uid).update({
+  'metadata.isDeleted': true,
+  'metadata.deletedAt': FieldValue.serverTimestamp(),
+  'metadata.deletedBy': adminUid,
+});
+```
+All `findAll` / `list` queries MUST implicitly filter: `.where('metadata.isDeleted', '==', false)`.
 
-## 3. FIREBASE RULES
--   Verify `.write` rules prevent `request.auth.token.admin != true` from setting `isDeleted` to true.
--   Strictly block `.remove` operations in security rules rules for Client SDKs.
+## 2. DUAL ADMIN PROTOCOL (Hard Delete Path)
+When a record must be permanently deleted (GDPR erasure):
+1. Requires TWO admin tokens — initiating admin + confirming admin.
+2. Logged to immutable `audit_log` collection before execution.
+3. All downstream `Storage` objects (avatars, files) purged in the same transaction.
+4. GDPR deletion confirmed via email to requestor within 30 days.
+
+## 3. FIRESTORE SECURITY RULES — Delete Lockdown
+```javascript
+// ✅ Firestore rules — block client-side delete entirely
+match /users/{userId} {
+  allow delete: if false; // NEVER allow client delete
+  allow update: if request.auth.token.admin == true
+    || request.resource.data.metadata.isDeleted == resource.data.metadata.isDeleted; // Only admins can flip isDeleted
+}
+```
+
+## 4. BACKUP & PITR
+- **Point-in-Time Recovery**: Enable PITR on all Firestore databases. Retention: 7 days minimum.
+- **Export Schedule**: Daily Firestore export to GCS bucket `gs://[project]-firestore-backups/`.
+- **Verify**: Monthly restoration drill — restore to staging, confirm data integrity.
+
+## 5. SCHEMA EVOLUTION
+- Never rename an existing Firestore field directly — add new field, migrate data, deprecate old.
+- All schema changes documented in `MISSION_STATE.md` under `## Schema Migrations`.
