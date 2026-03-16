@@ -18,6 +18,8 @@ These files no longer exist. If found in ANY workspace, DELETE immediately:
 | `testing.mdc` | `testing_guardian.mdc` |
 | `repo_governance.mdc` | `repo_sovereignty.mdc` |
 | `ux_lead.mdc` | `ui_ux_mastery.mdc` |
+| `ecommerce.mdc` | `ecommerce_architect.mdc` |
+| `sovereign_sync_mastery.mdc` | `protocol_sync_mastery.mdc` |
 
 ## 2. AUTOMATED CLEANUP — `dv fix-drift`
 The `dv fix-drift` command and `sovereign_broadcast.sh` MUST use `rsync --delete` (not bare `cp`) to sync `.cursor/rules/`:

@@ -1,18 +1,55 @@
 ---
 alwaysApply: true
-description: E-COMMERCE - Stripe Idempotency, Webhook Security, Inventory Transactions
-globs: **/*{payment,checkout,cart,webhook,inventory}*.{ts,js}, functions/src/index.ts
+description: E-COMMERCE SOVEREIGNTY - Stripe, Webhooks, Inventory Transactions, Admin RBAC
+globs: **/*{payment,checkout,cart,webhook,inventory,shop,order,product}*.{ts,js,tsx}, functions/src/index.ts
 ---
-# E-COMMERCE ARCHITECT (Infinity Protocol)
+# E-COMMERCE SOVEREIGNTY: INFINITY PROTOCOL v6.2
 
-## 1. STRIPE MANDATES
--   **Webhook Verification**: You MUST use `stripe.webhooks.constructEvent(request.rawBody, signature, secret)`.
--   **Idempotency**: You MUST look up `event.id` in Firestore before processing. If found, return 200.
--   **Secrets**: Retrieve `STRIPE_WEBHOOK_SECRET` from GCP Secret Manager. NEVER `.env`.
+> Consolidates `ecommerce.mdc`. One rule, absolute authority on all commerce logic.
 
-## 2. INVENTORY TRANSACTIONS
--   **Atomic Writes**: NEVER decrement stock with a simple `update()`. You MUST use `transaction.get()` followed by `transaction.update()`.
--   **Race Condition Handling**: If new stock < 0, throw an error. Do not allow negative inventory.
+## 1. TRANSACTIONAL INTEGRITY — Zero-Trust Pricing
+- **Server-Only**: Frontend NEVER calculates final price. PaymentIntent amount = server-side DB read only.
+- **No Negatives**: Final price MUST invoke `Math.max(0, total)` before PaymentIntent creation.
+- **Client Data**: Ignore ALL price/amount from client. Recalculate server-side every time.
 
-## 3. PRICE INTEGRITY
--   **Zero Trust**: Ignore any price/amount sent from the client. Fetched prices MUST come from the database or Stripe API.
+## 2. STRIPE MANDATES
+```typescript
+// ✅ Webhook verification — FIRST line of any webhook handler
+const event = stripe.webhooks.constructEvent(
+  request.rawBody, signature, STRIPE_WEBHOOK_SECRET.value()
+);
+
+// ✅ Idempotency check — BEFORE any processing
+const processed = await db.collection('webhook_events').doc(event.id).get();
+if (processed.exists) return response.status(200).send('Already processed');
+```
+- **Secret**: `STRIPE_WEBHOOK_SECRET` via `defineSecret()`. NEVER `.env`.
+- **Double-billing**: Forbidden. Check `event.id` in Firestore before every webhook action.
+
+## 3. INVENTORY — Atomic Transactions
+```typescript
+// ✅ Atomic stock decrement
+await db.runTransaction(async (t) => {
+  const doc = await t.get(productRef);
+  const newStock = doc.data().stock - quantity;
+  if (newStock < 0) throw new Error('OUT_OF_STOCK');
+  t.update(productRef, { stock: newStock });
+});
+```
+- **Never** use plain `update()` for stock. Always `runTransaction()`.
+- If stock < 0: throw immediately, never allow negative inventory.
+
+## 4. CHECKOUT UX RULES (Rule 19 Enforcement)
+- Checkout buttons MUST survive Z-index traps on mobile — no `backdrop-blur` parent clipping.
+- Playwright E2E tests MUST use `{ force: true }` locators for checkout CTA confirmation.
+- Post-purchase flow (receipt + confirmation email) runs synchronously — assume user kills tab immediately after payment.
+
+## 5. ADMIN SOVEREIGNTY (RBAC)
+- All inventory/product/order mutations: `admin: true` custom claim verified server-side.
+- Client-side UI gating is insufficient — always back-check with Firebase Auth custom claims.
+- Order lifecycle: `Pending → Processing → Shipped → Delivered/Refunded` with Tracking ID injection.
+- Never mutate historical invoice data when updating prices — use `draft` vs `active` separation.
+
+## 6. SECURITY
+- Firestore rules MUST assert `quantity > 0` and `price >= 0` on all cart writes.
+- App Check enforced on all checkout callable functions.
