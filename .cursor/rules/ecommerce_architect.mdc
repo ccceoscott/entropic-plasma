@@ -148,3 +148,25 @@ export const getRelatedProducts = async (productId: string, limit: number = 4) =
 - Firestore rules MUST assert `quantity > 0` and `price >= 0` on all cart writes.
 - App Check enforced on all checkout callable functions.
 
+---
+
+## 12. BULK OPERATIONS SOVEREIGNTY (Transactional Batches)
+- **Batch Gating**: Any bulk mutation (Price edit, Stock reset) affecting >5 units MUST utilize `db.batch()` to ensure atomicity.
+- **Limit Enforcement**: Strictly adhere to the 500-operation Firestore limit per batch. If higher, split into `await Promise.all(batches)`.
+
+```typescript
+// ✅ Bulk Price Update Pattern
+export const updateMassPricing = async (productIds: string[], multiplier: number) => {
+  const batch = adminDb.batch();
+  for (const id of productIds.slice(0, 500)) {
+     const ref = adminDb.collection('products').doc(id);
+     batch.update(ref, { price: admin.firestore.FieldValue.increment(multiplier) });
+  }
+  await batch.commit();
+};
+```
+
+## 13. MEDIA SOVEREIGNTY (Admin-Side Automation)
+- **Atomic Transformation**: Administrative product uploads MUST trigger an `onFinalize` Cloud Storage function for automatic WebP/AVIF resizing.
+- **Metadata Extraction**: Product metadata (dimensions, color-palette) MUST be extracted and injected into the Firestore product document during the upload handshake.
+

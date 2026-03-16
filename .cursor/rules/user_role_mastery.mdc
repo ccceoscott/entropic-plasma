@@ -241,15 +241,29 @@ export const onUserCreate = onDocumentCreated('users/{uid}', async (event) => {
 
 ## 7. ECOMMERCE PERMISSION MATRIX
 
-| Action | superAdmin | admin | vendor | distributor | support | fulfillment | customer |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| View all orders | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
-| View own orders | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Create order | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
-| Update order status | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| Manage products | ✅ | ✅ | own | ❌ | ❌ | ❌ | ❌ |
-| View user list | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| Manage users | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Issue refunds | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| View analytics | ✅ | ✅ | own | own | ❌ | ❌ | ❌ |
 | Assign roles | ✅ | limited | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+---
+
+## 8. ADMINISTRATIVE AUDIT LOGGING (The Eternal Ledger)
+- **Mandatory Log**: EVERY administrative mutation (Role change, Product delete, B2B approval) MUST write a sync log to `system_audit_logs/{id}`.
+- **Context Payload**: Log must contain `actor_uid`, `action_type`, `target_uid/id`, and a `diff` of the change.
+
+```typescript
+// ✅ Audit Log Helper
+export const logAdminAction = async (actorUid: string, action: string, targetId: string, diff: any) => {
+  await adminDb.collection('system_audit_logs').add({
+    actorUid,
+    action,
+    targetId,
+    diff,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    ip_address: '[REDACTED]', // Rule 4 Compliance
+  });
+};
+```
+
+## 9. IMPERSONATION MODE (Safe Shadowing)
+- **Claim-Based Access**: Admins can assume a `target_uid` by setting a session-scoped Custom Claim.
+- **Frontend Intercept**: When `impersonating: true` exists in the claim, the UI MUST display a persistent "IMPERSONATING: [UID]" banner.
+- **Restricted Write**: Write access in Impersonation Mode is strictly `false` unless explicitly overridden (and logged) by a `superAdmin`.
