@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: Infinity Protocol v6.2 SYNC — Automated Protocol Drift Detection and Repair
 globs: MISSION_STATE.md, scripts/dv
 ---

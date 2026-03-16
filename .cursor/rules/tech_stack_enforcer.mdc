@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: TECH STACK ENFORCER - Prohibited Tech & Mandatory Patterns
 globs: package.json, **/*.ts, **/*.tsx
 ---

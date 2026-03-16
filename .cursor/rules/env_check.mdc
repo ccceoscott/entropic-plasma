@@ -1,7 +1,7 @@
 ---
 description: [Security] Environment Parity Scanner (/env-check)
 globs: **/*
-alwaysApply: false
+alwaysApply: true
 ---
 
 # /env-check - Parity Scanner

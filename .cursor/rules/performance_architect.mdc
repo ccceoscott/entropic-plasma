@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: PERFORMANCE ARCHITECT - Enforces Speed, Core Web Vitals, and React 19 Patterns.
 globs: **/*.tsx, **/*.ts, next.config.mjs
 ---

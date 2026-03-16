@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: INFINITY BOOTLOADER - Auto-Injects Sovereignty into New/Legacy Projects
 globs: package.json, README.md, MISSION_STATE.md
 ---

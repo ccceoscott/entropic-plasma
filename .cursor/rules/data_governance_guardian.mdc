@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: DATA GOVERNANCE - Trash Protocol, Soft Deletes, Dual Admin Check
 globs: **/*{service,controller,action}.{ts,js}, **/*.rules
 ---

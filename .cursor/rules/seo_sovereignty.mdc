@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: SEO SOVEREIGNTY - Metadata, Schema, Sitemaps, Core Web Vitals
 globs: **/*.tsx, **/*.ts, app/**/page.tsx, app/**/layout.tsx
 ---

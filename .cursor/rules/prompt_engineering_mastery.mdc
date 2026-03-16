@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: PROMPT ENGINEERING MASTERY - CoT, Sequencing, and Meta-Prompting
 globs: **/*.md, **/*.txt, **/*.ts
 ---

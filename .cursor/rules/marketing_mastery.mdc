@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: MARKETING MASTERY - Lead Generation and value-first conversion protocols
 globs: **/*.tsx, **/*.ts, **/*.md
 ---

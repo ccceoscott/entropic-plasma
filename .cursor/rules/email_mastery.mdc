@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: EMAIL MASTERY - Resend, React Email, and Deliverability Best Practices
 globs: **/*.tsx, **/*.ts, functions/src/**/*.ts
 ---

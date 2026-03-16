@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: GITHUB SOVEREIGNTY - Sync, Milestone Pushes, and Branch Hygiene
 globs: .git/**/*, .gitignore, scripts/*.sh
 ---

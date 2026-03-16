@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: CODE QUALITY GUARDIAN - Strict Types, Validation, patterns
 globs: **/*.ts, **/*.tsx
 ---

@@ -1,7 +1,7 @@
 ---
 description: [Workflow] Initialize Squad Project and Setup Milestone Planning
 globs: **/*
-alwaysApply: false
+alwaysApply: true
 ---
 
 # /init - Infinity Protocol v6.2 Workspace Forging

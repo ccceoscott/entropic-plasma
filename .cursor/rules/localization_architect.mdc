@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: LOCALIZATION - i18n, No Hardcoded Text, Intl Formatting
 globs: **/*.{tsx,ts,js,jsx}
 ---

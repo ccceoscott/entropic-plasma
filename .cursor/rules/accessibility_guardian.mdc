@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: ACCESSIBILITY - WCAG 2.1 AA, Semantic HTML, ARIA, Keyboard Nav
 globs: **/*.{tsx,jsx}
 ---

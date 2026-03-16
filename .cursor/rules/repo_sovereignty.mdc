@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: REPO SOVEREIGNTY - Automated Pushes, Sync, and Backups
 globs: .git/**/*, scripts/sovereign_sync.sh
 ---

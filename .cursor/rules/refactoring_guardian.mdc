@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: REFACTORING & MODULARIZATION - Optimization, DRY, FSD Architecture
 globs: **/*.{ts,tsx,js,jsx,php,css}
 ---

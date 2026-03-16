@@ -1,7 +1,7 @@
 ---
 description: [Workflow] Infinity Protocol v6.2 /audit with Identity Verification and State Sync.
 globs: **/*
-alwaysApply: false
+alwaysApply: true
 ---
 
 # /audit - Quality & Compliance Gate

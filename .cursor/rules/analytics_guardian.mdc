@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: ANALYTICS - Bot Filtering, Test Account Exclusion, Dashboard Data Purity
 globs: **/*{dashboard,analytics,metric,chart}*.{tsx,ts,js}, functions/src/index.ts
 ---

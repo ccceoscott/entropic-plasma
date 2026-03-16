@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: JACK ROBERTS MASTERY - Vibe Coding, AntiGravity Framework, and F.L.O.W
 globs: **/*.md, **/*.tsx, **/*.ts
 ---

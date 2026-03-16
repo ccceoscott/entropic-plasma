@@ -1,4 +1,5 @@
 ---
+alwaysApply: true
 description: SOVEREIGN SYNC - Automated Protocol Patching
 globs: MISSION_STATE.md, scripts/sovereign_sync.sh
 ---
