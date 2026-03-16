@@ -54,12 +54,12 @@ export function ContactPage() {
 }
 ```
 
-## 3. ASSET HYGIENE (Next.js Hard Rules)
+## 4. ASSET HYGIENE (Next.js Hard Rules)
 
 - **Images**: CRITICAL ERROR if `<img>` is used instead of `next/image`.
+- **Public Asset Strategy**: Require absolute paths (e.g., `/images/...`) for large high-fidelity images to bypass the Vite/Next transformation pipeline and reduce ARM64 build deadlock risks.
 - **Fonts**: CRITICAL ERROR if standard `<link>` fonts are used. Use `next/font`.
 - **Scripts**: CRITICAL ERROR if `<script>` tags are used. Use `next/script`.
-
 ```tsx
 // ✅ REQUIRED: Third-party Script Loading
 import Script from 'next/script';
@@ -84,5 +84,48 @@ export function Analytics() {
 - **Imports**: Direct imports preferred over Barrel files for tree-shaking (e.g., `import { X } from 'lucide-react'` works because Next.js has `optimizePackageImports`).
 - **React Compiler**: Stop using manual `useMemo`/`useCallback` unless strictly profiling a known bottleneck. Let the React 19 Compiler handle memoization.
 
-## 5. MONITORING
+## 5. BUILD & MEMORY STABILITY (ARM64 & CI/CD)
+- **Node v22 (LTS) Mandate**: Enforce Node v22 LTS for production builds to prevent ARM64 worker thread paralysis during Rollup PostCSS/Tailwind pipelines.
+- **Memory Scaling**: Enforce `NODE_OPTIONS=--max-old-space-size=8192` for large e-commerce builds to prevent OOM errors during static generation.
+- **Production Console Hygiene**: Mandate suppression of non-critical console logs in production (via `next.config.mjs` compiler options or terser).
+
+## 6. MONITORING
 - **Vitals**: Use `useReportWebVitals` to pipe real-world LCP/CLS/INP metrics to Google Analytics or Sentry.
+
+## Implementation Architecture: Analytics Proxy & Web Vitals Injection
+
+To eliminate client-side heavy lifting and key exposure, pipe all Next.js Core Web Vitals directly to an internal server/function proxy.
+
+```tsx
+// app/components/WebVitalsReporter.tsx
+'use client';
+
+import { useReportWebVitals } from 'next/web-vitals';
+import { useEffect } from 'react';
+
+export function WebVitalsReporter() {
+  useReportWebVitals((metric) => {
+    // Filter noise: Only log core rendering bottlenecks in production
+    if (process.env.NODE_ENV !== 'production') return;
+
+    const body = JSON.stringify(metric);
+
+    // ✅ PROXY EXFILTRATION: Do not load Google/Datadog SDK client-side here.
+    // Instead, use `navigator.sendBeacon` for non-blocking payload delivery.
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/analytics/vitals', body);
+    } else {
+      fetch('/api/analytics/vitals', {
+        body,
+        method: 'POST',
+        keepalive: true, // Guarantees execution even if user navigates away
+      });
+    }
+  });
+
+  return null; // Headless component
+}
+
+// Usage in app/layout.tsx:
+// <body> <WebVitalsReporter /> {children} </body>
+```

@@ -19,6 +19,24 @@ globs: package.json, README.md, MISSION_STATE.md
     ```
 4.  **CREATE** a `MISSION_STATE.md` if one does not exist (using the Template).
 
+## 2. FUNCTIONAL BOOTLOADER SCRIPT
+**Enforce via package.json `prebuild` hook**:
+```javascript
+// scripts/enforce-infinity.js
+const fs = require('fs');
+const path = require('path');
+
+const rulesDir = path.join(process.cwd(), '.cursor', 'rules');
+const stateFile = path.join(process.cwd(), 'MISSION_STATE.md');
+
+if (!fs.existsSync(rulesDir) || !fs.existsSync(stateFile)) {
+  console.error('[FATAL] Infinity Protocol v6.2 Not Detected!');
+  console.error('Run: dv upgrade && dv broadcast');
+  process.exit(1);
+}
+console.log('[OK] Infinity Protocol Confirmed.');
+```
+
 ## 2. LEGACY RETROFITTING
 **IF** the project has a `package.json` but relies on prohibited tech (Redux, Pages Router):
 1.  **FLAG** it immediately.

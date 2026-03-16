@@ -111,6 +111,23 @@ export default function robots(): MetadataRoute.Robots {
 - Use `schema-dts` for all structured data. No raw JSON-LD strings.
 - Required schemas: `Organization` (root layout), `Product` (commerce), `Article` (blog), `BreadcrumbList` (navigation).
 
+```tsx
+// ✅ REQUIRED: Type-Safe JSON-LD Component (components/seo/JsonLd.tsx)
+import { Thing, WithContext } from 'schema-dts';
+
+export function JsonLd<T extends Thing>({ schema }: { schema: WithContext<T> }) {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+// Usage in page.tsx:
+// <JsonLd<Product> schema={{ '@context': 'https://schema.org', '@type': 'Product', name: '...' }} />
+```
+
 ## 5. IMAGE SEO & VITAL METRICS
 - ALL `<img>` → `next/image` with `alt`, `width`, `height`.
 - WebP/AVIF format mandatory.

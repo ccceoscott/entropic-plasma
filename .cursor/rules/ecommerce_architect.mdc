@@ -1,11 +1,11 @@
 ---
 alwaysApply: true
-description: E-COMMERCE SOVEREIGNTY - Stripe, Webhooks, Inventory Transactions, Admin RBAC
+description: E-COMMERCE SOVEREIGNTY - Shopify-Grade Architecture, Stripe Choreography, B2B Tiers, Component Chunking
 globs: **/*{payment,checkout,cart,webhook,inventory,shop,order,product}*.{ts,js,tsx}, functions/src/index.ts
 ---
-# E-COMMERCE SOVEREIGNTY: INFINITY PROTOCOL v6.2
+# E-COMMERCE SOVEREIGNTY: INFINITY PROTOCOL v6.2 (Shopify-Grade)
 
-> Consolidates `ecommerce.mdc`. One rule, absolute authority on all commerce logic.
+> Consolidates `ecommerce_architect.mdc`. One rule, absolute authority on all commerce logic. Incorporates all EPIHAB Platinum wins for headless architecture.
 
 ## 1. TRANSACTIONAL INTEGRITY — Zero-Trust Pricing
 - **Server-Only**: Frontend NEVER calculates final price. PaymentIntent amount = server-side DB read only.
@@ -23,7 +23,15 @@ export const CartItemSchema = z.object({
 });
 ```
 
-## 2. STRIPE WEBHOOK ARCHITECTURE (Next.js App Router)
+## 2. THE CHECKOUT & FULFILLMENT HANDSHAKE (Security-First)
+The order lifecycle MUST follow this exact state machine to decouple financial capture from downstream side-effects (ShipStation, QuickBooks):
+
+1. **Phase 1 (Drafting/Initiator)**: Order initialized in Firestore as `'draft'` with `paymentStatus: 'unpaid'`. Secures inventory/logistics parameters *before* payment elements render. Use `createPaymentIntent` (HTTPS Callable v2).
+2. **Phase 2 (Payment Handshake/Executor)**: Client consumes `clientSecret` via Stripe Elements to authorize the charge.
+3. **Phase 3 (Confirmation)**: Successful client-side redirect sets order `status: 'processing'` and `paymentStatus: 'paid'`.
+4. **Phase 4 (Automation Trigger)**: A Cloud Function (`onOrderUpdated` equivalent) detects the `'draft' -> 'processing'` transition and initiates the `syncOrderToDownstreamServices` helper.
+
+## 3. STRIPE WEBHOOK ARCHITECTURE (Next.js App Router)
 ```typescript
 // app/api/webhooks/stripe/route.ts
 import { headers } from "next/headers";
@@ -51,7 +59,7 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    // Process order fulfillment...
+    // Process order fulfillment OR rely on Phase 4 (Draft -> Processing) Trigger.
   }
 
   await eventRef.set({ processedAt: new Date().toISOString(), type: event.type });
@@ -59,7 +67,11 @@ export async function POST(req: Request) {
 }
 ```
 
-## 3. INVENTORY — Atomic Transactions (Cloud Functions)
+## 4. INVENTORY & CART ITEM IDENTITY — Atomic Transactions
+- **Composite Cart IDs**: For complex products (e.g., configurations, options), cart item IDs MUST be generated as a sorted, concatenated string of the `productId` and serialized `options`. 
+  - *Pattern*: `${product.id}-${optionsString}` (e.g., `mug01-color:red|size:L`). This ensures distinct line items.
+- **Atomic Stock Deductions**: Cloud Functions MUST decrement stock using atomic transactions to prevent race conditions.
+
 ```typescript
 import * as admin from 'firebase-admin';
 
@@ -80,17 +92,24 @@ export const decrementStock = async (productId: string, quantity: number) => {
 };
 ```
 
-## 4. CHECKOUT UX RULES (Rule 19 Enforcement)
+## 5. B2B / ADMIN SOVEREIGNTY (RBAC) & STOREFRONT CLONING
+- **Multi-Tiered Pricing**: Implement role verification (e.g., `wholesale_approved`) via `useAuthStore` combined with server-side Custom Claims validation to unlock trade discounts (e.g., 40% off).
+- **Storefront Portals**: Sub-brands or B2B partners access specific UI themes via URL slugs. Inject `PortalContext.tsx` to apply specific CSS variables (`--portal-primary`) globally for Liquid Glass UI alterations.
+- All inventory/product/order mutations: `admin: true` custom claim verified server-side.
+- Client-side UI gating is insufficient — always back-check with Firebase Auth custom claims.
+
+## 6. PERFORMANCE, BUILD & E2E PROTOCOLS (ARM64 Safety)
+- **Node v22 (LTS) Mandate**: Production builds MUST run on Node 22 to prevent memory deadlocks during PostCSS transformation on large Tailwind ecosystems.
+- **Rollup Chunking**: Manually chunk massive vendor libraries (e.g., `@react-three`, `firebase`, `framer-motion`) in `vite.config.ts` to prevent "Ghost Success" blank page renders.
+- **Tailwind Ambiguity Guards**: Avoid arbitrary values in complex classes (e.g., `duration-[15000ms]`). Extend `tailwind.config` with named tokens (e.g., `duration-slowest`) to prevent JIT parser deadlocks.
+- **Playwright Asynchronous Hydration**: Fill inputs, **blur**, and rely on static locators (e.g., `data-testid="cart-drawer"`). Use the Double-Click protocol for checkout verification (Wait for Matrix -> Confirm).
+
+## 7. CHECKOUT UX RULES (Rule 19 Enforcement)
 - Checkout buttons MUST survive Z-index traps on mobile — no `backdrop-blur` parent clipping.
 - Playwright E2E tests MUST use `{ force: true }` locators for checkout CTA confirmation.
 - Post-purchase flow (receipt + confirmation email) runs synchronously — assume user kills tab immediately after payment.
 
-## 5. ADMIN SOVEREIGNTY (RBAC)
-- All inventory/product/order mutations: `admin: true` custom claim verified server-side.
-- Client-side UI gating is insufficient — always back-check with Firebase Auth custom claims.
-- Order lifecycle: `Pending → Processing → Shipped → Delivered/Refunded` with Tracking ID injection.
-- Never mutate historical invoice data when updating prices — use `draft` vs `active` separation.
-
-## 6. SECURITY
+## 8. SECURITY
 - Firestore rules MUST assert `quantity > 0` and `price >= 0` on all cart writes.
 - App Check enforced on all checkout callable functions.
+

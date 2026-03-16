@@ -83,3 +83,30 @@ export const InteractiveButton = ({ children, onClick }) => (
 // ✅ FUNCTIONAL PATTERN: Skeleton Pulse
 <div className="w-full h-32 rounded-xl bg-white/5 animate-pulse border border-white/10" />
 ```
+
+## 5. Global Toaster Configuration (Liquid Glass)
+This component MUST be mounted in the Root Layout (`app/layout.tsx`) to ensure the `sonner` notifications adhere to the Infinity Protocol v6.2 aesthetic standard.
+
+```tsx
+// ✅ FUNCTIONAL PATTERN: providers/ToasterProvider.tsx
+'use client';
+
+import { Toaster } from 'sonner';
+
+export function ToasterProvider() {
+  return (
+    <Toaster
+      position="bottom-right"
+      toastOptions={{
+        className: 'bg-black/60 backdrop-blur-2xl border-white/10 text-white shadow-2xl rounded-2xl p-4',
+        classNames: {
+          error: 'text-rose-400 border-rose-500/30 bg-rose-500/10',
+          success: 'text-teal-400 border-teal-500/30 bg-teal-500/10',
+          warning: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
+          info: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
+        },
+      }}
+    />
+  );
+}
+```

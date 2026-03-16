@@ -71,3 +71,34 @@ Firebase Edge CDN rules must match the framework configuration to prevent Edge c
 -   `scripts/safe-deploy-guard.sh` MUST verify `APP_VERSION` matches `package.json` *before* deploy.
 -   After every `firebase deploy --only hosting`, the script should validate the new version is live: `curl -s https://[domain] | grep APP_VERSION`.
 -   If version mismatch post-deploy → rollback immediately via standard ops protocols.
+
+## Implementation Architecture: Synchronous Build ID (`next.config.mjs`)
+
+Next.js generates a random build ID by default, which creates caching mismatch windows across serverless clusters if out of sync. This snippet forces absolute parity with `package.json`.
+
+```javascript
+// next.config.mjs
+import pkg from './package.json' assert { type: 'json' };
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Sync Next.js internal build cache identifier with exact package version
+  generateBuildId: async () => {
+    return `v${pkg.version}`;
+  },
+  // Ensure strict cross-origin isolated policies for advanced performance APIs
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },
+        ],
+      },
+    ];
+  },
+};
+
+export default nextConfig;
+```

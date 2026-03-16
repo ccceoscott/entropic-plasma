@@ -9,6 +9,25 @@ globs: **/*.php, **/*.tsx
 - **Architecture**: WordPress is a CMS ONLY. The frontend MUST be Next.js.
 - **Communication**: WPGraphQL Only. REST API disabled (unless RankMath).
 
+### Next.js 15 WPGraphQL Fetch Standard
+```typescript
+export async function fetchWP<T>(query: string, variables = {}): Promise<T> {
+  const res = await fetch(process.env.NEXT_PUBLIC_WP_GRAPHQL_URL!, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables }),
+    next: { revalidate: 3600, tags: ['wordpress'] }
+  });
+  
+  const json = await res.json();
+  if (json.errors) {
+    console.error('[WPGraphQL Error]', json.errors);
+    throw new Error('Failed to fetch WordPress Content');
+  }
+  return json.data;
+}
+```
+
 ## 2. SECURITY HARDENING
 - **XML-RPC**: Disabled (`add_filter('xmlrpc_enabled', '__return_false')`).
 - **Auth**: Application Passwords / JWT for API access.

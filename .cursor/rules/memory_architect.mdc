@@ -49,3 +49,31 @@ The agent MUST autonomously append to `MISSION_STATE.md` when:
 At the start of EVERY new conversation, or when transitioning tasks, the agent MUST read `MISSION_STATE.md`.
 
 *Self-Correction Protocol*: If the agent realizes it has forgotten a prior constraint, it must instantly apologize and execute a file edit replacing/appending the lost context to `MISSION_STATE.md`.
+
+## Implementation Architecture: Agent Intelligence Directive
+
+When agents interact with the `MISSION_STATE.md`, they must conform to this internal extraction paradigm. This snippet is a metaprompt directive for the LLM itself:
+
+```markdown
+# INTERNAL AGENT DIRECTIVE: STATE EXTRACTION & SYNTHESIS
+
+Whenever you are instructed to alter architecture or transition phases, perform the following atomic sequence:
+
+1. **READ**: Invoke file-system read on `MISSION_STATE.md`.
+2. **VERIFY**: Check the `Current Phase` and `Active Blockers`.
+3. **DO NOT DEVIATE**: If the proposed action conflicts with `Decisions Log`, HALT and ask for explicit user override.
+4. **WRITE**: Upon completing a task, you MUST append a concise entry to `Recent Updates` and adjust the `Current Phase` if necessary.
+
+Example State Mutation (Mental Model):
+```json
+{
+  "action": "UPDATE_STATE",
+  "target": "MISSION_STATE.md",
+  "patches": {
+      "Current Phase": "Phase 28 Complete",
+      "Recent Updates": "-> [timestamp] Implemented Liquid Glass button standard."
+  }
+}
+```
+**MANDATE**: You are the memory guardian. You write to the state document before you announce completion to the user.
+```

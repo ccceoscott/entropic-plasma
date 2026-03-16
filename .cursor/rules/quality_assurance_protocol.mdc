@@ -15,7 +15,7 @@ globs: **/*.ts, **/*.tsx, **/*.php
 
 ## 2. FUNCTIONAL TEST BASELINES
 
-### Playwright E2E (Smoke Test)
+### Playwright E2E (Smoke Test & E-commerce Anti-Flake)
 **`tests/e2e/smoke.spec.ts`**
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -35,6 +35,11 @@ test.describe('Critical Path: Authentication', () => {
   });
 });
 ```
+
+### Advanced E2E Stabilization (The Playwright Mandate)
+- **Asynchronous Hydration Synchronization**: For complex interactions (like forms affecting price matrices), you MUST `fill`, explicitly `blur`, and `wait` for a reactive landmark before clicking the next CTA.
+- **Double-Click Protocol**: Specific pattern for high-stakes flows (e.g., Stripe Payment). Deploy intent -> Wait for backend matrix stabilization -> Confirm click.
+- **Environment Hardening**: Complex local tests require a pre-flight port purge (`npx kill-port 5173 8080 9099`) and Firebase Auth emulator readiness retry loops to eliminate silent deadlock flake.
 
 ### Vitest Logic (Unit Test)
 **`src/lib/__tests__/utils.test.ts`**

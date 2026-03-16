@@ -44,3 +44,22 @@ Responsibilities split across:
 | Secrets | Firebase Secret Manager (`defineSecret()`) |
 | Testing | Playwright (E2E) + Vitest (Unit) |
 | SEO | Native Metadata API + schema-dts |
+
+## 6. THE UNIVERSAL EXECUTION WRAPPER (Error Path Analysis)
+```typescript
+// All critical async operations MUST be wrapped in safeExecute
+export async function safeExecute<T>(
+  operation: () => Promise<T>,
+  context: string,
+  fallback?: T
+): Promise<T | null> {
+  try {
+    return await operation();
+  } catch (error) {
+    console.error(`[FATAL] ${context} Execution Failed:`, error);
+    // Sentry / Logging hook
+    if (fallback !== undefined) return fallback;
+    throw new Error(`Infinity Protocol Violation in ${context}: ${error}`);
+  }
+}
+```

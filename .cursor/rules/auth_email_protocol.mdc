@@ -79,3 +79,41 @@ export const mailer = nodemailer.createTransport({
 ## 4. SECRETS
 - **Passwords**: NEVER access user passwords directly. ALWAYS use Firebase Auth's standard flow.
 - **Keys**: Use GCP Secret Manager for AWS Keys in Cloud Functions (`defineSecret()`). Locally, use `.env.local` ONLY.
+
+## Implementation Architecture: Transactional HTML Cloud Function
+
+Never send basic text structures. All transactional triggers must use a compiled HTML standard (React-Email / MJML output) to align with Liquid Glass and premium aesthetic protocols.
+
+```typescript
+// functions/src/triggers/onUserCreated.ts
+import { auth } from 'firebase-functions/v2';
+import { mailer } from '../lib/aws-ses'; // Defined in Rule #3 above
+
+export const sendWelcomeEmail = auth.user().onCreate(async (user) => {
+  const emailHtmlTemplate = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <body style="background-color: #000000; color: #ffffff; font-family: Inter, sans-serif; padding: 40px; text-align: center;">
+      <h1 style="font-size: 24px; font-weight: 600;">Welcome to Infinity.</h1>
+      <p style="color: #a1a1aa; font-size: 16px;">Your account has been securely provisioned.</p>
+    </body>
+    </html>
+  `;
+
+  try {
+    await mailer.sendMail({
+      from: '"Infinity Protocol" <admin@yourdomain.com>',
+      to: user.email,
+      subject: 'Welcome to Infinity',
+      html: emailHtmlTemplate,
+      // Fallback text required for strict spam filtering algorithms
+      text: 'Welcome to Infinity. Your account has been securely provisioned.',
+    });
+    console.log(`[AUTH EVENT] Welcome email dispatched to ${user.email}`);
+  } catch (err) {
+    // Escalate to Sentry/DataDog via custom error pipeline
+    console.error(`[AUTH EVENT FATAL] Failed email dispatch for ${user.uid}`, err);
+    throw new Error('Email dispatch failure.');
+  }
+});
+```

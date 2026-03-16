@@ -26,6 +26,8 @@ globs: **/*{auth,role,permission,middleware,guard,claim}*.{ts,tsx,js}, middlewar
 |---|---|---|
 | `vendor` | `{ vendor: true, vendorId: "v_xxx" }` | Manages own store/products |
 | `distributor` | `{ distributor: true, distributorId: "d_xxx" }` | B2B bulk buyer / reseller |
+| `wholesale_pending` | `{ wholesale_pending: true }` | B2B account awaiting tax ID / EIN verification |
+| `wholesale_approved` | `{ wholesale_approved: true }` | Verified B2B account; access to portal & discount pricing |
 | `affiliate` | `{ affiliate: true, affiliateId: "a_xxx" }` | Commission-based referral partner |
 | `support` | `{ support: true }` | Read-only across orders/users; no write |
 | `fulfillment` | `{ fulfillment: true }` | Mark orders shipped/fulfilled only |
@@ -35,30 +37,46 @@ globs: **/*{auth,role,permission,middleware,guard,claim}*.{ts,tsx,js}, middlewar
 
 ---
 
-## 2. FIREBASE CUSTOM CLAIMS — The Source of Truth
+## 2. FIREBASE CUSTOM CLAIMS — The Source of Truth (Gen 2 + Zod)
 
 ```typescript
-// ✅ Admin SDK — server-only (Cloud Function)
+// ✅ Admin SDK — server-only (Cloud Function Gen 2)
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { auth } from 'firebase-admin';
+import { z } from 'zod';
 
-// GRANT a role
-export async function grantRole(uid: string, role: string, meta?: Record<string, string>) {
+const RoleSchema = z.object({
+  uid: z.string().min(1),
+  role: z.enum(['admin', 'vendor', 'distributor', 'affiliate', 'support', 'fulfillment']),
+  meta: z.record(z.string()).optional()
+});
+
+export const grantRole = onCall({ enforceAppCheck: true }, async (request) => {
+  // 1. Enforce superAdmin or admin Caller
+  if (!request.auth?.token.superAdmin && !request.auth?.token.admin) {
+    throw new HttpsError('permission-denied', 'Only Admins can grant roles.');
+  }
+
+  // 2. Validate Boundary Payload
+  const parsed = RoleSchema.safeParse(request.data);
+  if (!parsed.success) {
+    throw new HttpsError('invalid-argument', 'Invalid role payload', parsed.error);
+  }
+
+  const { uid, role, meta } = parsed.data;
+
+  // 3. Execution
   const user = await auth().getUser(uid);
   const existing = user.customClaims ?? {};
+  
   await auth().setCustomUserClaims(uid, {
     ...existing,
     [role]: true,
-    ...meta, // e.g. vendorId, distributorId
+    ...meta, 
   });
-}
 
-// REVOKE a role
-export async function revokeRole(uid: string, role: string) {
-  const user = await auth().getUser(uid);
-  const claims = { ...(user.customClaims ?? {}) };
-  delete claims[role];
-  await auth().setCustomUserClaims(uid, claims);
-}
+  return { success: true, roleGranted: role };
+});
 ```
 
 **Critical rules:**
@@ -91,8 +109,14 @@ export function useUserRoles() {
     isFulfillment: claims.fulfillment === true,
     isSupport: claims.support === true,
     isCustomer: claims.customer === true,
+    isWholesalePending: claims.wholesale_pending === true,
+    isWholesaleApproved: claims.wholesale_approved === true,
   };
 }
+
+// ✅ Portal & Storefront Cloning Context
+// Use PortalContext to inject branding and custom pricing tiers based on active RBAC roles.
+// Example: wholesale_approved users see different CSS variables and un-gated wholesale catalogs.
 ```
 
 ---
@@ -107,7 +131,7 @@ import type { NextRequest } from 'next/server';
 const ROLE_ROUTES: Record<string, string[]> = {
   '/admin':       ['admin', 'superAdmin'],
   '/vendor':      ['vendor', 'superAdmin'],
-  '/distributor': ['distributor', 'superAdmin'],
+  '/portal':      ['distributor', 'wholesale_approved', 'superAdmin'],
   '/fulfillment': ['fulfillment', 'admin', 'superAdmin'],
   '/support':     ['support', 'admin', 'superAdmin'],
 };
@@ -201,6 +225,17 @@ export const onUserCreate = onDocumentCreated('users/{uid}', async (event) => {
   await auth().setCustomUserClaims(event.params.uid, { customer: true });
 });
 ```
+
+---
+
+## 7. ADMIN COMMAND CENTER & LOGISTICS HUB
+**Rule**: The Admin surface (`/admin`) MUST be cleanly separated from the consumer application.
+- **Lazy Loading**: Use `React.lazy` and `Suspense` for all `/admin` routes to prevent polluting the client bundle for standard users.
+- **Real-Time Logistics**: Use Firebase `onSnapshot` exclusively for order tracking grids to ensure fulfillment/logistics accuracy without manual refreshes.
+- **Native React CMS (No FireCMS)**: Absolutely **NO FireCMS**. Build custom administrative dashboards natively using Next.js and Shadcn/UI primitives.
+  - **Data Tables**: Utilize TanStack Table wrapped in Shadcn for advanced sorting, filtering, and row-selection (e.g., bulk order fulfillment).
+  - **Server Actions**: All mutations (create product, update status, ban user) must occur via Next.js Server Actions directly interacting with the Firebase Admin SDK.
+  - **Optimistic UI**: Use React 19 `useOptimistic` to instantly resolve UI toggles (like "Published" status) while the Server Action resolves in the background.
 
 ---
 

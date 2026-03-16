@@ -123,3 +123,10 @@ service cloud.firestore {
 
 - Rules MUST validate: data types, required fields, value ranges, and `isDeleted == false` on creates.
 - Test rules with Firebase Emulator. Never deploy untested rules to production.
+
+## 6. RUNTIME DATA SAFETY & PARSING
+
+Firestore reads from the client are inherently untyped network boundaries.
+
+- **Date Safety**: Mandate wrapping Firestore timestamps in `formatDateSafe()` before calling `.toLocaleDateString()` or plotting on UI. Failure to anticipate `null` or `undefined` timestamps leads to instant crashing.
+- **Null-Safe Strings**: Mandate the use of `safeString()`, `safeLower()`, or `safeTrimLower()` when processing user/API strings to avoid `.toLowerCase() is not a function` errors. Never blindly call string methods on unvalidated data.

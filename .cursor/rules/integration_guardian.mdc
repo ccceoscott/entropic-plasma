@@ -48,3 +48,45 @@ export async function safeFetch<T>(
 ## 3. ANALYTICS PROXY
 -   **Client Ban**: Do NOT initialize sensitive analytics SDKs with admin keys on the client.
 -   **Proxy**: Use `callFunction('logAnalyticsEvent')` instead of direct client calls for critical events.
+
+## Implementation Architecture: Zero-Trust Webhook Signature Validator
+
+Never parse an incoming external webhook without cryptographically matching its hash signature.
+
+```typescript
+// pages/api/webhook/stripe.ts (or equivalent App Router Route Handler)
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+export async function POST(req: NextRequest) {
+  try {
+    const rawBody = await req.text();
+    const signature = req.headers.get('stripe-signature');
+    const secret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!signature || !secret) {
+      return NextResponse.json({ error: 'Missing Identity Components' }, { status: 401 });
+    }
+
+    // Example verification (for general platforms using HMAC SHA256)
+    // Note: Use official stripe.webhooks.constructEvent for Stripe specifically; 
+    // the below is the generic HMAC protocol for other webhooks (e.g., Twilio, internal queues).
+    const hash = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    
+    // Constant-time string comparison protects against timing attacks
+    if (!crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature))) {
+      console.error('INTEGRATION BREACH: Webhook signature mismatch.');
+      return NextResponse.json({ error: 'Signature Verification Failed' }, { status: 403 });
+    }
+
+    const payload = JSON.parse(rawBody);
+    // Proceed with Zod Payload Validation & DB Idempotency Checks...
+
+    return NextResponse.json({ received: true }, { status: 200 });
+
+  } catch (error) {
+    console.error('Webhook processing trap fired:', error);
+    return NextResponse.json({ error: 'Server Fault' }, { status: 500 });
+  }
+}
+```

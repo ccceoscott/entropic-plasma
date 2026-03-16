@@ -66,3 +66,68 @@ export const executeGdprErasure = async (userId: string, adminToken1: string, ad
 -   **Point-in-Time Recovery**: Enable PITR on all production Firestore databases. Retention must be set to 7 days minimum.
 -   **Export Schedule**: Ensure daily Firestore exports to a coldline/archive GCS bucket (`gs://[project]-firestore-backups/`).
 -   Never rename an existing Firestore field directly — add the new field, migrate data backward-compatibly, then deprecate the old.
+
+## 5. GEN 2 CLOUD FUNCTION ENFORCEMENT (Dual Admin / GDPR)
+This is the required architecture for handling highly sensitive destructive operations. It enforces strict payload validation via Zod and verifies dual administrative authority before executing the deletion of the User, their Firestore Document, and Storage bucket.
+
+```typescript
+// ✅ REQUIRED: functions/src/admin/executeGdprErasure.ts
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
+import { z } from 'zod';
+
+const ErasurePayload = z.object({
+  targetUid: z.string().min(1),
+  confirmingAdminEmail: z.string().email(),
+});
+
+export const executeGdprErasure = onCall(async (request) => {
+  // 1. Primary Admin Check (The Caller)
+  if (!request.auth?.token.admin) {
+    throw new HttpsError('permission-denied', 'Primary admin authorization required.');
+  }
+
+  // 2. Boundary Validation
+  const result = ErasurePayload.safeParse(request.data);
+  if (!result.success) {
+    throw new HttpsError('invalid-argument', 'Invalid payload structure.');
+  }
+  const { targetUid, confirmingAdminEmail } = result.data;
+
+  // 3. Secondary Admin Check (Dual-Key Requirement)
+  try {
+    const confirmingAdmin = await getAuth().getUserByEmail(confirmingAdminEmail);
+    if (!confirmingAdmin.customClaims?.admin) {
+      throw new HttpsError('permission-denied', 'Confirming user is not an admin.');
+    }
+  } catch (error) {
+    throw new HttpsError('not-found', 'Confirming admin account not found.');
+  }
+
+  const db = getFirestore();
+  const bucket = getStorage().bucket();
+
+  try {
+    // 4. Immutable Audit Log (Write BEFORE execution)
+    await db.collection('audit_logs').add({
+      action: 'GDPR_ERASURE_EXECUTED',
+      targetUid,
+      executedBy: request.auth.uid,
+      confirmedByEmail: confirmingAdminEmail,
+      timestamp: new Date(),
+    });
+
+    // 5. Destructive Operations
+    await getAuth().deleteUser(targetUid);
+    await db.collection('users').doc(targetUid).delete();
+    await bucket.deleteFiles({ prefix: `users/${targetUid}/` });
+
+    return { success: true, message: `GDPR Erasure completed for ${targetUid}` };
+  } catch (error) {
+    console.error(`Erasure failed for ${targetUid}:`, error);
+    throw new HttpsError('internal', 'Erasure execution failed.', error);
+  }
+});
+```

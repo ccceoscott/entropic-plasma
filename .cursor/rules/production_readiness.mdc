@@ -66,3 +66,29 @@ export default function RootLayout({ children }) {
   );
 }
 ```
+
+## Implementation Architecture: Full-Stack Sentry Config (`sentry.server.config.ts` & `sentry.edge.config.ts`)
+
+In addition to the client config, Next.js App Router requires server and edge telemetry observability injected at the root of the project.
+
+```typescript
+// sentry.server.config.ts
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  debug: false,
+});
+```
+
+```typescript
+// sentry.edge.config.ts
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  debug: false,
+});
+```

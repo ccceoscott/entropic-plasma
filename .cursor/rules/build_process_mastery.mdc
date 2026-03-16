@@ -1,0 +1,90 @@
+---
+alwaysApply: true
+description: BUILD PROCESS MASTERY - Build Pipelines, CI/CD, Node 22 LTS, and ARMs Stability
+globs: "**/package.json, **/next.config.mjs, **/.github/workflows/*.yml, **/scripts/*.sh"
+---
+# BUILD PROCESS MASTERY: INFINITY PROTOCOL v6.2
+
+> **THE SOVEREIGN BUILD MANDATE**: Production artifacts must be mathematically identical, fully verified, and globally persistent.
+
+## 1. RUNTIME & PLATFORM SOVEREIGNTY
+
+### Node.js v22 (LTS) Baseline
+To prevent ARM64 (Mac Silicon) worker thread paralysis and silent build hangs during heavy Rollup/PostCSS pipelines, the protocol mandates Node 22.
+
+```json
+// ✅ REQUIRED: package.json
+{
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' next build"
+  }
+}
+```
+
+### ARM64 vs x86 Parity
+- **The Deadlock Trap**: PostCSS and Tailwind JIT can hang on ARM64 if `swc` is not properly configured. Prohibit `style={{}}` to reduce JIT complexity.
+- **Native Bindings**: Always use `npm ci` in CI to ensure native binaries (like `esbuild` or `sharp`) are fetched for the correct target architecture.
+
+## 2. THE NUCLEAR CLEAN PROTOCOL
+Before every production build, the build environment MUST be purged of all cached artifacts to prevent ghost-state contamination.
+
+```bash
+# ✅ REQUIRED PATTERN: Nuclear Reset
+npx kill-port 3000 5173 8080 9099
+rm -rf .next out dist .vercel .firebase
+find . -name "tsbuildinfo" -delete
+```
+
+## 3. CI/CD GAUNTLET (GitHub Actions)
+The CI/CD pipeline is the final Gate of Sovereignty. It must verify the build before deployment.
+
+```yaml
+# ✅ REQUIRED: .github/workflows/verify-build.yml
+name: Build Mastery Verification
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Artifact Integrity Check
+        run: |
+          [ -d ".next" ] || exit 1
+          [ -f "public/sitemap.xml" ] || echo "Warning: Sitemap missing"
+          grep -q "console.log" .next/static/chunks/*.js && echo "Warning: Console bleed detected"
+```
+
+## 4. ARTIFACT AUDIT & SECURITY
+- **Secret Scanning**: Mandate `dv scan-secrets` before build.
+- **Dependency Audit**: `npm audit --audit-level=high` MUST pass.
+- **Bundle Analysis**: Use `@next/bundle-analyzer` periodically. Prohibit single-chunk bundles > 250kb.
+
+## 5. DYNAMIC SYNC (The Heartbeat)
+Build IDs must be synchronized across all compute layers (Edges, Functions, Servers) to prevent hydration mismatches during rolling deploys.
+
+```javascript
+// ✅ REQUIRED: next.config.mjs
+import pkg from './package.json' assert { type: "json" };
+
+export default {
+  generateBuildId: async () => `v${pkg.version}`,
+}
+```
+
+## 6. SOVEREIGN DEPLOY GATES
+Every deployment must be preceded by a successful `npm run build` and `npm run test`. 
+Deployments using `--only hosting` must include the `--force` flag only if a version increment is detected in `package.json`.

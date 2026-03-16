@@ -65,3 +65,47 @@ export default function DashboardView() {
 - **Memoization**: React 19 Compiler handles this natively. Do **NOT** litter the codebase with manual `useMemo`/`useCallback` unless specifically fixing a profiled render bottleneck.
 - **Any**: Usage of `any` is a compile-time error. Use `unknown` or rigidly defined Zod types.
 - **State Sprawl**: Don't use `useState` for derived data that can be calculated on the fly during render.
+### React 19 Avoidance
+- Do NOT use React 19 features unless explicitly instructed or the ecosystem has reached 100% stability. Next.js App Router already handles much of what React 19 attempts to solve natively.
+
+## 6. TAILWIND & HOT MODULE REPLACEMENT (HMR) SAFETY
+- **Context Isolation Pattern**: React Context and Providers MUST be isolated from constant configurations and Zod schemas in entirely separate files. Mixing exported components with exported constants breaks Vite/Next HMR and triggers full-page reloads.
+- **Tailwind Ambiguity Guards**: Prohibit complex arbitrary values (e.g., `duration-[15000ms]`) in JSX markup. Define heavily-used or highly-specific values in `tailwind.config.mjs` (`theme.extend.transitionDuration`) to prevent JIT parser lockups and build deadlocks.
+
+## Implementation Architecture: Generic Chunking Configuration (`vite.config.ts`)
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Critical generic vendor chunks for optimal caching
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
+          'vendor-ui': ['lucide-react', 'framer-motion', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+    // Prevent unoptimized giant bundles
+    chunkSizeWarningLimit: 600, 
+  },
+  server: {
+    port: 3000,
+    strictPort: true,
+  },
+});
+```

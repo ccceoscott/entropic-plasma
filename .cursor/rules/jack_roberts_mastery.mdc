@@ -17,6 +17,39 @@ For any feature request > 50 lines of code, you MUST follow **F.L.O.W**:
 3.  **ORCHESTRATION**: Add state, event handlers, and data fetching.
 4.  **WORLD**: Verify build and export for deployment.
 
+### F.L.O.W. Code Standard
+```tsx
+// 1. FRAME: [Mini-spec: Product card with Add to Cart]
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+
+// 3. ORCHESTRATION: Logic & Data
+export function ProductCard({ id, name }: { id: string, name: string }) {
+  const [isAdding, setIsAdding] = useState(false);
+  
+  const handleAdd = async () => {
+    setIsAdding(true);
+    await addToCart(id);
+    setIsAdding(false);
+  };
+
+  // 2. LAYOUT: Core UI Structure (Liquid Glass)
+  // 4. WORLD: Exported and ready
+  return (
+    <motion.div 
+      className="p-4 rounded-xl backdrop-blur-md bg-white/10 border border-white/20"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <h3>{name}</h3>
+      <button onClick={handleAdd} disabled={isAdding}>
+        {isAdding ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </motion.div>
+  );
+}
+```
+
 ## 3. Context Engineering
 - **Input**: ALWAYS check `MISSION_STATE.md` and `task.md` before answering.
 - **Output**: Use "Reference-Based Coding".
