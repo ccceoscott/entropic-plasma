@@ -99,24 +99,52 @@ export const reserveInventory = async (productId: string, quantity: number) => {
 };
 ```
 
-## 5. B2B / ADMIN SOVEREIGNTY (RBAC) & STOREFRONT CLONING
+## 5. AI INTELLIGENCE — Recommendation & Proximity Logic
+- **Server-Side Proximity**: Recommendation logic MUST NOT rely on client-side filtering. Use Cloud Functions to calculate proximity based on tags, category, and price-point.
+- **Cold-Start Safety**: Use `shared_tags` to fetch related products if specific user history is absent.
+
+```typescript
+// ✅ AI Proximity Pattern (Simplified)
+export const getRelatedProducts = async (productId: string, limit: number = 4) => {
+  const productDoc = await adminDb.collection('products').doc(productId).get();
+  const { category, tags, price } = productDoc.data()!;
+  
+  // Scoring: Same Category (3pts), Tag Match (1pt each), Price within 20% (2pts)
+  return adminDb.collection('products')
+    .where('category', '==', category)
+    .where('active', '==', true)
+    .limit(limit * 2) // Over-fetch for price scoring
+    .get();
+};
+```
+
+## 6. LOYALTY & REWARDS — Atomic Point Harvesting
+- **Resolution Trigger**: Points MUST be awarded ONLY when `status` transitions to `'completed'`.
+- **Atomic Increment**: Use `admin.firestore.FieldValue.increment()` to prevent point-doubling in concurrent resolution events.
+- **Redemption Locking**: Points used during checkout MUST be temporarily locked in a `pending_points` field until the transaction resolves.
+
+## 7. SUBSCRIPTION SYNCHRONICITY (Stripe Billing)
+- **Claim-Backed Access**: Subscription status (e.g., `pro`, `tier_1`) MUST be mirrored from Stripe metadata into Firebase Custom Claims via Webhook.
+- **Re-Auth Enforcement**: If a subscription is revoked, set a `force_reauth: true` flag in the user document to trigger a client-side `auth.signOut()` on next interaction.
+
+## 8. B2B / ADMIN SOVEREIGNTY (RBAC) & STOREFRONT CLONING
 - **Multi-Tiered Pricing**: Implement role verification (e.g., `wholesale_approved`) via `useAuthStore` combined with server-side Custom Claims validation to unlock trade discounts (e.g., 40% off).
 - **Storefront Portals**: Sub-brands or B2B partners access specific UI themes via URL slugs. Inject `PortalContext.tsx` to apply specific CSS variables (`--portal-primary`) globally for Liquid Glass UI alterations.
 - All inventory/product/order mutations: `admin: true` custom claim verified server-side.
 - Client-side UI gating is insufficient — always back-check with Firebase Auth custom claims.
 
-## 6. PERFORMANCE, BUILD & E2E PROTOCOLS (ARM64 Safety)
+## 9. PERFORMANCE, BUILD & E2E PROTOCOLS (ARM64 Safety)
 - **Node v22 (LTS) Mandate**: Production builds MUST run on Node 22 to prevent memory deadlocks during PostCSS transformation on large Tailwind ecosystems.
 - **Rollup Chunking**: Manually chunk massive vendor libraries (e.g., `@react-three`, `firebase`, `framer-motion`) in `vite.config.ts` to prevent "Ghost Success" blank page renders.
 - **Tailwind Ambiguity Guards**: Avoid arbitrary values in complex classes (e.g., `duration-[15000ms]`). Extend `tailwind.config` with named tokens (e.g., `duration-slowest`) to prevent JIT parser deadlocks.
 - **Playwright Asynchronous Hydration**: Fill inputs, **blur**, and rely on static locators (e.g., `data-testid="cart-drawer"`). Use the Double-Click protocol for checkout verification (Wait for Matrix -> Confirm).
 
-## 7. CHECKOUT UX RULES (Rule 19 Enforcement)
+## 10. CHECKOUT UX RULES (Rule 19 Enforcement)
 - Checkout buttons MUST survive Z-index traps on mobile — no `backdrop-blur` parent clipping.
 - Playwright E2E tests MUST use `{ force: true }` locators for checkout CTA confirmation.
 - Post-purchase flow (receipt + confirmation email) runs synchronously — assume user kills tab immediately after payment.
 
-## 8. SECURITY
+## 11. SECURITY
 - Firestore rules MUST assert `quantity > 0` and `price >= 0` on all cart writes.
 - App Check enforced on all checkout callable functions.
 
