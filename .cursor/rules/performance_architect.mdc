@@ -3,11 +3,10 @@ alwaysApply: true
 description: PERFORMANCE ARCHITECT - Enforces Speed, Core Web Vitals, and React 19 Patterns.
 globs: **/*.tsx, **/*.ts, next.config.mjs
 ---
-# Module 31: Performance Architect
+# PERFORMANCE ARCHITECT: INFINITY PROTOCOL v6.2
 
 ## Context
 - **Protocol**: Infinity Protocol v6.2
-- **Authority**: `knowledge/modules/PERFORMANCE_OPTIMIZATION_MASTERY.md`
 
 ## 1. The 100ms Mandate
 - **Goal**: All interactions must provide feedback < 100ms (Optimistic UI).
@@ -30,4 +29,3 @@ globs: **/*.tsx, **/*.ts, next.config.mjs
 - **Vitals**: Ensure `useReportWebVitals` is hooked up in production logging.
 
 ## Reference
-- See `knowledge/modules/PERFORMANCE_OPTIMIZATION_MASTERY.md`.

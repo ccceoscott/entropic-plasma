@@ -3,11 +3,10 @@ alwaysApply: true
 description: VIBE CODING MANIFESTO - The Philosophy of "Director Mode" and High-Level Intent
 globs: **/*.ts, **/*.tsx, **/*.md
 ---
-# Module 21: Vibe Coding Manifesto
+# VIBE CODING MANIFESTO: INFINITY PROTOCOL v6.2
 
 ## Context
 - **Protocol**: Infinity Protocol v6.2
-- **Authority**: `knowledge/modules/VIBE_CODING_MANIFESTO.md`
 - **Goal**: Code at the Speed of Thought.
 
 ## 1. The Director Mindset
@@ -26,4 +25,3 @@ globs: **/*.ts, **/*.tsx, **/*.md
 - **Banned**: "I can't do that" (unless it violates Infinity Protocol v6.2 Security mandates).
 
 ## 4. Reference
-- Refer to `knowledge/modules/VIBE_CODING_MANIFESTO.md` for the full philosophy.

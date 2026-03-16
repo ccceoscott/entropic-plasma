@@ -1,19 +1,54 @@
 ---
 alwaysApply: true
-description: OBSERVABILITY - Structured Logging, Tracing, PII Redaction
-globs: **/*{log,logger,monitor,trace}*.{ts,js}, functions/src/**/*.ts
+description: OBSERVABILITY - Structured logging, tracing, PII redaction, Cloud Logging
+globs: **/*{log,logger,monitor,trace,observ}*.{ts,js}, functions/src/**/*.ts
 ---
-# OBSERVABILITY ARCHITECT (Infinity Protocol)
+# OBSERVABILITY ARCHITECT: INFINITY PROTOCOL v6.2
 
-## 1. LOGGING DISCIPLINE
--   **No Console**: `console.log` is banned in production code. Use a structured logger (e.g., `pino` or wrapper).
--   **JSON Only**: Logs must be machine-readable JSON objects.
--   **Context**: Always attach `context` object to logs.
+## 1. LOGGING DISCIPLINE — No console.log in Production
+```typescript
+// ❌ BANNED in production
+console.log('User signed in:', user);
 
-## 2. TRACING
--   **Header**: Check for `x-correlation-id` on request ingress. If missing, generate UUID.
--   **Propagate**: Pass this ID to all FS/HTTP calls.
+// ✅ REQUIRED — structured JSON logger
+import { logger } from 'firebase-functions';
+logger.info('User signed in', {
+  uid: user.uid,
+  correlationId: req.headers['x-correlation-id'],
+});
+```
+- `console.log/warn/error` banned in production Functions code. Use `firebase-functions/logger`.
+- Every log entry MUST include a `correlationId` and relevant context object.
 
-## 3. REDACTION
--   **Scrubber**: Any object logged must pass through `scrubPII(obj)`.
--   **Keywords**: Scrub keys matching `password`, `token`, `key`, `secret`, `credit`, `ssn`.
+## 2. CORRELATION TRACING
+```typescript
+// ✅ On every function ingress
+const correlationId = req.headers['x-correlation-id'] ?? crypto.randomUUID();
+// Propagate to all downstream calls as the X-Correlation-Id header
+```
+- If `x-correlation-id` header is missing → generate `crypto.randomUUID()`.
+- Attach to ALL outgoing HTTP requests and Firestore operation contexts.
+
+## 3. PII REDACTION — Mandatory Scrubber
+```typescript
+const SCRUB_KEYS = ['password', 'token', 'key', 'secret', 'credit', 'ssn', 'email', 'phone'];
+
+function scrubPII(obj: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) =>
+      SCRUB_KEYS.some(bad => k.toLowerCase().includes(bad))
+        ? [k, '[REDACTED]']
+        : [k, typeof v === 'object' && v ? scrubPII(v as Record<string, unknown>) : v]
+    )
+  );
+}
+// Every object logged MUST pass through scrubPII() first
+```
+
+## 4. ALERTING THRESHOLDS
+| Metric | Threshold | Action |
+|---|---|---|
+| Function error rate | > 1% | Alert + page |
+| Cold start p99 latency | > 2000ms | Investigate `minInstances` |
+| Firestore read cost | > 100k reads/hr | Review query indexes |
+| 5xx responses | > 0.5% | Immediate incident |

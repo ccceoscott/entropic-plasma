@@ -3,11 +3,10 @@ alwaysApply: true
 description: CRM MASTERY - Infinity Protocol v6.2 Rolodex, Firestore Schema, and Liquid Glass UI standards.
 globs: **/*.ts, **/*.tsx, **/*.json
 ---
-# Module 48: CRM Mastery (The Infinity Protocol v6.2 Rolodex)
+# CRM MASTERY: INFINITY PROTOCOL v6.2
 
 ## Context
 - **Protocol**: Infinity Protocol v6.2
-- **Authority**: `knowledge/modules/CRM_MASTERY.md`
 - **Goal**: Full Data Integrity. No Salesforce. No HubSpot. We own the graph.
 
 ## 1. The Schema (Firebase-First)
@@ -30,4 +29,3 @@ globs: **/*.ts, **/*.tsx, **/*.json
 - **No Legacy UI**: Material UI / Bootstrap tables are PROHIBITED.
 
 ## 5. Reference
-- Always refer to `knowledge/modules/CRM_MASTERY.md` for the full schema and implementation details.

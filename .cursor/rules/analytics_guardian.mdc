@@ -1,17 +1,41 @@
 ---
 alwaysApply: true
-description: ANALYTICS - Bot Filtering, Test Account Exclusion, Dashboard Data Purity
-globs: **/*{dashboard,analytics,metric,chart}*.{tsx,ts,js}, functions/src/index.ts
+description: ANALYTICS GUARDIAN - Bot filtering, test account exclusion, data purity, honeypots
+globs: **/*{dashboard,analytics,metric,chart,report}*.{tsx,ts,js}, functions/src/index.ts
 ---
-# ANALYTICS GUARDIAN (Infinity Protocol)
+# ANALYTICS GUARDIAN: INFINITY PROTOCOL v6.2
 
-## 1. QUERY HYGIENE
--   **Bot/Test Filter**: Every Firestore count or list query for "Leads", "Users", or "Revenue" MUST include `.where('metadata.isTest', '==', false)`.
--   **Regex Check**: When creating a user/lead, check email against `/(?:\+test|@example\.com|@internal\.corp)/i`. If match, set `isTest: true`.
+## 1. QUERY HYGIENE — Zero Dirty Data
+Every Firestore count/list for Leads, Users, or Revenue MUST filter test accounts:
+```typescript
+// ✅ Required filter on every analytics query
+const leads = await db.collection('leads')
+  .where('metadata.isTest', '==', false)
+  .where('metadata.isBot', '==', false)
+  .get();
+```
+- **Test detection**: On user/lead creation, check email against `/(?:\+test|@example\.com|@internal\.corp|@test\.)/i`. If match → `isTest: true`.
+- **Dashboard default**: Always load with test/bot data hidden. No toggle visible by default.
 
-## 2. DASHBOARD PURITY
--   **Default View**: Dashboards must ALWAYS load with test data hidden.
--   **Widgets**: "Recent Leads" widgets must explicitly exclude bots.
+## 2. BOT HONEYPOT MANDATE
+```html
+<!-- ✅ Hidden from real users, filled by bots — add to every public form -->
+<input
+  type="text"
+  name="hp_field"
+  style={{ display: 'none' }}
+  tabIndex={-1}
+  autoComplete="off"
+/>
+```
+- If `hp_field` is filled on submission → set `isBot: true`, reject silently with 200.
 
-## 3. HONEYPOTS
--   **Bot Traps**: Forms must include hidden honeypot fields. If filled, flag entry as `isBot: true` immediately.
+## 3. EVENT LOGGING (Server-Side Only)
+- **Client SDK**: NEVER initialize analytics SDKs with admin/write keys on the client.
+- **Proxy pattern**: Critical conversion events (`purchase`, `signup`, `upgrade`) MUST go through a Cloud Function: `callFunction('logAnalyticsEvent', payload)`.
+- **Immutability**: Analytics event documents are append-only. No updates or deletes on event logs.
+
+## 4. DASHBOARD SOVEREIGNTY
+- Recent Leads, Revenue, and User Count widgets: always exclude `isTest` + `isBot`.
+- Time-series charts: group by UTC date server-side. Never client-side date math.
+- Caching: Analytics aggregations cached in Firestore `_cache/analytics` doc — refresh max every 5 min via Cloud Function trigger, not on every dashboard load.

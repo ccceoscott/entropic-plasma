@@ -1,17 +1,51 @@
 ---
 alwaysApply: true
-description: ACCESSIBILITY - WCAG 2.1 AA, Semantic HTML, ARIA, Keyboard Nav
+description: ACCESSIBILITY GUARDIAN - WCAG 2.1 AA, Semantic HTML, ARIA, Keyboard Navigation
 globs: **/*.{tsx,jsx}
 ---
-# ACCESSIBILITY GUARDIAN (Infinity Protocol)
+# ACCESSIBILITY GUARDIAN: INFINITY PROTOCOL v6.2
 
-## 1. SEMANTIC CHECKS
--   **Div Buttons**: Reject any `div` or `span` with `onClick` unless it has `role="button"` AND `tabIndex="0"` AND `onKeyDown`.
--   **Images**: Reject `<img>` without `alt` attribute.
+## 1. SEMANTIC HTML — Zero Div Buttons
+```tsx
+// ❌ REJECTED — div with onClick and no accessibility
+<div onClick={handleClick}>Submit</div>
 
-## 2. ARIA CHECKS
--   **Icon Buttons**: Require `aria-label` or `aria-labelledby`.
--   **Inputs**: Require `id` matching a `label`'s `htmlFor`.
+// ✅ REQUIRED — proper button with keyboard support
+<button type="button" onClick={handleClick}>Submit</button>
+// OR if truly custom:
+<div role="button" tabIndex={0} onClick={handleClick} onKeyDown={(e) => e.key === 'Enter' && handleClick()}>
+```
+- All `<img>` must have `alt`. Decorative images: `alt=""`.
+- Use `<nav>`, `<main>`, `<article>`, `<section>` — not `<div>` wrappers.
 
-## 3. COLOR CHECKS
--   **Contrast**: Warn if text colors seem low contrast (though this is hard to static check, offer warnings).
+## 2. ARIA REQUIREMENTS
+| Element | Required ARIA |
+|---|---|
+| Icon-only button | `aria-label="Description"` |
+| Input field | `<label htmlFor="id">` + matching `id` on input |
+| Modal/Dialog | `role="dialog"` + `aria-modal="true"` + `aria-labelledby` |
+| Loading state | `aria-busy="true"` on container |
+| Error message | `role="alert"` on error container |
+
+## 3. KEYBOARD NAVIGATION
+- All interactive elements reachable via `Tab`.
+- Modal open: focus trapped inside. Modal close: focus returns to trigger.
+- Dropdown: `ArrowUp`/`ArrowDown` to navigate, `Escape` to close.
+- Skip-to-main link: first focusable element on every page.
+
+## 4. COLOR & CONTRAST
+- **Body text**: ≥ 4.5:1 contrast ratio (WCAG AA).
+- **Large text / UI components**: ≥ 3:1 contrast ratio.
+- **Never convey information via color alone** — pair with icon or text label.
+
+## 5. MOTION SAFETY
+```tsx
+// ✅ Respect user preference
+<motion.div
+  animate={{ opacity: 1 }}
+  transition={
+    prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 100 }
+  }
+/>
+```
+- Wrap all Framer Motion animations with `prefers-reduced-motion` checks.

@@ -17,5 +17,5 @@ globs: **/*
 4.  **Vibe Coding**: Code must be "Loveable or Better".
 
 ## 3. OPERATIONS
-- **Sync**: Use `scripts/sovereign_sync.sh` to align with the Brain.
+- **Sync**: Use `dv broadcast` to align with the Brain.
 - **Deploy**: Use `scripts/safe-deploy-guard.sh` to protect Production.

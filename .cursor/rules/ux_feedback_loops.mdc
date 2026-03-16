@@ -3,11 +3,10 @@ alwaysApply: true
 description: UX FEEDBACK LOOPS - Toasts, Notifications, and Real-Time Feedback Standards
 globs: **/*.tsx, **/*.ts
 ---
-# Module 25: UX Feedback Loops
+# UX FEEDBACK LOOPS: INFINITY PROTOCOL v6.2
 
 ## Context
 - **Protocol**: Infinity Protocol v6.2
-- **Authority**: `knowledge/modules/UX_FEEDBACK_LOOPS.md`
 - **Goal**: The system must always acknowledge user intent.
 
 ## 1. The "Zero-Latency" Illusion
@@ -27,4 +26,3 @@ globs: **/*.tsx, **/*.ts
 - **Transition**: No abrupt DOM changes. Use `<AnimatePresence>`.
 
 ## 4. Reference
-- Refer to `knowledge/modules/UX_FEEDBACK_LOOPS.md` for implementation details.

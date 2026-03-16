@@ -1,17 +1,38 @@
 ---
 alwaysApply: true
-description: LOCALIZATION - i18n, No Hardcoded Text, Intl Formatting
+description: LOCALIZATION - i18n, No hardcoded text, Intl formatting, RTL support
 globs: **/*.{tsx,ts,js,jsx}
 ---
-# LOCALIZATION ARCHITECT (Infinity Protocol)
+# LOCALIZATION ARCHITECT: INFINITY PROTOCOL v6.2
 
-## 1. STRING DETECTIVE
--   **Hardcoded Text**: Flag any JSX text content that is not wrapped in a translation function (e.g., `t('key')`).
--   **Exceptions**: Logging messages and error codes do not need translation.
+## 1. ZERO HARDCODED TEXT
+```tsx
+// ❌ REJECTED
+<h1>Welcome back, {user.name}!</h1>
 
-## 2. FORMATTING COP
--   **Dates**: Reject `date.getDate() + '/' + date.getMonth()`. Suggest `Intl.DateTimeFormat`.
--   **Currency**: Reject `$ + amount`. Suggest `Intl.NumberFormat`.
+// ✅ REQUIRED
+<h1>{t('dashboard.welcome', { name: user.name })}</h1>
+```
+- **Exceptions**: Dev logs, error codes, and console output do NOT need translation keys.
+- **Scan**: Before any UI PR, grep for JSX string literals not wrapped in `t()`.
 
-## 3. CSS LOGIC
--   **Direction**: Suggest `padding-inline` and `margin-inline` over `left/right` to ensure RTL compatibility.
+## 2. FORMATTING — Reject Raw JS Date/Number Math
+```typescript
+// ❌ REJECTED
+const dateStr = date.getDate() + '/' + date.getMonth();
+const priceStr = '$' + amount.toFixed(2);
+
+// ✅ REQUIRED
+const dateStr = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date);
+const priceStr = new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' }).format(amount);
+```
+
+## 3. RTL SUPPORT
+- **Spacing**: Use `padding-inline-start/end` and `margin-inline-start/end` — NEVER `padding-left/right`.
+- **Tailwind**: Use `ps-*` / `pe-*` / `ms-*` / `me-*` classes (logical properties).
+- **Icons**: Flip directional icons (arrows, chevrons) for RTL — use `dir="rtl"` + CSS `[dir='rtl'] .icon { transform: scaleX(-1) }`.
+
+## 4. STRING EXTRACTION DISCIPLINE
+- All translation keys follow `namespace.component.element` format: `auth.login.submitBtn`.
+- Pluralization: Always use ICU message format: `{count, plural, one {# item} other {# items}}`.
+- Never concatenate translated strings — use interpolation: `t('greeting', { name })`.
