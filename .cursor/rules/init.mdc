@@ -4,7 +4,7 @@ globs: **/*
 alwaysApply: false
 ---
 
-# /init - Infinity Protocol v3.0 Workspace Forging
+# /init - Infinity Protocol v6.2 Workspace Forging
 
 **TRIGGER**: Initialize a new environment.
 

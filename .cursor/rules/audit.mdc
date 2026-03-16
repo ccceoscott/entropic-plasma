@@ -1,12 +1,12 @@
 ---
-description: [Workflow] Infinity Protocol v3.0 /audit with Identity Verification and State Sync.
+description: [Workflow] Infinity Protocol v6.2 /audit with Identity Verification and State Sync.
 globs: **/*
 alwaysApply: false
 ---
 
 # /audit - Quality & Compliance Gate
 
-**TRIGGER**: Execute the absolute Infinity Protocol v3.0 verification gate.
+**TRIGGER**: Execute the absolute Infinity Protocol v6.2 verification gate.
 
 ## EXECUTION STEPS
 1. **Identity Check**: Verify current project signature within `MISSION_STATE.md`.
@@ -18,4 +18,4 @@ alwaysApply: false
 4. **Live Audit (LCA)**: If UI/Prod related, navigate to local preview URL and capture console errors.
 5. **Scoring**: Issue a 1-10 status report. If < 10, trigger Recursive Audit (RA) to fix.
 6. **State Persistence**: Update `MISSION_STATE.md` to lock trajectory.
-7. **Sign-Off**: Output "Infinity Protocol v3.0: SOVEREIGNTY LOCKED".
+7. **Sign-Off**: Output "Infinity Protocol v6.2: SOVEREIGNTY LOCKED".

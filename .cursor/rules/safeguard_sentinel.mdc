@@ -2,7 +2,7 @@
 description: Safeguard Sentinel - Security & Regression
 ---
 
-# Safeguard Sentinel: Infinity Protocol v3.0
+# Safeguard Sentinel: Infinity Protocol v6.2
 
 **Goal**: Prevent hallucinations, context bleed, and architectural regressions.
 
@@ -14,4 +14,4 @@ description: Safeguard Sentinel - Security & Regression
 
 ## 2. EVOLUTION ALGORITHMS
 - **Recursive Self-Evolution (RSE)**: After a major task, audit for failures. Propose global rule updates if repeated failures occur.
-- **Recursive Audit (RA)**: Self-correct internally against Infinity Protocol v3.0 constraints before final output submission.
+- **Recursive Audit (RA)**: Self-correct internally against Infinity Protocol v6.2 constraints before final output submission.
