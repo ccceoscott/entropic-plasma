@@ -1,19 +1,41 @@
 ---
-description: SEO SOVEREIGNTY - Metadata, Schema, Sitemaps
-globs: **/*.tsx, **/*.ts
+description: SEO SOVEREIGNTY - Metadata, Schema, Sitemaps, Core Web Vitals
+globs: **/*.tsx, **/*.ts, app/**/page.tsx, app/**/layout.tsx
 ---
 # SEO SOVEREIGNTY: INFINITY PROTOCOL v6.2
 
-## 1. METADATA API
-- **Dynamic**: Use `generateMetadata({ params })`.
-- **Fields**: Title, Description, OpenGraph, Twitter, Alternates (Canonical).
+> Consolidates `seo_governance.mdc`. One rule, absolute authority.
 
-## 2. STRUCTURED DATA
-- **Library**: `schema-dts`.
-- **Format**: JSON-LD scripts in `<head>`.
-- **Validation**: Test with Google Rich Results Test.
+## 1. METADATA API (Next.js App Router)
+```typescript
+// Every page MUST export generateMetadata
+export async function generateMetadata({ params }): Promise<Metadata> {
+  return {
+    title: `${product.name} | Brand`,
+    description: product.description.slice(0, 160),
+    openGraph: { images: [{ url: product.imageUrl }] },
+    alternates: { canonical: `https://domain.com/${params.slug}` },
+  };
+}
+```
 
-## 3. TECHNICAL SEO
-- **Sitemap**: `sitemap.ts` (Dynamic).
-- **Robots**: `robots.ts` (Allow/Disallow).
-- **Performance**: Core Web Vitals (LCP, CLS, INP) optimized.
+## 2. SCHEMA.ORG (schema-dts)
+- Use `schema-dts` for all structured data. No raw JSON-LD strings.
+- Required schemas: `Organization` (root), `Product` (commerce), `Article` (blog), `BreadcrumbList` (nav).
+
+## 3. TECHNICAL SEO MANDATES
+- **Sitemap**: Dynamic `app/sitemap.ts` — auto-generates from Firestore/CMS data.
+- **Robots**: `app/robots.ts` — block `/admin*`, `/api*`, `/dashboard*`.
+- **Canonical**: Always set. Trailing-slash consistency enforced (Rule 17).
+- **Core Web Vitals**: LCP < 2.5s, CLS < 0.1, INP < 200ms. Non-negotiable.
+
+## 4. IMAGE SEO
+- ALL `<img>` → `next/image` with `alt`, `width`, `height`.
+- WebP/AVIF format mandatory.
+- Preload hero images via `priority` prop.
+
+## 5. FORBIDDEN PATTERNS
+- Duplicate `<title>` tags.
+- Missing `alt` attributes.
+- `noindex` on public content pages.
+- Blocking Googlebot in `robots.ts`.

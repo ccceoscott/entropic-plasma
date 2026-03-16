@@ -1,17 +1,34 @@
 ---
-description: Infinity Protocol v6.2 SYNC - Automated Protocol Patching
-globs: MISSION_STATE.md, scripts/Infinity Protocol v6.2_sync.sh
+description: Infinity Protocol v6.2 SYNC — Automated Protocol Drift Detection and Repair
+globs: MISSION_STATE.md, scripts/dv
 ---
-# Infinity Protocol v6.2 SYNC MASTERY (Infinity Protocol)
+# PROTOCOL SYNC MASTERY: INFINITY PROTOCOL v6.2
 
-## 1. THE TRIGGER
-If the Agent detects that the `.cursor/rules` folder in the current project is older than the `Infinity Protocol` Brain status (or missing key rules like `cache_busting_mastery.mdc`), it MUST PROPOSE running `scripts/Infinity Protocol v6.2_sync.sh`.
+## 1. THE TRIGGER (Auto-Detection)
+On every session start, the agent MUST check for protocol drift:
+- `.cursor/rules/` missing `secret_management_guardian.mdc` or `constitution.mdc` → DRIFT
+- `.cursorrules` hash differs from HUB → DRIFT
+- `GEMINI.md` missing or outdated → DRIFT
 
-## 2. THE PROCEDURE
-1.  **Request Approval**: "Protocol drift detected. Run Infinity Protocol v6.2 Sync?"
-2.  **Execute**: Run `sh scripts/Infinity Protocol v6.2_sync.sh`.
-3.  **Verify**: Run `/audit`.
+## 2. THE FIX — `dv` CLI Commands
+```bash
+# Detect drift across all workspaces
+dv doctor
+
+# Auto-heal the current workspace
+dv fix-drift
+
+# Broadcast v6.2 protocol to ALL workspaces (parallel, git auto-commit)
+dv broadcast
+
+# Verify post-heal state
+dv lint-rules
+```
 
 ## 3. LOGGING
--   Ensure `MISSION_STATE.md` captures the sync event.
--   Identify if any local rules were overwritten and notify the user if those rules contained manual overrides.
+- Record sync events in `MISSION_STATE.md` under `## 🔄 Sync Log`.
+- If local rules had manual overrides that were overwritten → notify the user immediately.
+
+## 4. GOVERNANCE
+- `SOVEREIGN_LOCK` is the checksum authority. Run `dv locksheet` to regenerate.
+- Rule drift is a CRITICAL issue. Never defer mitigation.

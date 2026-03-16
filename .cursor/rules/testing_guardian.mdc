@@ -1,17 +1,55 @@
 ---
-description: TESTING - Firebase Emulator, Data Teardown, Mocking, Hermetic Environment
-globs: **/*.{test,spec}.{ts,js,tsx}
+description: TESTING SOVEREIGNTY - E2E (Playwright), Unit (Vitest), Firebase Emulator, Coverage
+globs: **/*.{test,spec}.{ts,js,tsx}, playwright.config.ts, vitest.config.ts
 ---
-# TESTING GUARDIAN (Infinity Protocol)
+# TESTING SOVEREIGNTY: INFINITY PROTOCOL v6.2
 
-## 1. EMULATOR MANDATE
--   **Connection Check**: Before running logic, verify `process.env.FIRESTORE_EMULATOR_HOST` is set. If not, HALT.
--   **Production Stop**: If `admin.app().options.projectId` matches the production ID, THROW FATAL ERROR.
+> Consolidates `testing.mdc` + `testing_guardian.mdc`. One rule, absolute authority.
 
-## 2. HYGIENE PROTOCOLS
--   **Teardown**: Every test file MUST include an `afterAll` or `afterEach` block that calls a `clearDatabase()` utility.
--   **Seeding**: Use a `seedUser()` factory pattern. Do not hardcode user IDs across files.
+## 1. STACK MANDATES
+| Layer | Tool | Standard |
+|---|---|---|
+| E2E | Playwright | All user flows + auth paths |
+| Unit/Integration | Vitest | All logic, hooks, utilities |
+| Mobile | Maestro | Critical user journeys |
+| Firestore Rules | `@firebase/rules-unit-testing` | `assertSucceeds` + `assertFails` |
+| A11y | `axe-playwright` | Zero violations on public pages |
 
-## 3. MOCKING DISCIPLINE
--   **Network Block**: CI environments should block egress traffic to ensure external APIs are mocked.
--   **Stripe**: Use `jest.mock('stripe')` or wait for webhook simulation.
+## 2. EMULATOR MANDATE
+```typescript
+// ALWAYS verify emulator connection before any test logic
+beforeAll(() => {
+  if (!process.env.FIRESTORE_EMULATOR_HOST) {
+    throw new Error('FATAL: Tests must run against emulator, not production.');
+  }
+  if (admin.app().options.projectId === PRODUCTION_PROJECT_ID) {
+    throw new Error('FATAL: Production project detected in test environment.');
+  }
+});
+```
+
+## 3. TEST HYGIENE
+- **Teardown**: Every test file MUST have `afterEach`/`afterAll` calling `clearDatabase()`.
+- **Seeding**: Use factory functions (`createUser()`, `createOrder()`). No hardcoded IDs.
+- **Isolation**: Tests MUST NOT share state. Every test starts from a clean slate.
+- **No Skipping**: Do NOT comment out or `.skip` failing tests. Fix the code.
+
+## 4. THE ZERO-MANUAL MANDATE
+- Never ask the user to "check if it works." Write a test. Run verification. Check logs.
+- If you fix a bug → write a regression test immediately.
+
+## 5. CI INTEGRATION
+- All tests run in `firebase emulators:exec` via CI.
+- Playwright config must target emulator URLs in CI (`baseURL: process.env.CI_BASE_URL`).
+- Network egress MUST be blocked in CI (mock all external APIs).
+- Code coverage threshold: **80% minimum** for new files.
+
+## 6. PERFORMANCE BUDGETS (enforced in E2E)
+- Page load: < 2000ms
+- LCP: < 2.5s
+- No layout shift (CLS < 0.1)
+
+## 7. GOVERNANCE
+- Maintain `TEST_INDEX.md` as a living registry of test surface area.
+- `dv fix-drift` auto-heals rule alignment. `dv test-all` runs workspace-wide E2E.
+- `AI_DEBUG.md` persists architectural decisions that affect test design.

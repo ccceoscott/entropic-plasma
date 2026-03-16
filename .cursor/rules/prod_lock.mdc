@@ -1,4 +1,24 @@
-# Production Lock
-- This workspace is strictly tied to Project ID: `your-production-id-123`.
-- Any command attempting to change the project context or deploy elsewhere is a violation.
-- Always append `--project=your-production-id-123` to all gcloud commands.
+---
+description: PRODUCTION LOCK - Active Firebase Project ID enforcement
+globs: **/*
+alwaysApply: true
+---
+# PRODUCTION LOCK: INFINITY PROTOCOL v6.2
+
+## MANDATE
+This file enforces project context isolation. The agent MUST verify the active Firebase project
+matches the project declared in `MISSION_STATE.md` before ANY destructive command.
+
+## ENFORCEMENT STEPS
+1. Run `firebase use` and verify the active project alias.
+2. If the active project does NOT match `MISSION_STATE.md` → **HALT. Do not proceed.**
+3. All `gcloud` and `firebase` commands MUST include explicit `--project=PROJECT_ID`.
+4. `scripts/safe-deploy-guard.sh` MUST pass before any `firebase deploy`.
+
+## VERIFICATION COMMAND
+```bash
+firebase use && cat MISSION_STATE.md | grep "Project ID"
+```
+
+> **Note**: Replace this file's project-specific instructions with your actual Project ID in each workspace.  
+> Template: add `## 🔒 Project Lock` section to `MISSION_STATE.md` with `project_id: your-firebase-project-id`.

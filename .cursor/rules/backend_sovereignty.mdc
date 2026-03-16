@@ -1,24 +1,35 @@
 ---
-description: BACKEND SOVEREIGNTY - Firebase, Security, Performance
+description: BACKEND SOVEREIGNTY - Firebase Cloud Functions, Firestore, Security, Performance
 globs: **/*.ts, functions/**
 ---
-# BACKEND SOVEREIGNTY: FIREBASE ABSOLUTISM
+# BACKEND SOVEREIGNTY: FIREBASE ABSOLUTISM — Infinity Protocol v6.2
+
+> **See Also**: `firebase_mastery.mdc` for implementation patterns. `secret_management_guardian.mdc` for credential rules (MANDATORY).
 
 ## 1. ARCHITECTURE
-- **Platform**: Firebase Cloud Functions (Gen 2).
-- **Database**: Firestore (NoSQL).
-- **Auth**: Firebase Auth (Custom Claims management).
+- **Platform**: Firebase Cloud Functions Gen 2 (`onCall`, `onRequest`, `onSchedule`).
+- **Database**: Firestore (NoSQL). Use Data Connect only for SQL-specific requirements.
+- **Auth**: Firebase Auth with Custom Claims for RBAC.
+- **Secrets**: `defineSecret()` from `firebase-functions/params`. **NEVER** `.env` or `process.env` for secrets. See `secret_management_guardian.mdc`.
 
-## 2. SECURITY "ZERO-DAY"
-- **App Check**: Enforce on ALL callable functions.
-- **Validation**: Zod schema validation for ALL inputs.
-- **Secrets**: Use `defineSecret()` / Google Secret Manager. NEVER `.env` for secrets.
+## 2. SECURITY — ZERO-DAY POSTURE
+- **App Check**: Enforce on ALL callable functions via `enforceAppCheck: true`.
+- **Validation**: Zod schema validation for ALL inputs — no raw `request.data` access.
+- **Auth Guard**: Verify `context.auth?.uid` before any data operation; throw `unauthenticated` otherwise.
+- **RBAC**: Verify custom claims server-side. Never trust client-side role checks.
 
 ## 3. PERFORMANCE
-- **Cold Starts**: Use `minInstances` for critical paths.
-- **Async**: Use `Promise.all` for parallel execution.
-- **Data**: Denormalize data in Firestore for read efficiency.
+- **Cold Starts**: Set `minInstances: 1` for latency-sensitive paths (checkout, auth).
+- **Concurrency**: Use `concurrency: 80` for high-throughput functions (Gen 2).
+- **Async**: Use `Promise.all()` for independent parallel operations.
+- **Firestore**: Denormalize data aggressively for read efficiency. Avoid N+1 reads.
 
 ## 4. ERROR HANDLING
-- **Observability**: Log strictly to Cloud Logging (structured JSON).
-- **Client**: Throw `HttpsError` with specific codes (not generic 500s).
+- **Logging**: Structured JSON only to Cloud Logging. ZERO `console.log` in production.
+- **Client Errors**: Throw `HttpsError` with specific codes (`permission-denied`, `not-found`, `internal`). Never generic 500s.
+- **Retries**: Design idempotent functions. Use Firestore transactions for atomic state changes.
+
+## 5. COST CONTROL
+- **Reads**: Use `select()` to fetch only required fields from Firestore.
+- **Writes**: Batch writes for bulk operations (`writeBatch`).
+- **Functions**: Set `timeoutSeconds` and `memory` explicitly. No unbounded loops.
