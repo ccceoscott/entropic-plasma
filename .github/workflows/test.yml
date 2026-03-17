@@ -2,50 +2,137 @@ name: Infinity Protocol CI (Apex Pipeline)
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
 
 jobs:
-  apex_verification:
+  # ─── Job 1: Unit Tests, Linting & Type Checking (runs in parallel with e2e) ───
+  unit_and_lint:
+    name: Unit Tests, Lint & Types
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js (Apex v22)
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: 22
+          cache: npm
 
-      - name: Install Project Dependencies
+      - name: Install Root Dependencies
         run: npm ci
 
       - name: Security & Secret Scanning (Sovereign Security v6.2)
         continue-on-error: true
+        # Native CI execution of audit policies
         run: |
-          # Native CI execution of audit policies
           npm audit --audit-level=high
           if [ -f "scripts/infinity-guardian.js" ]; then npm run test:security; fi
 
-      - name: Data Integrity & Schema Validation
+      - name: Run Quality Gates (TSC + ESLint + Vitest concurrently)
         run: |
-          if grep -q '"test:integrity":' package.json; then npm run test:integrity; fi
+          npx tsc --noEmit &
+          PID_TSC=$!
+          if grep -q '"lint":' package.json; then npm run lint & PID_LINT=$!; else PID_LINT=""; fi
+          if grep -q '"test:unit":' package.json; then npm run test:unit -- --run --coverage & PID_TEST=$!; else PID_TEST=""; fi
+          wait $PID_TSC
+          if [ -n "$PID_LINT" ]; then wait $PID_LINT; fi
+          if [ -n "$PID_TEST" ]; then wait $PID_TEST; fi
 
-      - name: Production Build Verification
-        run: |
-          if grep -q '"build":' package.json; then npm run build; fi
+      - name: Upload Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-coverage
+          path: coverage/
+          retention-days: 14
 
-      - name: Functions Verification
-        if: hashFiles('functions/package.json') != ''
-        working-directory: ./functions
-        run: |
-          npm ci
-          if grep -q '"test":' package.json; then npm run test; fi
-          if grep -q '"test:security":' package.json; then npm run test:security; fi
+  # ─── Job 2: E2E Tests (Playwright + Firebase Emulators) ──────────────────────
+  e2e_tests:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
 
-      - name: Global Health Check
-        run: |
-          echo "Infinity Protocol v5.0: Sovereign Apex Verification Complete."
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Java 21 (Firebase Emulators)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install Root Dependencies
+        run: npm ci
+
+      - name: Cache Functions Dependencies
+        if: hashFiles('functions/package-lock.json') != ''
+        uses: actions/cache@v4
+        with:
+          path: functions/node_modules
+          key: ${{ runner.os }}-functions-${{ hashFiles('functions/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-functions-
+
+      - name: Install Functions Dependencies
+        if: hashFiles('functions/package-lock.json') != ''
+        run: npm --prefix functions ci
+
+      - name: Build Functions
+        if: hashFiles('functions/package-lock.json') != ''
+        run: npm --prefix functions run build
+
+      - name: Build Frontend
+        run: npm run build
+        env:
+          CI: true
+
+      - name: Get Playwright Version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | awk '{print $2}')" >> $GITHUB_ENV
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright OS Dependencies
+        run: npx playwright install-deps chromium firefox
+
+      - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium firefox
+
+      - name: Run E2E Tests
+        run: if grep -q '"test:e2e":' package.json; then npm run test:e2e; fi
+        env:
+          CI: true
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload Playwright Videos (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos
+          path: test-results/
+          retention-days: 7

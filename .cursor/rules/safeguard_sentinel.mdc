@@ -1,75 +1,17 @@
 ---
-alwaysApply: true
-description: SAFEGUARD SENTINEL - Hallucination prevention, context bleed, poison strings, regression audit
-globs: "**/*"
+description: Safeguard Sentinel - Security & Regression
 ---
-# SAFEGUARD SENTINEL: INFINITY PROTOCOL v6.2
 
-> **The Alpha Directive**: The last line of defense before modifying files or executing risky commands. 
+# Safeguard Sentinel: Infinity Protocol v6.2
 
-## 1. THE CONTEXT BLEED PRE-FLIGHT (`scripts/context-check.sh`)
-When switching projects or initializing a session involving destructive actions (deploys, mass deletions), execute this script to ensure absolute workspace isolation.
+**Goal**: Prevent hallucinations, context bleed, and architectural regressions.
 
-**`scripts/context-check.sh`**
-```bash
-#!/bin/bash
-set -e
+## 1. CORE MANDATES
+- **Context Bleed**: Scan every output for "Poison Strings" from unrelated projects. Sever immediately if found.
+- **Hallucination Audit**: Verify you have physically READ the current file/identifier before executing any tool modifying it.
+- **Regression Check**: Audit backwards-compatibility before finalizing any core logic changes.
+- **Zero-Tolerance Guessing**: DO NOT guess project IDs, active URLs, or remote variable names. Query or ask.
 
-EXPECTED_PROJECT="infinity-protocol-1"
-
-# 1. Verify Directory
-CURRENT_DIR=$(basename "$PWD")
-if [ "$CURRENT_DIR" != "$EXPECTED_PROJECT" ]; then
-  echo "❌ BLEED DETECTED: Expected $EXPECTED_PROJECT, but in $CURRENT_DIR."
-  exit 1
-fi
-
-# 2. Verify Git Remote
-REMOTE_URL=$(git config --get remote.origin.url)
-if [[ "$REMOTE_URL" != *"ccceoscott/infinity-protocol"* ]]; then
-  echo "❌ BLEED DETECTED: Invalid Git Remote ($REMOTE_URL)."
-  exit 1
-fi
-
-# 3. Verify Firebase Project (if applicable)
-if command -v firebase &> /dev/null && [ -f ".firebaserc" ]; then
-  ACTIVE_FB=$(firebase use)
-  echo "🔥 Active Firebase Project: $ACTIVE_FB"
-  # Add specific checks here if a specific FB project is mandated
-fi
-
-echo "✅ Context Verification Passed. Safe to proceed."
-```
-
-## 2. POISON STRING GUARD
-Scan every response and generated file for these forbidden strings/patterns before submission:
-
-| Category | Forbidden Strings & Anti-Patterns |
-|---|---|
-| **Legacy Branding** | `CareKey`, `SARAH`, `Vast`, `Anti-Gravity Diamond` |
-| **Version Drift** | `v1.x`, `v1.7`, `v1.6`, `v6.1` (We are STRICTLY v6.2) |
-| **Banned Tech** | `Supabase`, `HubSpot`, `Salesforce`, `Bootstrap`, `Material UI` |
-| **Stale Scripts** | `sovereign_sync.sh`, `Infinity Protocol v6.2_sync.sh` |
-
-**Enforcement:** If found, HALT output, flag the string, and self-correct immediately.
-
-## 3. HALLUCINATION PREVENTION (Data Validation)
-Before making architectural assumptions, you **MUST** verify existence:
-1.  **Files**: Do not modify files you haven't read in the current session (`cat` or `view_file`).
-2.  **Functions**: Do not import or call functions unless you have `grep`ped the codebase to confirm their signature.
-3.  **Firestore**: Do not assume schema fields exist. Check `types/` or `interfaces/`.
-4.  **Secrets**: Never assume an environment variable's name. Check `.env.example`.
-
-## 4. REGRESSION AUDIT (The "Don't Break It" Checklist)
-Before finalizing any change to shared/core logic (`utils/`, `hooks/`, `components/ui/`):
-- [ ] Does this break existing TypeScript types? (Run `npx tsc --noEmit`)
-- [ ] Does this alter a public function signature? (Identify and update all callers)
-- [ ] Does this change Firestore document shape? (Update Security Rules accordingly)
-- [ ] Does this touch auth flow? (Re-verify the session lifecycle)
-
-## 5. RECURSIVE SELF-AUDIT (Pre-Submission)
-Before every final tool submission or user notification:
-- [ ] No poison strings in output.
-- [ ] No hardcoded secrets or API keys (Use `[REDACTED]`).
-- [ ] Commit messages follow `<type>(<scope>): <subject>` format.
-- [ ] `MISSION_STATE.md` represents the true current state.
+## 2. EVOLUTION ALGORITHMS
+- **Recursive Self-Evolution (RSE)**: After a major task, audit for failures. Propose global rule updates if repeated failures occur.
+- **Recursive Audit (RA)**: Self-correct internally against Infinity Protocol v6.2 constraints before final output submission.

@@ -1,11 +1,6 @@
----
-alwaysApply: true
-description: E-COMMERCE SOVEREIGNTY - Shopify-Grade Architecture, Stripe Choreography, B2B Tiers, Component Chunking
-globs: **/*{payment,checkout,cart,webhook,inventory,shop,order,product}*.{ts,js,tsx}, functions/src/index.ts
----
-# E-COMMERCE SOVEREIGNTY: INFINITY PROTOCOL v6.2 (Shopify-Grade)
+# E-COMMERCE SOVEREIGNTY: INFINITY PROTOCOL v6.2.13 (Intelligence)
 
-> Consolidates `ecommerce_architect.mdc`. One rule, absolute authority on all commerce logic. Incorporates all EPIHAB Platinum wins for headless architecture.
+> Consolidates `ecommerce_architect.mdc`. One rule, absolute authority on all commerce logic. Incorporates all EPIHAB Platinum wins and v6.2.13 AI Intelligence.
 
 ## 1. TRANSACTIONAL INTEGRITY — Zero-Trust Pricing
 - **Server-Only**: Frontend NEVER calculates final price. PaymentIntent amount = server-side DB read only.
@@ -34,11 +29,55 @@ The order lifecycle MUST follow this exact state machine to decouple financial c
    - **Partial Refund Support**: State machine MUST support `paymentStatus: 'partially_refunded'` to handle split fulfillment or inventory shortages without killing the entire order object.
 5. **Phase 5 (Resolution)**: Order moved to `'completed'`.
 
-## 3. PORTAL ID & B2B VERIFICATION
-- **X-Portal-ID**: Middleware MUST verify the `X-Portal-ID` header against the `allowed_portals` array in the project config to prevent cross-tenant leakages in cloned storefronts.
-- **Dynamic CSS**: Use `PortalContext` to inject `--theme-accent` based on the verified Portal ID.
+## 3. CHECKOUT RECOVERY & ABANDONMENT (Automated)
+- **Edge Recovery Sentinel**: Use Next.js Middleware or Server Actions to track "Checkout Started" events.
+- **Zombie Cleanup**: Fulfillment Sentinels (Cron) MUST release inventory locks if an order remains in `'draft'` > 60 mins.
+- **Recovery Links**: Standardize a `recovery_token` (JWT) passed via Phase 39 email protocols to restore cart state.
 
-## 4. STRIPE WEBHOOK ARCHITECTURE (Next.js App Router)
+## 4. AI INTELLIGENCE — Predictive Cross-Selling
+- **Proximity Logic**: Use Firestore-lite category/tag matching for recommendations.
+- **Vector-Ready**: Prepare for Vertex AI / Gemini integration by storing `vector_embedding` fields (future-proofing).
+
+```typescript
+// ✅ AI-Driven Related Products Logic
+export const getRelatedProducts = async (productId: string, limit: number = 4) => {
+  const productDoc = await adminDb.collection('products').doc(productId).get();
+  const { category, tags, price } = productDoc.data()!;
+  
+  // Intelligence: Same Category (Priority) + Tag Overlap + Price Proximity
+  return adminDb.collection('products')
+    .where('category', '==', category)
+    .where('active', '==', true)
+    .where('price', '>=', price * 0.7) // Within 30% range
+    .where('price', '<=', price * 1.3) 
+    .limit(limit)
+    .get();
+};
+```
+
+## 5. SMART DISCOUNTING — Dynamic Tier Logic
+- **Server-Side Enforcement**: All coupons/discounts MUST be validated server-side against Firestore `coupons` collection.
+- **Tiered Stacking**: Enforce logical limits (e.g., "Welcome" coupon cannot stack with "B2B" wholesale pricing).
+
+```typescript
+// ✅ Tier-Based Discount Logic
+export const calculateDiscount = (subtotal: number, coupon: any, userRole: string) => {
+  if (userRole === 'wholesale_approved') return subtotal * 0.6; // Flat 40% B2B
+  if (coupon.type === 'percentage') return subtotal * (1 - coupon.value / 100);
+  if (coupon.type === 'fixed') return Math.max(0, subtotal - coupon.value);
+  return subtotal;
+};
+```
+
+## 6. INVENTORY VELOCITY & URGENCY
+- **Scarcity Hook**: Ingest `sales_velocity` (units/day) to trigger "Selling Fast!" or "Only X Left!" flags in the frontend UI.
+- **Stock Thresholds**: Cloud Functions MUST notify admins when `stock - reserved < low_stock_threshold`.
+
+## 7. B2B / ADMIN SOVEREIGNTY (RBAC) & STOREFRONT CLONING
+- **Multi-Tiered Pricing**: Implement role verification (e.g., `wholesale_approved`) via `useAuthStore` combined with server-side Custom Claims validation.
+- **Storefront Portals**: Sub-brands or B2B partners access specific UI themes via URL slugs. Inject `PortalContext.tsx` to apply specific CSS variables (`--portal-primary`) globally.
+
+## 8. STRIPE WEBHOOK ARCHITECTURE (Next.js App Router)
 ```typescript
 // app/api/webhooks/stripe/route.ts
 import { headers } from "next/headers";
@@ -59,114 +98,41 @@ export async function POST(req: Request) {
     return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
   }
 
-  // ✅ Idempotency guard using Firebase Admin
+  // Idempotency guard
   const eventRef = adminDb.collection("webhook_events").doc(event.id);
   const doc = await eventRef.get();
-  if (doc.exists) return NextResponse.json({ received: true, status: "already_processed" });
-
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    // Process order fulfillment OR rely on Phase 4 (Draft -> Processing) Trigger.
-  }
+  if (doc.exists) return NextResponse.json({ received: true });
 
   await eventRef.set({ processedAt: new Date().toISOString(), type: event.type });
   return NextResponse.json({ received: true });
 }
 ```
 
-## 4. INVENTORY & CART ITEM IDENTITY — Atomic Transactions
-- **Composite Cart IDs**: For complex products (e.g., configurations, options), cart item IDs MUST be generated as a sorted, concatenated string of the `productId` and serialized `options`. 
-  - *Pattern*: `${product.id}-${optionsString}` (e.g., `mug01-color:red|size:L`). This ensures distinct line items.
-- **Atomic Stock Deductions**: Cloud Functions MUST decrement stock using atomic transactions to prevent race conditions.
-
-```typescript
-// ✅ Atomic stock hold (Phase 1)
-export const reserveInventory = async (productId: string, quantity: number) => {
-  const db = admin.firestore();
-  const productRef = db.collection('products').doc(productId);
-
-  await db.runTransaction(async (t) => {
-    const doc = await t.get(productRef);
-    if (!doc.exists) throw new Error('PRODUCT_NOT_FOUND');
-    const data = doc.data()!;
-    
-    // Check against available (stock - reserved)
-    const available = data.stock - (data.reserved || 0);
-    if (available < quantity) throw new Error('OUT_OF_STOCK');
-    
-    t.update(productRef, { reserved: admin.firestore.FieldValue.increment(quantity) });
-  });
-};
-```
-
-## 5. AI INTELLIGENCE — Recommendation & Proximity Logic
-- **Server-Side Proximity**: Recommendation logic MUST NOT rely on client-side filtering. Use Cloud Functions to calculate proximity based on tags, category, and price-point.
-- **Cold-Start Safety**: Use `shared_tags` to fetch related products if specific user history is absent.
-
-```typescript
-// ✅ AI Proximity Pattern (Simplified)
-export const getRelatedProducts = async (productId: string, limit: number = 4) => {
-  const productDoc = await adminDb.collection('products').doc(productId).get();
-  const { category, tags, price } = productDoc.data()!;
-  
-  // Scoring: Same Category (3pts), Tag Match (1pt each), Price within 20% (2pts)
-  return adminDb.collection('products')
-    .where('category', '==', category)
-    .where('active', '==', true)
-    .limit(limit * 2) // Over-fetch for price scoring
-    .get();
-};
-```
-
-## 6. LOYALTY & REWARDS — Atomic Point Harvesting
-- **Resolution Trigger**: Points MUST be awarded ONLY when `status` transitions to `'completed'`.
-- **Atomic Increment**: Use `admin.firestore.FieldValue.increment()` to prevent point-doubling in concurrent resolution events.
-- **Redemption Locking**: Points used during checkout MUST be temporarily locked in a `pending_points` field until the transaction resolves.
-
-## 7. SUBSCRIPTION SYNCHRONICITY (Stripe Billing)
-- **Claim-Backed Access**: Subscription status (e.g., `pro`, `tier_1`) MUST be mirrored from Stripe metadata into Firebase Custom Claims via Webhook.
-- **Re-Auth Enforcement**: If a subscription is revoked, set a `force_reauth: true` flag in the user document to trigger a client-side `auth.signOut()` on next interaction.
-
-## 8. B2B / ADMIN SOVEREIGNTY (RBAC) & STOREFRONT CLONING
-- **Multi-Tiered Pricing**: Implement role verification (e.g., `wholesale_approved`) via `useAuthStore` combined with server-side Custom Claims validation to unlock trade discounts (e.g., 40% off).
-- **Storefront Portals**: Sub-brands or B2B partners access specific UI themes via URL slugs. Inject `PortalContext.tsx` to apply specific CSS variables (`--portal-primary`) globally for Liquid Glass UI alterations.
-- All inventory/product/order mutations: `admin: true` custom claim verified server-side.
-- Client-side UI gating is insufficient — always back-check with Firebase Auth custom claims.
-
 ## 9. PERFORMANCE, BUILD & E2E PROTOCOLS (ARM64 Safety)
-- **Node v22 (LTS) Mandate**: Production builds MUST run on Node 22 to prevent memory deadlocks during PostCSS transformation on large Tailwind ecosystems.
-- **Rollup Chunking**: Manually chunk massive vendor libraries (e.g., `@react-three`, `firebase`, `framer-motion`) in `vite.config.ts` to prevent "Ghost Success" blank page renders.
-- **Tailwind Ambiguity Guards**: Avoid arbitrary values in complex classes (e.g., `duration-[15000ms]`). Extend `tailwind.config` with named tokens (e.g., `duration-slowest`) to prevent JIT parser deadlocks.
-- **Playwright Asynchronous Hydration**: Fill inputs, **blur**, and rely on static locators (e.g., `data-testid="cart-drawer"`). Use the Double-Click protocol for checkout verification (Wait for Matrix -> Confirm).
+- **Node v22 (LTS) Mandate**: Production builds MUST run on Node 22.
+- **Rollup Chunking**: Manually chunk massive vendor libraries in `vite.config.ts`.
+- **Hydration Safety**: Playwright tests MUST wait for Hydration before interaction.
 
-## 10. CHECKOUT UX RULES (Rule 19 Enforcement)
-- Checkout buttons MUST survive Z-index traps on mobile — no `backdrop-blur` parent clipping.
-- Playwright E2E tests MUST use `{ force: true }` locators for checkout CTA confirmation.
-- Post-purchase flow (receipt + confirmation email) runs synchronously — assume user kills tab immediately after payment.
+## 10. MEDIA SOVEREIGNTY (Admin-Side Automation)
+- **Atomic Transformation**: Product uploads MUST trigger `onFinalize` Cloud Functions for AVIF/WebP generation.
+- **Autotagging**: Ingest Vision AI tags into product document for improved cross-selling logic.
 
-## 11. SECURITY
-- Firestore rules MUST assert `quantity > 0` and `price >= 0` on all cart writes.
-- App Check enforced on all checkout callable functions.
-
----
-
-## 12. BULK OPERATIONS SOVEREIGNTY (Transactional Batches)
-- **Batch Gating**: Any bulk mutation (Price edit, Stock reset) affecting >5 units MUST utilize `db.batch()` to ensure atomicity.
-- **Limit Enforcement**: Strictly adhere to the 500-operation Firestore limit per batch. If higher, split into `await Promise.all(batches)`.
+## 11. PRODUCT HEALTH & AI CONTENT (Intelligence+)
+- **Product Health Audit**: Automated sentinel to flag products with missing metadata, low-res images, or stale inventory (>6 months).
+- **AI Description Booster**: Cloud Function pattern to generate SEO-optimized product descriptions using Gemini Pro based on raw attributes.
 
 ```typescript
-// ✅ Bulk Price Update Pattern
-export const updateMassPricing = async (productIds: string[], multiplier: number) => {
-  const batch = adminDb.batch();
-  for (const id of productIds.slice(0, 500)) {
-     const ref = adminDb.collection('products').doc(id);
-     batch.update(ref, { price: admin.firestore.FieldValue.increment(multiplier) });
-  }
-  await batch.commit();
-};
+// ✅ AI Description Booster (Gemini Pro Handshake)
+export const boostProductDescription = onCall(async (request) => {
+  const { productId, attributes } = request.data;
+  // Invoke Gemini API via AI Proxy (Phase 61)
+  const enhancedDescription = await callAiProxy('gemini-1.5-pro', {
+    prompt: `Generate a luxury sales description for: ${attributes.join(', ')}`,
+  });
+  await adminDb.collection('products').doc(productId).update({ description: enhancedDescription });
+});
 ```
 
-## 13. MEDIA SOVEREIGNTY (Admin-Side Automation)
-- **Atomic Transformation**: Administrative product uploads MUST trigger an `onFinalize` Cloud Storage function for automatic WebP/AVIF resizing.
-- **Metadata Extraction**: Product metadata (dimensions, color-palette) MUST be extracted and injected into the Firestore product document during the upload handshake.
-
+## 12. ADMIN WORKFLOW AUTOMATION (Bulk Actions)
+- **Sovereign Bulk Ops**: Standardize atomic batch patterns for "Mark as Sale", "Update Categories", or "Adjust Stock" across multiple documents.
+- **Action Buffer**: Implement a 5-second "Undo" buffer in the Admin UI for destructive bulk operations.

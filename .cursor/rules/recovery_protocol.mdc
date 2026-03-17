@@ -1,0 +1,64 @@
+# RECOVERY PROTOCOL: INFINITY PROTOCOL v6.2.13 (Automated Recovery)
+
+> **Mandate**: No lost revenue. Intercept, track, and re-engage every abandoned checkout.
+
+## 1. EDGE RECOVERY SENTINEL (Next.js Middleware)
+- **Concept**: Detect "Checkout Started" by monitoring navigation to `/checkout` or Stripe session creation.
+- **Persistence**: Store `checkout_session_id` or `cart_id` in a secure `__recovery_lock` cookie (HttpOnly).
+- **Handshake**: If the user leaves the site before order confirmation, the sentinel triggers an "Abandonment Event" in Firestore via a background Server Action.
+
+```typescript
+// ✅ Recovery Middleware Interceptor
+export async function recoverySentinel(req: NextRequest) {
+  const isCheckout = req.nextUrl.pathname.startsWith('/checkout');
+  const hasRecoveryLock = req.cookies.has('__recovery_lock');
+
+  if (isCheckout && !hasRecoveryLock) {
+    const recoveryId = crypto.randomUUID();
+    const response = NextResponse.next();
+    response.cookies.set('__recovery_lock', recoveryId, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+    
+    // Internal trigger for abandonment tracking
+    await trackCheckoutStart(recoveryId); 
+    return response;
+  }
+}
+```
+
+## 2. AUTOMATED RE-ENGAGEMENT (Cloud Function Sentinel)
+- **Logic**: Triggered by a Cron schedule (e.g., every 30 mins).
+- **Condition**: Find orders in `'draft'` where `updatedAt < now - 60 mins` AND `recoverySent: false`.
+- **Action**: Generate a signed JWT recovery link and dispatch via `auth_email_protocol.mdc` (Phase 39).
+
+```typescript
+// ✅ Cloud Function: Dispatch Recovery
+export const onCheckoutAbandoned = onSchedule('every 30 minutes', async (event) => {
+  const abandonedQuery = adminDb.collection('orders')
+    .where('status', '==', 'draft')
+    .where('recoverySent', '==', false)
+    .where('updatedAt', '<', admin.firestore.Timestamp.fromDate(new Date(Date.now() - 3600000)));
+
+  const snapshot = await abandonedQuery.get();
+  
+  for (const doc of snapshot.docs) {
+    const order = doc.data();
+    await sendRecoveryEmail(order.customerEmail, {
+      recoveryUrl: `https://yourdomain.com/checkout?resume=${doc.id}`,
+      discountCode: 'COMEBACK10' // Smart Discounting integration
+    });
+    await doc.ref.update({ recoverySent: true, updatedAt: FieldValue.serverTimestamp() });
+  }
+});
+```
+
+## 3. RECOVERY JWT STANDARDS
+- **Claims**: Must contain `orderId`, `exp` (default 48h), and `items_hash`.
+- **Validation**: Server Action `/api/checkout/resume` validates the JWT before hydrating the cart state from the `'draft'` order object.
+
+## 4. LOGISTICS & AUDIT
+- **Tracking**: Log `recovery_link_clicked` and `recovery_converted` to `analytics_guardian.mdc` for ROI measurement.
+- **Cleanup**: Delete expired `'draft'` orders after 7 days via Fulfillment Sentinel.

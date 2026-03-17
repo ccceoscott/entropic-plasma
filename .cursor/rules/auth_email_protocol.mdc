@@ -3,9 +3,6 @@ alwaysApply: true
 description: AUTH & EMAIL PROTOCOL - Firebase Auth, SES, Security, Middleware
 globs: **/*.ts, **/*.tsx, middleware.ts
 ---
-# AUTH & EMAIL PROTOCOL: INFINITY PROTOCOL v6.2
-
-> **Mandate**: Absolute security boundaries. Never trust the client. Verify all tokens server-side.
 
 ## 1. NEXT.JS MIDDLEWARE (Edge-Ready Auth Guard)
 ```typescript
@@ -76,44 +73,75 @@ export const mailer = nodemailer.createTransport({
 - **Logging**: Log all email attempts (success/fail) to a dedicated `logs/email` Firestore collection or DataDog.
 - **HTML Templates**: Use React-Email or compile standard MJML. Never send raw untemplated text logic.
 
-## 4. SECRETS
-- **Passwords**: NEVER access user passwords directly. ALWAYS use Firebase Auth's standard flow.
-- **Keys**: Use GCP Secret Manager for AWS Keys in Cloud Functions (`defineSecret()`). Locally, use `.env.local` ONLY.
+## 4. DELIVERY SOVEREIGNTY (Loop Protection & Guards)
+### Loop Protection Pattern
+```typescript
+// Throttling Logic for Email Dispatch (Firestore-backed)
+const checkEmailThrottling = async (uid: string) => {
+  const metaRef = db.collection('private_metadata').doc(uid);
+  const snap = await metaRef.get();
+  const now = Date.now();
+  const cooldown = 10 * 60 * 1000; // 10 minute cooldown
+  
+  if (snap.exists && (now - snap.data()?.lastEmailSentAt?.toMillis() < cooldown)) {
+    throw new Error('SOVEREIGN_COOLDOWN: Rapid fire email detected. Aborting.');
+  }
+  
+  await metaRef.set({ lastEmailSentAt: FieldValue.serverTimestamp() }, { merge: true });
+};
+```
 
-## Implementation Architecture: Transactional HTML Cloud Function
+### Magic Link / OTP Standards
+- **Wait Duration**: Minimum 60s wait before allowing re-send.
+- **Audit Logging**: Store `ipAddress` and `userAgent` of the requestor in the auth trigger log.
 
-Never send basic text structures. All transactional triggers must use a compiled HTML standard (React-Email / MJML output) to align with Liquid Glass and premium aesthetic protocols.
+## 5. EMAIL SOVEREIGNTY (Resend + React Email)
+- **Stack**: MUST use **Resend** and **React Email**.
+- **Execution**: Logic MUST exist in Cloud Functions or Server Actions, never client-side.
+- **Sovereign Templates**: Store templates in `@/emails/` or `emails/` at root.
+- **Attachments**: Absolute paths ONLY. Favor signed Cloud Storage URLs over large buffers.
 
 ```typescript
-// functions/src/triggers/onUserCreated.ts
-import { auth } from 'firebase-functions/v2';
-import { mailer } from '../lib/aws-ses'; // Defined in Rule #3 above
+// ✅ Standardized Resend + React Email Handshake
+import { Resend } from "resend";
+import { render } from "@react-email/render";
+import { WelcomeEmail } from "./emails/WelcomeEmail";
 
-export const sendWelcomeEmail = auth.user().onCreate(async (user) => {
-  const emailHtmlTemplate = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <body style="background-color: #000000; color: #ffffff; font-family: Inter, sans-serif; padding: 40px; text-align: center;">
-      <h1 style="font-size: 24px; font-weight: 600;">Welcome to Infinity.</h1>
-      <p style="color: #a1a1aa; font-size: 16px;">Your account has been securely provisioned.</p>
-    </body>
-    </html>
-  `;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-  try {
-    await mailer.sendMail({
-      from: '"Infinity Protocol" <admin@yourdomain.com>',
-      to: user.email,
-      subject: 'Welcome to Infinity',
-      html: emailHtmlTemplate,
-      // Fallback text required for strict spam filtering algorithms
-      text: 'Welcome to Infinity. Your account has been securely provisioned.',
+export const sendSovereignEmail = async (to: string, payload: any) => {
+  // 1. Loop Protection Enforcement
+  await checkEmailThrottling(payload.uid);
+
+  // 2. Render Template
+  const html = await render(<WelcomeEmail {...payload} />);
+  
+  // 3. Dispatch via Resend
+  await resend.emails.send({
+    from: "Infinity Protocol <noreply@yourdomain.com>",
+    to,
+    subject: payload.subject,
+    html,
+    tags: [{ name: "category", value: "transactional" }]
+  });
+};
+```
+
+## 6. BEHAVIORAL FLOWS & PERSONALIZED UPSELLS
+- **Event-Driven Flows**: Standardize triggers for "Post-Purchase Thank You", "Browse Abandonment", and "Milestone Rewards".
+- **Dynamic Upsell Injection**: Logic to query `getRelatedProducts` (from `ecommerce_architect.mdc`) and inject them into the React Email template.
+
+```typescript
+// ✅ Post-Purchase Upsell Trigger
+export const onOrderCompleted = onDocumentUpdated('orders/{orderId}', async (event) => {
+  const order = event.data.after.data();
+  if (order.status === 'completed') {
+    const recommendations = await getRelatedProducts(order.items[0].productId);
+    await sendSovereignEmail(order.customerEmail, {
+      template: 'OrderCompletedUpsell',
+      recommendations,
+      subject: "Thanks! You might also like these..."
     });
-    console.log(`[AUTH EVENT] Welcome email dispatched to ${user.email}`);
-  } catch (err) {
-    // Escalate to Sentry/DataDog via custom error pipeline
-    console.error(`[AUTH EVENT FATAL] Failed email dispatch for ${user.uid}`, err);
-    throw new Error('Email dispatch failure.');
   }
 });
 ```

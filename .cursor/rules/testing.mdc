@@ -1,0 +1,80 @@
+---
+description: Infinity Protocol Testing Standards & Guidelines
+globs: *.test.ts, *.test.tsx, *.spec.ts, *.spec.tsx, e2e/**/*.ts, playwright.config.ts, vitest.config.ts
+---
+# Infinity Protocol Testing Standards v6.2
+
+## 1. The Separation of Concerns
+- **Vitest**: Used exclusively for Unit Testing and Component Testing (non-browser logic).
+- **Playwright**: Used exclusively for E2E Testing, complete user flows, and browser-dependent interactions.
+
+## 2. When to Test
+Testing is a first-class citizen in the Infinity Protocol. Do NOT skip testing for:
+- **Authentication Flows**: Login, Registration, JWT state.
+- **Financial/Checkout**: Payment calculation, Cart adjustments, Stripe webhooks.
+- **Database Mutators**: Any logic writing to Firestore or Firebase Functions.
+
+## 3. Unit Testing (Vitest)
+- Place tests adjacent to the file being tested (e.g., `calculateTotal.ts` -> `calculateTotal.test.ts`).
+- Mock all external dependencies (Firebase, Stripe, etc.). Use `vi.mock()`.
+- Keep component tests focused on rendering and local state, NOT full page routing.
+
+## 4. E2E Testing (Playwright)
+- Place tests in the `/e2e` directory at the project root.
+- Treat the application as a black box. Avoid mocking where possible; prefer hitting an emulator or a dedicated staging database.
+- Name tests clearly describing the user intent: `user-can-complete-checkout.spec.ts`.
+- Use `data-testid` attributes on elements to ensure brittle CSS changes do not break tests.
+
+## 5. Mocking Firebase (The Protocol Way)
+- When using Playwright, always point the app to the Firebase Local Emulator Suite if executing locally or in CI.
+- When using Vitest, use `vitest-mock-extended` or standard `vi.mock('firebase/firestore')` to intercept UI interactions.
+
+## 7. Visual Testing (Playwright Snapshots)
+- Use `await expect(page).toHaveScreenshot()` to catch UI regressions on premium "Liquid Glass" components.
+- Always name snapshots descriptively: `toHaveScreenshot('user-profile-header-dark.png')`.
+- Maintain snapshots in the repository; commit changes only after manual verification of the delta.
+
+## 8. Continuous Integration
+- All critical paths MUST have an E2E test verifying success and standard failure modes before a branch is merged into `main`.
+- Failing tests absolutely block deployments. Do not bypass the Safe-Deploy guards.
+
+## 9. Security Rules Testing
+- All Firestore/Storage rules MUST have dedicated unit tests in `__tests__/security/`.
+- Use `@firebase/rules-unit-testing` to verify both `assertSucceeds` (authorized access) and `assertFails` (unauthorized access).
+- Rules testing is mandatory for any project handling User Data or Payment information.
+
+## 10. Accessibility (A11y) Audits
+- Automated A11y scans using `axe-playwright` are required for all public-facing pages.
+- Zero violations is the standard. Use `expect(accessibilityScanResults.violations).toEqual([])`.
+
+## 11. Performance Budgets (Liquid Smooth UX)
+- Use Playwright timing audits to ensure main pages load within 2 seconds.
+- Monitor `LCP` (Largest Contentful Paint) and `TBT` (Total Blocking Time) during E2E flows.
+- Performance regressions on premium animated sections must be treated as critical bugs.
+
+## 12. API Contract & Data Integrity
+- Use Zod schemas to validate all data flowing between Frontend and Firebase/APIs.
+- Maintain unit tests in `__tests__/integrity/` to verify schema compliance.
+- No ad-hoc `any` types for data payloads; strict schema enforcement is mandatory.
+
+## 13. Omni-Sentinel & Living Documentation
+- Every project must maintain a `TEST_INDEX.md` as a living registry of its testing surface area.
+- Rule drift is strictly prohibited. Use `dv fix-drift` to auto-heal project alignment with the Master protocol.
+- Parallelized testing via `dv test-all` is the standard for workspace-wide validation.
+
+## 14. Neural Sentinel & AI-Context
+- `AI_DEBUG.md` must be maintained as an immutable persistence layer for architectural decisions.
+- Project fingerprinting must be updated whenever new core technologies (e.g. Edge, RTDB) are integrated.
+- Real-time telemetry via `dv log` is the primary mechanism for workspace-wide health monitoring.
+- CI workflows must remain pinned to the Master template via `dv sync-ci`.
+
+## 15. Resilience & Chaos Engineering
+- All E2E suites must include chaos testing (latency, network failure) to ensure frontend robustness.
+- Error boundaries and fallback states must be verified under simulated API downtime.
+- Performance budgets are strictly enforced: <2000ms page load is a hard requirement.
+
+## 16. Sovereign Governance
+- All projects must adhere to the Master Ruleset version pinned in `SOVEREIGN_LOCK`.
+- Workspace dependencies must be mapped via `dv graph` to monitor integration risks.
+- The `dv dash` hub is the single source of truth for workspace-wide health and sanity checks.
+

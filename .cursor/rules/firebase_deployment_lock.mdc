@@ -1,0 +1,20 @@
+---
+description: Firebase Deployment Lock Protocol - Strict Cross-Deploy Prevention
+---
+
+# Firebase Deployment Lock: Infinity Protocol v6.2
+
+**Goal**: STRICTLY prevent the accidental crossover deployment of applications to the wrong Firebase targets.
+
+## CORE MANDATE
+- **Zero-Tolerance ID Drift**: The `.firebaserc` `"default"` project MUST exactly match the `Allowed Firebase Project` defined in the workspace's `MISSION_STATE.md`.
+- **Pre-Flight Lock**: All deployment scripts (e.g., `safe-deploy-guard.sh`, `scripts/safe-deploy.js`) MUST intercept the `deploy` command and halt execution if the currently active Firebase CLI project or `.firebaserc` target does not perfectly align with the `Allowed Firebase Project` value.
+
+## REQUIRED CONFIGURATION
+1. **MISSION_STATE.md**: Must contain a line EXACTLY formatting the allowed target:
+   `- **Allowed Firebase Project**: \`project-id-here\``
+2. **.firebaserc**: Must not drift from the `project-id-here`.
+3. **Verification**: When touching deployment logic, ALWAYS assert that this parity exists. If it does not, throw a FATAL ERROR and refuse to execute.
+
+## DV INTEGRATION
+- Use the central intelligence terminal utility `dv check-deploy-locks` to audit global deployment state. Any `[MISMATCH]` or `[MISSING LOCK]` output is a critical vulnerability that must be repaired immediately.

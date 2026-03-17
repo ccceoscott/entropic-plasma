@@ -3,10 +3,6 @@ alwaysApply: true
 description: USER ROLE MASTERY - RBAC, Firebase custom claims, ecommerce + SaaS role taxonomy, Firestore rules, Next.js enforcement
 globs: **/*{auth,role,permission,middleware,guard,claim}*.{ts,tsx,js}, middleware.ts, firestore.rules
 ---
-# USER ROLE MASTERY: INFINITY PROTOCOL v6.2
-
-> Role-Based Access Control (RBAC) governs every action in the system.
-> Firebase custom claims are the single source of truth. No exceptions.
 
 ---
 
