@@ -1,18 +1,92 @@
 ---
-description: [Security] Environment Parity Scanner (/env-check)
-globs: **/*
-alwaysApply: false
+description: ENVIRONMENT PARITY SCANNER - Sync verification between local and production secrets
+globs: .env.local, .env.example, scripts/env-check.js
+alwaysApply: true
 ---
+# ENVIRONMENT PARITY SCANNER: INFINITY PROTOCOL v6.2
 
-# /env-check - Parity Scanner
+> "A missing key in production is a 500 error waiting to happen."
 
-**TRIGGER**: Run before any production deployment or major backend push.
+## 1. THE PARITY MANDATE
+Before any production deployment, you MUST guarantee that every key required locally (`.env.local`) exists in the production environment (Google Secret Manager, Vercel Env, or `.env.production`).
 
-## EXECUTION STEPS
-1. **Intake**: Parse keys from `.env.local`.
-2. **Comparison**: Verify existence of every local key inside `.env.production` or Secret Manager configs.
-3. **Reporting**:
-   - **PASS**: 1:1 Parity achieved.
-   - **WARN**: Missing keys identified in production environment.
-   - **CAUTION**: Literal sensitive keys found in `.env.production` (Must be reference pointers).
-4. **Resolution**: Autonomously propose GCP Secret Manager injection commands for missing keys.
+## 2. THE `/env-check` CLI ENFORCER
+Projects should maintain a `scripts/env-check.js` utility, executed during the `prebuild` or `predeploy` phase.
+
+```javascript
+// scripts/env-check.js
+const fs = require('fs');
+
+function parseEnvKeys(filePath) {
+  if (!fs.existsSync(filePath)) return new Set();
+  const content = fs.readFileSync(filePath, 'utf-8');
+  return new Set(
+    content.split('\n')
+      .filter(line => line.trim() && !line.startsWith('#'))
+      .map(line => line.split('=')[0])
+  );
+}
+
+const localKeys = parseEnvKeys('.env.local');
+const exampleKeys = parseEnvKeys('.env.example');
+
+console.log(`Checking Parity: ${localKeys.size} local keys...`);
+
+const missingInExample = [...localKeys].filter(k => !exampleKeys.has(k));
+
+if (missingInExample.length > 0) {
+  console.error('❌ FATAL: Keys in .env.local missing from .env.example:');
+  missingInExample.forEach(k => console.error(`   - ${k}`));
+  console.error('\nFix: Update .env.example (without values) and ensure production has these keys.');
+  process.exit(1);
+}
+
+console.log('✅ ENVIRONMENT PARITY: PASS');
+```
+
+## 3. CHECKING GCP SECRET MANAGER PARITY (Agent Action)
+When deploying Cloud Functions, the agent MUST run this command to verify secrets in GCP:
+
+```bash
+# List all active secrets in the authorized Firebase project
+gcloud secrets list --project=$(firebase use) --format="value(name)"
+```
+Compare the output against the requested `defineSecret()` names in `functions/src/index.ts`. If any are missing, propose the `gcloud secrets create` command and **HALT** deployment.
+
+## 4. RESOLUTION PROTOCOL
+If the parity check fails:
+1. **Never copy values**: Do not copy `.env.local` values blindly.
+2. **Generate Command**: Construct the GCP command: `printf "VALUE" | gcloud secrets create [NAME] --data-file=-`.
+3. **Wait for Auth**: Prompt the user to execute the string, or wait for them to provide the production value.
+
+## 5. RUNTIME VALIDATION (Zod + `env.ts`)
+The ultimate defense against missing keys is a hard crash at startup. Every Next.js project MUST implement a Zod schema to parse `process.env`. If a required key is missing, the build or runtime will crash instantly, preventing undefined variables from bleeding into production.
+
+```typescript
+// ✅ REQUIRED: lib/env.ts
+import { z } from 'zod';
+
+const envSchema = z.object({
+  // Server-side (Private)
+  FIREBASE_PROJECT_ID: z.string().min(1),
+  FIREBASE_CLIENT_EMAIL: z.string().email(),
+  FIREBASE_PRIVATE_KEY: z.string().min(1),
+  
+  // Client-side (Public)
+  NEXT_PUBLIC_FIREBASE_API_KEY: z.string().min(1),
+  NEXT_PUBLIC_SITE_URL: z.string().url(),
+});
+
+// Parse the environment variables. This will throw an error immediately if invalid.
+export const env = envSchema.parse({
+  FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
+  FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL,
+  FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY,
+  NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+});
+
+// Usage anywhere in the app (strongly typed):
+// import { env } from '@/lib/env';
+// console.log(env.FIREBASE_PROJECT_ID);
+```

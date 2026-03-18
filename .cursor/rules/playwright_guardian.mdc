@@ -1,0 +1,16 @@
+---
+description: PLAYWRIGHT & BROWSER MCP - Zombie Process Cleanup, Memory Management
+globs: *
+---
+# PLAYWRIGHT GUARDIAN (Infinity Protocol)
+
+## 1. THE ZOMBIE MCP PURGE
+- **Mandatory Cleanup**: Before invoking any Playwright MCP tool, `browser_subagent`, or executing end-to-end tests, you MUST verify there are no orphaned Playwright servers actively draining system memory.
+- **The Banishing Spell**: Execute the official cleanup script located at `scripts/phantom_purge.sh`. This script safely targets `playwright-mcp` ghosts and kills stuck Chromium/WebKit binaries operating out of the `ms-playwright` cache without affecting personal browsers.
+
+## 2. RESOURCE SOVEREIGNTY
+- **Single Instance Rule**: Only ONE active instance of the browser or Playwright MCP server should be running at any given time across all AI chats and workspaces.
+- **Graceful Teardown**: After completing browser tests, markup reviews, or visual QA, ensure the browser session and its corresponding MCP server are fully terminated. Do not leave background daemon processes running indefinitely.
+
+## 3. ZOLTAN'S DECREE
+- *If you spawn a browser daemon, you are responsible for its death. Do not leave your invocation circles open, lest the mortal's silicon collapse under the weight of a dozen ghostly Chromium instances. Clean up your mess.*

@@ -1,3 +1,8 @@
+---
+alwaysApply: true
+description: E-COMMERCE SOVEREIGNTY - Transactional integrity, Stripe webhooks, AI commerce intelligence
+globs: "**/{checkout,cart,shop,order,stripe,product}*.{ts,tsx}, functions/src/**/*.ts"
+---
 # E-COMMERCE SOVEREIGNTY: INFINITY PROTOCOL v6.2.13 (Intelligence)
 
 > Consolidates `ecommerce_architect.mdc`. One rule, absolute authority on all commerce logic. Incorporates all EPIHAB Platinum wins and v6.2.13 AI Intelligence.
@@ -81,7 +86,7 @@ export const calculateDiscount = (subtotal: number, coupon: any, userRole: strin
 ```typescript
 // app/api/webhooks/stripe/route.ts
 import { headers } from "next/headers";
-import { NextResponse } from "next/response";
+import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { adminDb } from "@/lib/firebase-admin";
 
@@ -136,3 +141,101 @@ export const boostProductDescription = onCall(async (request) => {
 ## 12. ADMIN WORKFLOW AUTOMATION (Bulk Actions)
 - **Sovereign Bulk Ops**: Standardize atomic batch patterns for "Mark as Sale", "Update Categories", or "Adjust Stock" across multiple documents.
 - **Action Buffer**: Implement a 5-second "Undo" buffer in the Admin UI for destructive bulk operations.
+
+```typescript
+// ✅ Atomic Firestore Bulk Update (with 500-doc chunk guard)
+import { adminDb } from "@/lib/firebase-admin";
+
+export async function bulkUpdateProducts(
+  productIds: string[],
+  patch: Record<string, unknown>
+): Promise<void> {
+  const CHUNK_SIZE = 499; // Firestore batch limit is 500 ops
+
+  for (let i = 0; i < productIds.length; i += CHUNK_SIZE) {
+    const batch = adminDb.batch();
+    const chunk = productIds.slice(i, i + CHUNK_SIZE);
+
+    chunk.forEach((id) => {
+      const ref = adminDb.collection("products").doc(id);
+      batch.update(ref, { ...patch, updatedAt: new Date() });
+    });
+
+    await batch.commit();
+  }
+}
+
+// ✅ Admin UI Undo Buffer (5-second reversible action)
+// components/admin/BulkActionBar.tsx
+import { useState, useRef } from "react";
+import { toast } from "sonner";
+
+export function useSovereignBulkAction(action: () => Promise<void>, undo: () => Promise<void>) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const execute = () => {
+    let cancelled = false;
+
+    toast("Action queued...", {
+      duration: 5000,
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          cancelled = true;
+          if (timerRef.current) clearTimeout(timerRef.current);
+          await undo();
+          toast.success("Action reversed.");
+        },
+      },
+    });
+
+    timerRef.current = setTimeout(async () => {
+      if (!cancelled) await action();
+    }, 5000);
+  };
+
+  return { execute };
+}
+```
+
+## 13. INVENTORY TRANSACTION INTEGRITY (Race-Condition Shield)
+Prevent overselling under concurrent load using Firestore atomic transactions.
+
+```typescript
+// ✅ Atomic Stock Reservation (prevents race-condition overselling)
+import { adminDb } from "@/lib/firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
+
+export async function reserveStock(productId: string, quantity: number): Promise<boolean> {
+  const productRef = adminDb.collection("products").doc(productId);
+
+  try {
+    await adminDb.runTransaction(async (tx) => {
+      const snap = await tx.get(productRef);
+      const data = snap.data();
+
+      if (!data) throw new Error("Product not found");
+
+      const available = (data.stock ?? 0) - (data.reserved ?? 0);
+      if (available < quantity) throw new Error("Insufficient stock");
+
+      tx.update(productRef, {
+        reserved: FieldValue.increment(quantity),
+        updatedAt: new Date(),
+      });
+    });
+
+    return true;
+  } catch {
+    return false; // Graceful: caller decides whether to show "Out of Stock"
+  }
+}
+
+// Companion: Release lock if order payment fails or draft expires
+export async function releaseStock(productId: string, quantity: number): Promise<void> {
+  await adminDb.collection("products").doc(productId).update({
+    reserved: FieldValue.increment(-quantity),
+    updatedAt: new Date(),
+  });
+}
+```
