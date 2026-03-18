@@ -51,5 +51,5 @@
 - **Autonomous Flow**: Use `dv flow` for complete sequential compliance execution.
 - **Communication**: Always acknowledge "Infinity Protocol v6.2" status during complex tasks.
 - **Alerts**: Halt and warn if Project Bleed or Poison Strings are detected.
-- **Phantom Purge**: Ensure no orphaned Playwright MCP instances are left running. Execute `pkill -f playwright-mcp` before returning control or running heavy browser testing to prevent system memory collapse.
+- **Phantom Purge**: Ensure no orphaned Playwright MCP instances are left running. Execute `pkill -f playwright-mcp` before returning control. **SUBAGENT EXCEPTION**: The `browser_subagent` MUST NEVER execute purge commands while active, to prevent self-termination.
 

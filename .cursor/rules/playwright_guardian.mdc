@@ -5,8 +5,8 @@ globs: *
 # PLAYWRIGHT GUARDIAN (Infinity Protocol)
 
 ## 1. THE ZOMBIE MCP PURGE
-- **Mandatory Cleanup**: Before invoking any Playwright MCP tool, `browser_subagent`, or executing end-to-end tests, you MUST verify there are no orphaned Playwright servers actively draining system memory.
-- **The Banishing Spell**: Execute the official cleanup script located at `scripts/phantom_purge.sh`. This script safely targets `playwright-mcp` ghosts and kills stuck Chromium/WebKit binaries operating out of the `ms-playwright` cache without affecting personal browsers.
+- **Mandatory Pre-Flight Cleanup (Primary Agent Only)**: Before invoking any Playwright MCP tool, `browser_subagent`, or executing end-to-end tests, you (the primary agent) MUST execute the official cleanup script located at `scripts/phantom_purge.sh`.
+- **CRITICAL SUBAGENT IMMUNITY**: If YOU are the `browser_subagent` currently inside a browser session, DO NOT execute `phantom_purge.sh` or any `pkill` commands under ANY circumstances! You will inadvertently kill your own browser instance, causing an infinite loop of new windows.
 
 ## 2. RESOURCE SOVEREIGNTY
 - **Single Instance Rule**: Only ONE active instance of the browser or Playwright MCP server should be running at any given time across all AI chats and workspaces.
