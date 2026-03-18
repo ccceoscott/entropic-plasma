@@ -15,7 +15,7 @@ When switching projects or initializing a session involving destructive actions 
 #!/bin/bash
 set -e
 
-EXPECTED_PROJECT="infinity-protocol-1"
+EXPECTED_PROJECT="infinity-protocol"
 
 # 1. Verify Directory
 CURRENT_DIR=$(basename "$PWD")
