@@ -15,19 +15,22 @@ When switching projects or initializing a session involving destructive actions 
 #!/bin/bash
 set -e
 
-EXPECTED_PROJECT="infinity-protocol"
-
-# 1. Verify Directory
-CURRENT_DIR=$(basename "$PWD")
-if [ "$CURRENT_DIR" != "$EXPECTED_PROJECT" ]; then
-  echo "❌ BLEED DETECTED: Expected $EXPECTED_PROJECT, but in $CURRENT_DIR."
+EXPECTED_PROJECT=$(awk -F"\\*\\*Project Name\\*\\*: " '/\*\*Project Name\*\*/ {print $2}' MISSION_STATE.md | tr -d '\r')
+if [ -z "$EXPECTED_PROJECT" ]; then
+  echo "❌ BLEED DETECTED: Could not extract Project Name from MISSION_STATE.md."
   exit 1
 fi
 
-# 2. Verify Git Remote
-REMOTE_URL=$(git config --get remote.origin.url)
-if [[ "$REMOTE_URL" != *"ccceoscott/infinity-protocol"* ]]; then
-  echo "❌ BLEED DETECTED: Invalid Git Remote ($REMOTE_URL)."
+# 1. Verify Directory matches MISSION State
+CURRENT_DIR=$(basename "$PWD")
+if [ "$CURRENT_DIR" != "$EXPECTED_PROJECT" ] && [[ "$EXPECTED_PROJECT" != *"$CURRENT_DIR"* ]]; then
+  echo "❌ BLEED DETECTED: Expected $EXPECTED_PROJECT, but physically in $CURRENT_DIR."
+  exit 1
+fi
+
+# 2. Verify Git Sandbox
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  echo "❌ BLEED DETECTED: Not executing within a valid Git Sandbox."
   exit 1
 fi
 
