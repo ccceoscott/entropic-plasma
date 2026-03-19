@@ -12,5 +12,9 @@ globs: *
 - **Single Instance Rule**: Only ONE active instance of the browser or Playwright MCP server should be running at any given time across all AI chats and workspaces.
 - **Graceful Teardown**: After completing browser tests, markup reviews, or visual QA, ensure the browser session and its corresponding MCP server are fully terminated. Do not leave background daemon processes running indefinitely.
 
-## 3. ZOLTAN'S DECREE
-- *If you spawn a browser daemon, you are responsible for its death. Do not leave your invocation circles open, lest the mortal's silicon collapse under the weight of a dozen ghostly Chromium instances. Clean up your mess.*
+## 3. THE MCP WATCHDOG DAEMON
+- **Automated Memory Defense**: The `$PROTOCOL_HUB/scripts/mcp_watchdog.sh` daemon runs continuously, executing any decoupled Playwright or MCP processes left orphaned for >2 hours.
+- **Agent Awareness**: If a browser session refuses to terminate via CLI actions, do NOT attempt deeply destructive `kill -9` commands outside the `phantom_purge.sh` scope. Trust that the Watchdog will garbage-collect the anomaly.
+
+## 4. ZOLTAN'S DECREE
+- *If you spawn a browser daemon, you are responsible for its death. Do not leave your invocation circles open, lest the mortal's silicon collapse under the weight of a dozen ghostly Chromium instances. Clean up your mess (or the Watchdog will do it for you).*

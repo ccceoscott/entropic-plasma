@@ -52,4 +52,5 @@
 - **Communication**: Always acknowledge "Infinity Protocol v6.2" status during complex tasks.
 - **Alerts**: Halt and warn if Project Bleed or Poison Strings are detected.
 - **Phantom Purge**: Ensure no orphaned Playwright MCP instances are left running. Execute `pkill -f playwright-mcp` before returning control. **SUBAGENT EXCEPTION**: The `browser_subagent` MUST NEVER execute purge commands while active, to prevent self-termination.
+- **MCP Watchdog**: A cron daemon (`mcp_watchdog.sh`) automatically hunts and kills any browser/Playwright processes orphaned for >2 hours. Do not panic and use `kill -9` if a process hangs; trust the Watchdog.
 
