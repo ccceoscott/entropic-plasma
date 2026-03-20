@@ -3,7 +3,7 @@ alwaysApply: true
 description: DATA GOVERNANCE - Soft deletes, GDPR, dual admin check, Firestore backup
 globs: **/*{service,controller,action,repository}.{ts,js}, **/*.rules
 ---
-# DATA GOVERNANCE GUARDIAN: INFINITY PROTOCOL v6.2
+# DATA GOVERNANCE GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 ## 1. DELETE PROHIBITION — No Hard Deletes
 Never write `doc.delete()` or `.remove()` on a Firestore document unless inside an isolated, highly-privileged `TrashService` or background cron job.

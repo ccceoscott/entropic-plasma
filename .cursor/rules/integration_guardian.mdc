@@ -3,7 +3,7 @@ alwaysApply: true
 description: API - Webhooks, External Requests, Circuit Breakers, Zod Validation
 globs: **/*{api,webhook,integration,service}*.{ts,js}
 ---
-# INTEGRATION GUARDIAN: INFINITY PROTOCOL v6.2
+# INTEGRATION GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 ## 1. OUTGOING SAFETY (The Fetch Wrapper)
 -   **Schema Check**: EVERY external API response must be parsed: `ResponseSchema.parse(data)`.

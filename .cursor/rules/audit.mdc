@@ -3,7 +3,7 @@ alwaysApply: true
 description: "[Workflow] /audit - Infinity Protocol v6.2 Automated Quality & Compliance Gate"
 globs: "**/playwright.config.ts, **/tests/e2e/*.spec.ts, **/scripts/audit.sh"
 ---
-# /audit WORKFLOW: INFINITY PROTOCOL v6.2
+# /audit WORKFLOW: INFINITY PROTOCOL v6.2.15
 
 > **THE COMPLIANCE GATE**: The `/audit` protocol must be a physically executable, mathematically provable gauntlet. Manual checks are forbidden.
 

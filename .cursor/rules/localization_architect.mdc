@@ -3,7 +3,7 @@ alwaysApply: true
 description: LOCALIZATION - i18n, next-intl, No hardcoded text, Intl formatting, RTL support
 globs: "**/*.{tsx,ts,js,jsx}"
 ---
-# LOCALIZATION ARCHITECT: INFINITY PROTOCOL v6.2
+# LOCALIZATION ARCHITECT: INFINITY PROTOCOL v6.2.15
 
 > **LOCALIZATION SOVEREIGNTY**: The system must be geographically unbound. Zero hardcoded text. Native platform formatting.
 

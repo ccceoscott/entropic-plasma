@@ -3,7 +3,7 @@ alwaysApply: true
 description: TECH STACK ENFORCER - Prohibited Tech & Mandatory Patterns
 globs: package.json, **/*.ts, **/*.tsx
 ---
-# TECH STACK ENFORCER: INFINITY PROTOCOL v6.2
+# TECH STACK ENFORCER: INFINITY PROTOCOL v6.2.15
 
 > **The Sovereign Stack**: We do not debate the stack. We execute the stack.
 

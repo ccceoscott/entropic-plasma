@@ -3,7 +3,7 @@ alwaysApply: true
 description: ACCESSIBILITY GUARDIAN - WCAG 2.1 AA, Semantic HTML, ARIA, Keyboard Navigation
 globs: **/*.{tsx,jsx}
 ---
-# ACCESSIBILITY GUARDIAN: INFINITY PROTOCOL v6.2
+# ACCESSIBILITY GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 > **MANDATE**: Build for everyone. A site without a11y is a broken site. Radix Primitives / Shadcn are the standard.
 

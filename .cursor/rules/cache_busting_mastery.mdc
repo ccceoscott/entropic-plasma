@@ -3,7 +3,7 @@ alwaysApply: true
 description: CACHE BUSTING MASTERY - Versioning, headers, CDN invalidation, Firebase deploy
 globs: package.json, next.config.mjs, vite.config.ts, **/*.tsx
 ---
-# CACHE BUSTING MASTERY: INFINITY PROTOCOL v6.2
+# CACHE BUSTING MASTERY: INFINITY PROTOCOL v6.2.15
 
 ## 1. VERSION INTEGRATION & ASSET CACHE BUSTING
 `package.json` `version` MUST increment before `npm run build`. Automate via standard npm scripts (e.g., `npm version patch`).

@@ -3,7 +3,7 @@ alwaysApply: true
 description: UX SOVEREIGNTY - Liquid Glass Design System, Framer Motion, Accessibility, Mobile
 globs: **/*.tsx, **/*.ts, tailwind.config.*
 ---
-# UX SOVEREIGNTY: INFINITY PROTOCOL v6.2
+# UX SOVEREIGNTY: INFINITY PROTOCOL v6.2.15
 
 > **Mandate**: Absolute authority over UI physics and accessible state management.
 

@@ -3,7 +3,7 @@ alwaysApply: true
 description: FIRESTORE SCHEMA GUARDIAN - Document modeling, indexes, subcollections, cost control
 globs: **/*{firestore,db,database,schema,model,repository}*.{ts,js}, firestore.rules, firestore.indexes.json
 ---
-# FIRESTORE SCHEMA GUARDIAN: INFINITY PROTOCOL v6.2
+# FIRESTORE SCHEMA GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 > Firestore is the backbone. Schema mistakes are permanent and costly. Model once, correctly.
 

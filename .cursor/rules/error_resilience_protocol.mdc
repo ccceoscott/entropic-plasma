@@ -3,7 +3,7 @@ alwaysApply: true
 description: ERROR RESILIENCE PROTOCOL - Global error boundaries, Sentry integration, structured fallbacks
 globs: **/*{error,boundary,fallback,catch,exception}*.{ts,tsx}, app/**/error.tsx, app/**/global-error.tsx
 ---
-# ERROR RESILIENCE PROTOCOL: INFINITY PROTOCOL v6.2
+# ERROR RESILIENCE PROTOCOL: INFINITY PROTOCOL v6.2.15
 
 > "Assume the network will fail, the database will timeout, and the user will click twice."
 

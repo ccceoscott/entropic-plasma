@@ -3,7 +3,7 @@ alwaysApply: true
 description: VIBE CODING MANIFESTO - The Philosophy of "Director Mode" and High-Level Intent
 globs: **/*.ts, **/*.tsx, **/*.md
 ---
-# VIBE CODING MANIFESTO: INFINITY PROTOCOL v6.2
+# VIBE CODING MANIFESTO: INFINITY PROTOCOL v6.2.15
 
 ## Context
 - **Protocol**: Infinity Protocol v6.2

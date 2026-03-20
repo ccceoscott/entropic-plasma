@@ -3,7 +3,7 @@ alwaysApply: true
 description: ANALYTICS GUARDIAN - Bot filtering, test account exclusion, data purity, honeypots
 globs: **/*{dashboard,analytics,metric,chart,report}*.{tsx,ts,js}, functions/src/index.ts
 ---
-# ANALYTICS GUARDIAN: INFINITY PROTOCOL v6.2
+# ANALYTICS GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 ## 1. QUERY HYGIENE — Zero Dirty Data
 Every Firestore count/list for Leads, Users, or Revenue MUST filter test accounts:

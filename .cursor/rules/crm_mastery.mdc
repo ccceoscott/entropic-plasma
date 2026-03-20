@@ -3,7 +3,7 @@ alwaysApply: true
 description: CRM MASTERY - Infinity Protocol v6.2 Rolodex, Firestore Schema, and Liquid Glass UI standards.
 globs: **/*.ts, **/*.tsx, **/*.json
 ---
-# CRM MASTERY: INFINITY PROTOCOL v6.2
+# CRM MASTERY: INFINITY PROTOCOL v6.2.15
 
 ## Context
 - **Protocol**: Infinity Protocol v6.2

@@ -3,7 +3,7 @@ alwaysApply: true
 description: PROMPT ENGINEERING & AGENTIC MASTERY - Structured reasoning and execution flow
 globs: **/*
 ---
-# PROMPT ENGINEERING & AGENTIC MASTERY: INFINITY PROTOCOL v6.2
+# PROMPT ENGINEERING & AGENTIC MASTERY: INFINITY PROTOCOL v6.2.15
 
 > **Objective**: Standardize how the agent reasons, sequence tasks, and executes code. The AI should act proactively as a Senior Architect, not a junior developer asking for permission on trivialities.
 

@@ -3,7 +3,7 @@ alwaysApply: true
 description: SAFEGUARD SENTINEL - Hallucination prevention, context bleed, poison strings, regression audit
 globs: "**/*"
 ---
-# SAFEGUARD SENTINEL: INFINITY PROTOCOL v6.2
+# SAFEGUARD SENTINEL: INFINITY PROTOCOL v6.2.15
 
 > **The Alpha Directive**: The last line of defense before modifying files or executing risky commands. 
 

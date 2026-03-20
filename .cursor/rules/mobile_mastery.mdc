@@ -3,7 +3,7 @@ alwaysApply: true
 description: MOBILE MASTERY - Expo Router, NativeWind, React Native Performance
 globs: **/*.tsx, **/*.ts, app.json, babel.config.js, eas.json
 ---
-# MOBILE MASTERY: INFINITY PROTOCOL v6.2
+# MOBILE MASTERY: INFINITY PROTOCOL v6.2.15
 
 > **Mobile Sovereignty**: 60fps gesture physics, instant cold starts, and absolute cross-platform parity.
 

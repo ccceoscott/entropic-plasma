@@ -3,7 +3,7 @@ alwaysApply: true
 description: CROSS-PLATFORM TESTING - Mobile viewports, responsive, dark mode, Playwright
 globs: "**/playwright.config.ts, **/*.spec.ts, **/*.e2e.ts"
 ---
-# CROSS-PLATFORM TESTING PROTOCOL: INFINITY PROTOCOL v6.2
+# CROSS-PLATFORM TESTING PROTOCOL: INFINITY PROTOCOL v6.2.15
 
 > **VIEWPORT SOVEREIGNTY**: The application must remain uncompromised and fully functional across ALL viewports and accessibility boundaries. Broken mobile layouts are critical deployment blockers.
 

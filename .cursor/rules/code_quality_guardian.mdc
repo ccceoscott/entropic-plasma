@@ -3,7 +3,7 @@ alwaysApply: true
 description: CODE QUALITY GUARDIAN - Strict Types, Validation, patterns
 globs: **/*.ts, **/*.tsx
 ---
-# CODE QUALITY GUARDIAN: INFINITY PROTOCOL v6.2
+# CODE QUALITY GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 > **Precision Execution**: No `any` types. No unvalidated inputs. No silent failures.
 

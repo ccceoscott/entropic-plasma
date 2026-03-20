@@ -3,7 +3,7 @@ alwaysApply: true
 description: EFFICIENCY MASTERY - Resource optimization for AI agent + 16GB environments
 globs: "**/*"
 ---
-# EFFICIENCY MASTERY: INFINITY PROTOCOL v6.2
+# EFFICIENCY MASTERY: INFINITY PROTOCOL v6.2.15
 
 > **Maximum Throughput**: Never block the main thread. Never await sequentially if you can await concurrently.
 

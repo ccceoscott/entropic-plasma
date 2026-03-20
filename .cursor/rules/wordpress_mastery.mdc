@@ -3,7 +3,7 @@ alwaysApply: true
 description: WORDPRESS SOVEREIGNTY - Headless, Security, GraphQL
 globs: **/*.php, **/*.tsx
 ---
-# WORDPRESS SOVEREIGNTY: INFINITY PROTOCOL v6.2
+# WORDPRESS SOVEREIGNTY: INFINITY PROTOCOL v6.2.15
 
 ## 1. HEADLESS MANDATE
 - **Architecture**: WordPress is a CMS ONLY. The frontend MUST be Next.js.

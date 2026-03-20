@@ -3,7 +3,7 @@ alwaysApply: true
 description: UX FEEDBACK LOOPS - Toasts, Notifications, and Real-Time Feedback Standards
 globs: "**/*.{tsx,ts,jsx,js}"
 ---
-# UX FEEDBACK LOOPS: INFINITY PROTOCOL v6.2
+# UX FEEDBACK LOOPS: INFINITY PROTOCOL v6.2.15
 
 > **UX SOVEREIGNTY**: The system must ALWAYS acknowledge user intent instantly. Silence is a failure state.
 

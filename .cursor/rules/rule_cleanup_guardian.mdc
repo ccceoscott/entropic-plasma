@@ -3,7 +3,7 @@ alwaysApply: true
 description: RULE CLEANUP - Automatically purge stale, renamed, or superseded rule files from all workspaces
 globs: .cursor/rules/**, **/.cursorrules
 ---
-# RULE CLEANUP GUARDIAN: INFINITY PROTOCOL v6.2
+# RULE CLEANUP GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 ## THE PRIME DIRECTIVE
 When a rule is **renamed, merged, or deleted** in the hub, it MUST be removed from **every workspace**. Stale rule files are poison — they create conflicting instructions and protocol drift.

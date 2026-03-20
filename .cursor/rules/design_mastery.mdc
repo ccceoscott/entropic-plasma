@@ -3,7 +3,7 @@ alwaysApply: true
 description: DESIGN MASTERY - Figma, Dribbble, Vibe Coding, Liquid Glass UI Standards
 globs: **/*.tsx, **/*.css, **/*.ts, tailwind.config.ts
 ---
-# DESIGN MASTERY: INFINITY PROTOCOL v6.2
+# DESIGN MASTERY: INFINITY PROTOCOL v6.2.15
 
 > **Visual Design Law**: Every UI decision must pass the aesthetic gates of Liquid Glass.
 

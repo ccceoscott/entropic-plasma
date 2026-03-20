@@ -3,7 +3,7 @@ alwaysApply: true
 description: REACT + VITE + NEXT.JS MASTERY - Build, Performance, Strict Types, Error Boundaries
 globs: vite.config.ts, tsconfig.json, next.config.*, **/*.tsx, **/*.ts
 ---
-# REACT MASTERY (Vite & Next.js App Router): INFINITY PROTOCOL v6.2
+# REACT MASTERY (Vite & Next.js App Router): INFINITY PROTOCOL v6.2.15
 
 ## 1. FUNCTIONAL ERROR BOUNDARIES (Client-Side Protection)
 ```tsx
