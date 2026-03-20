@@ -80,3 +80,21 @@ Before every final tool submission or user notification:
 ## 6. NODE V8 SOVEREIGNTY (Memory Limits)
 - **Global Constraints**: Node must NEVER be allowed to run unbounded on Apple Silicon. `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix all `dev`, `build`, and `test` scripts in `package.json` for Next.js and Vite.
 - **Next.js Compiler Locks**: All `next.config.ts` files MUST disable `productionBrowserSourceMaps` and force `experimental: { memoryBasedWorkersCount: true }` to prevent Rollup memory blowout during vectorization.
+
+## 7. JVM SOVEREIGNTY (Firebase Emulator Memory)
+- **Mandate**: Firebase Emulators run on Java. `_JAVA_OPTIONS="-Xmx2048m"` MUST be set in `~/.zshenv` globally. Never allow JVM heap to expand beyond 2GB.
+- **Verification**: Run `echo $JAVA_OPTIONS` before starting emulators. If unset, halt and inject.
+
+## 8. IDE SERVER SOVEREIGNTY (TypeScript Language Server)
+- **Mandate**: Every workspace `.vscode/settings.json` MUST contain `"typescript.tsserver.maxTsServerMemory": 2048`. The `tsserver` process runs outside the Node execution context and ignores all `NODE_OPTIONS` constraints.
+- **Enforcement**: The `sovereign_broadcast.sh` script MUST propagate `.vscode/settings.json` to all workspaces.
+
+## 9. APFS SNAPSHOT AWARENESS
+- **Mandate**: When freeing disk space via `rm -rf`, physical blocks are NOT released immediately on macOS APFS. Time Machine creates local snapshots that hold deleted data hostage.
+- **Fix**: After any mass deletion, always run `tmutil deletelocalsnapshots /` to immediately release APFS snapshot blocks.
+- **Phantom Purge**: The `phantom_purge.sh` script is the canonical mass-deletion tool. Run it before any deployment where disk space is critical. It scrubs `.next/cache`, `.vite`, `test-results`, AI agent `browser_recordings`, and the `antigravity-browser-profile`.
+- **Agent Video Bloat**: The AI `browser_subagent` automatically records `.webm` videos to `~/.gemini/antigravity/browser_recordings` during every task. This folder MUST be included in every Phantom Purge execution.
+
+## 10. FILE DESCRIPTOR SOVEREIGNTY (EMFILE Prevention)
+- **Mandate**: `ulimit -n 65536` MUST be set in `~/.zshenv` and `~/.zshrc`. Without this, large Next.js monorepos with `node_modules` cause `EMFILE: too many open files` panics during hot-reload.
+- **Telemetry Kill**: `NEXT_TELEMETRY_DISABLED=1` and `ASTRO_TELEMETRY_DISABLED=1` MUST be set globally to prevent framework beacons from blocking the CPU event loop during compilation.
