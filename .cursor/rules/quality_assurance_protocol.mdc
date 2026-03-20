@@ -96,12 +96,15 @@ jobs:
       - name: Unit Tests (Vitest)
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
+          _JAVA_OPTIONS: '-Xmx2048m'
         run: npm run test:unit
         
       - name: E2E Tests (Playwright)
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
+          _JAVA_OPTIONS: '-Xmx2048m'
           NEXT_TELEMETRY_DISABLED: '1'
+          ASTRO_TELEMETRY_DISABLED: '1'
         run: |
           npx playwright install --with-deps
           npm run test:e2e
