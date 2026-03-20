@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  productionBrowserSourceMaps: false,
+  experimental: {
+    memoryBasedWorkersCount: true
+  }
 };
 
 export default nextConfig;
