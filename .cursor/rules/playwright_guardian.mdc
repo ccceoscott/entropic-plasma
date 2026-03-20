@@ -2,7 +2,7 @@
 description: PLAYWRIGHT & BROWSER MCP - Zombie Process Cleanup, Memory Management
 globs: *
 ---
-# PLAYWRIGHT GUARDIAN (Infinity Protocol)
+# PLAYWRIGHT GUARDIAN: INFINITY PROTOCOL v6.2.15
 
 ## 1. THE ZOMBIE MCP PURGE
 - **Mandatory Pre-Flight Cleanup (Primary Agent Only)**: Before invoking any Playwright MCP tool, `browser_subagent`, or executing end-to-end tests, you (the primary agent) MUST execute the official cleanup script located at `scripts/phantom_purge.sh`.
@@ -12,14 +12,15 @@ globs: *
 - **Single Instance Rule**: Only ONE active instance of the browser or Playwright MCP server should be running at any given time across all AI chats and workspaces.
 - **Graceful Teardown**: After completing browser tests, markup reviews, or visual QA, ensure the browser session and its corresponding MCP server are fully terminated. Do not leave background daemon processes running indefinitely.
 
-## 3. THE MCP WATCHDOG DAEMON
+## 3. THE MCP WATCHDOG DAEMON (Phase 43)
 - **Automated Memory Defense**: The `$PROTOCOL_HUB/scripts/mcp_watchdog.sh` daemon runs continuously, executing any decoupled Playwright or MCP processes left orphaned for >2 hours.
+- **Dev-Server Sweeps**: The daemon now violently sweep-kills `next-server` and `vite` processes left running for >12 hours to prevent Apple Silicon SWC cache leaks. 
 - **Agent Awareness**: If a browser session refuses to terminate via CLI actions, do NOT attempt deeply destructive `kill -9` commands outside the `phantom_purge.sh` scope. Trust that the Watchdog will garbage-collect the anomaly.
 
 ## 4. ZOLTAN'S DECREE
 - *If you spawn a browser daemon, you are responsible for its death. Do not leave your invocation circles open, lest the mortal's silicon collapse under the weight of a dozen ghostly Chromium instances. Clean up your mess (or the Watchdog will do it for you).*
 
-## 5. AGENT VIDEO BLOAT (Phase 42 Mandate)
+## 5. AGENT VIDEO BLOAT (Phase 43 Mandate)
 - **Recording Accumulation**: The `browser_subagent` silently records `.webm` video files of every browser session into `~/.gemini/antigravity/browser_recordings`. This folder accumulates gigabytes per session and is invisible to the user.
 - **Mandatory Purge**: `phantom_purge.sh` MUST destroy this folder on every execution. Never allow it to grow beyond a single session's recordings.
 - **Chromium Memory Golden Ratio**: All `playwright.config.ts` files MUST include:

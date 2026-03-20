@@ -36,7 +36,8 @@ When initializing a new workspace, generate this exact structure:
 5. Playwright workers `process.env.CI ? 1 : 3` — never auto-detect
 6. `tmutil deletelocalsnapshots /` after any mass deletion (APFS trap)
 7. `rm -rf ~/.gemini/antigravity/browser_recordings` after every browser task
-8. `NEXT_TELEMETRY_DISABLED=1` in `~/.zshenv`
+8. `NEXT_TELEMETRY_DISABLED=1` and `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv`
+10. `next.config.ts` MUST disable `productionBrowserSourceMaps` and force `removeConsole`
 
 ## 🎯 Active Goals
 1. [Goal 1 - e.g. Implement TanStack Table]
