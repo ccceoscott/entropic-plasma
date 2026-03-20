@@ -3,7 +3,7 @@ alwaysApply: true
 description: BACKEND SOVEREIGNTY - Firebase Cloud Functions, Firestore, Security, Performance
 globs: **/*.ts, functions/**/*.ts, src/lib/firebase/**/*.ts
 ---
-# BACKEND SOVEREIGNTY: FIREBASE ABSOLUTISM — Infinity Protocol v6.2
+# BACKEND SOVEREIGNTY: FIREBASE ABSOLUTISM — Infinity Protocol v6.2.15
 
 > **See Also**: `firebase_mastery.mdc` for implementation patterns. `secret_management_guardian.mdc` for credential rules (MANDATORY).
 
@@ -94,3 +94,8 @@ export async function updateUserProfile(formData: FormData) {
 - **EPA (Error Path Analysis)**: Map potential failure points before implementation.
 - **Logging**: ZERO `console.log()` usage. Use `firebase-functions/logger` or a dedicated system logger.
 - **Secrets**: Use `defineSecret()` from `firebase-functions/params`.
+
+## 6. PHASE 43 RUNTIME SOVEREIGNTY
+- **JVM Cap**: `_JAVA_OPTIONS="-Xmx2048m"` in `~/.zshenv`. Firebase Emulators will consume unbounded JVM heap otherwise. See `firebase_mastery.mdc §5` for the full `~/.zshenv` bootstrap.
+- **EMFILE Guard**: `ulimit -n 65536` in `~/.zshenv`. Cloud Functions local emulation opens thousands of file descriptors.
+- **Telemetry Kill**: `NEXT_TELEMETRY_DISABLED=1` and `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv`. Execute `dv purge` after any emulator + browser session.

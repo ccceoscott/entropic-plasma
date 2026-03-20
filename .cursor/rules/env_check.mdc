@@ -3,7 +3,7 @@ description: ENVIRONMENT PARITY SCANNER - Sync verification between local and pr
 globs: .env.local, .env.example, scripts/env-check.js
 alwaysApply: true
 ---
-# ENVIRONMENT PARITY SCANNER: INFINITY PROTOCOL v6.2
+# ENVIRONMENT PARITY SCANNER: INFINITY PROTOCOL v6.2.15
 
 > "A missing key in production is a 500 error waiting to happen."
 
@@ -89,4 +89,18 @@ export const env = envSchema.parse({
 // Usage anywhere in the app (strongly typed):
 // import { env } from '@/lib/env';
 // console.log(env.FIREBASE_PROJECT_ID);
+```
+
+## 6. PHASE 43 RUNTIME ENVIRONMENT SOVEREIGNTY
+Beyond `.env` key parity, the agent MUST verify these shell-level environment vars are set **before any dev server or test run**:
+
+```bash
+# ✅ REQUIRED — verify all Phase 43 machine laws are active
+[ -z "$NODE_OPTIONS" ] && echo "❌ FATAL: NODE_OPTIONS not set. Add to ~/.zshenv" && exit 1
+[ -z "$_JAVA_OPTIONS" ] && echo "❌ FATAL: _JAVA_OPTIONS not set. Firebase Emulators will OOM." && exit 1
+[ "$NEXT_TELEMETRY_DISABLED" != "1" ] && echo "⚠️ WARNING: NEXT_TELEMETRY_DISABLED not set. Build performance degraded."
+ulimit -Sn 2>/dev/null | grep -qv "^unlimited" || echo "⚠️ WARNING: ulimit not set — EMFILE panics possible"
+```
+
+The agent MUST run this check at workspace boot as part of `dv doctor`. If any `FATAL` checks fail, HALT and instruct the user to add the mandated vars to `~/.zshenv` per Phase 43.
 ```

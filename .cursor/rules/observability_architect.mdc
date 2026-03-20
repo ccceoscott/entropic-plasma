@@ -3,7 +3,7 @@ alwaysApply: true
 description: OBSERVABILITY - Structured logging, tracing, PII redaction, Cloud Logging
 globs: **/*{log,logger,monitor,trace,observ}*.{ts,js}, functions/src/**/*.ts
 ---
-# OBSERVABILITY ARCHITECT: INFINITY PROTOCOL v6.2
+# OBSERVABILITY ARCHITECT: INFINITY PROTOCOL v6.2.15
 
 ## 1. LOGGING DISCIPLINE — No console.log in Production
 ```typescript
@@ -73,3 +73,11 @@ export function scrubPII(obj: Record<string, unknown>): Record<string, unknown> 
 | Cold start p99 latency | > 2000ms | Investigate `minInstances` |
 | Firestore read cost | > 100k reads/hr | Review query indexes |
 | 5xx responses | > 0.5% | Immediate incident |
+| `browser_recordings` size | > 500MB | Run `dv purge` immediately |
+| JVM heap (emulators) | > 1.8GB | Restart emulators, check `_JAVA_OPTIONS` |
+
+## 5. PHASE 43 AI AGENT OBSERVABILITY
+AI execution pipelines produce invisible telemetry waste. Observe and control:
+- **`mcp_watchdog.sh`**: Cron-based monitor logs zombie Playwright/browser processes to `watchdog.log`. Review daily.
+- **`browser_recordings/`**: Browser subagents silently record every session as `.webm` to `~/.gemini/antigravity/browser_recordings`. Run `dv purge` after every AI browser task.
+- **Agent Correlation**: For any AI-initiated Cloud Function call, inject `x-agent-correlation-id` header containing a `crypto.randomUUID()` so AI-generated traffic can be separated in Cloud Logging from user-generated traffic.

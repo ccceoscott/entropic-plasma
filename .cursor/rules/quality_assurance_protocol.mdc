@@ -3,7 +3,7 @@ alwaysApply: true
 description: QUALITY ASSURANCE PROTOCOL - Testing & QC Standards
 globs: **/*.ts, **/*.tsx, **/*.php
 ---
-# QUALITY ASSURANCE PROTOCOL: INFINITY PROTOCOL v6.2
+# QUALITY ASSURANCE PROTOCOL: INFINITY PROTOCOL v6.2.15
 
 > **The Zero-Manual Mandate**: If you fix a bug, write a test. Do not ask the user to "check if it works".
 
@@ -94,13 +94,24 @@ jobs:
           npm run lint
           
       - name: Unit Tests (Vitest)
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
         run: npm run test:unit
         
       - name: E2E Tests (Playwright)
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          NEXT_TELEMETRY_DISABLED: '1'
         run: |
           npx playwright install --with-deps
           npm run test:e2e
 ```
+
+## 5. PHASE 43 AGENT QA MANDATES
+- **Pre-flight**: Run `dv doctor` before any test session to verify JVM, EMFILE, and NODE_OPTIONS are set.
+- **Worker Lock**: Playwright workers must be `process.env.CI ? 1 : 3`. Never allow auto-detection.
+- **Post-flight**: Run `dv purge` after any Playwright session to destroy `.webm` recordings and release APFS snapshot blocks.
+- **Coverage Gate**: 80% line/function/branch/statement coverage enforced by Vitest. Do not merge PRs that lower coverage.
 
 ## 4. ERROR HANDLING & FIXING
 1.  **Never comment out failing tests**. If an update breaks a test, update the test to match the new behavior or fix the regression.
