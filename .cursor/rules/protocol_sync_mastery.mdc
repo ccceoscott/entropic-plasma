@@ -31,6 +31,9 @@ dv lint-rules
 
 # 5. Phantom Purge — kill orphaned processes, release APFS blocks, report disk state
 dv purge
+
+# 6. USB Camera Reset — forcefully restart AppleCameraAssistant and audio daemons on Apple Silicon
+dv fix-camera
 ```
 
 ## 3. THE HEARTBEAT (Functional Auto-Sync)
