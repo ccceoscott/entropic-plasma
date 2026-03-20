@@ -87,9 +87,10 @@ export function Analytics() {
 ## 5. BUILD & MEMORY STABILITY (ARM64 & CI/CD — Phase 43)
 - **Node v22 (LTS) Mandate**: Enforce Node v22 LTS for production builds to prevent ARM64 worker thread paralysis during Rollup PostCSS/Tailwind pipelines.
 - **NODE_OPTIONS Cap**: `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. **NEVER use 8192.** Setting 8192 tells Node's GC it has 8GB available, which causes it to defer garbage collection and creates catastrophic swap storms on Apple Silicon with 8–16GB unified memory.
-- **Telemetry Kill**: Set `NEXT_TELEMETRY_DISABLED=1` in `~/.zshenv`. Framework telemetry beacons execute synchronously on the CPU event loop during cold starts and degrade build times by 8–15%.
+- **Telemetry Kill**: Set `NEXT_TELEMETRY_DISABLED=1` and `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv`. Framework telemetry beacons execute synchronously on the CPU event loop during cold starts and degrade build times by 8–15%.
 - **Production Console Hygiene**: Mandate suppression of non-critical console logs in production (via `next.config.mjs` compiler options or terser).
 - **Source Map Kill**: `productionBrowserSourceMaps: false` is MANDATORY in `next.config.ts`. Source maps during production builds consume 3–4x additional RAM during Rollup compilation.
+- **SWC Worker Ban**: NEVER enable `experimental: { memoryBasedWorkersCount: true }`. On Apple Silicon, it triggers SWC to spawn CPU-bound threads that exhaust unified memory.
 - **EMFILE Guard**: `ulimit -n 65536` MUST be in `~/.zshenv`. Without it, hot-reload in large monorepos causes `EMFILE: too many open files` panics.
 
 ## 6. MONITORING

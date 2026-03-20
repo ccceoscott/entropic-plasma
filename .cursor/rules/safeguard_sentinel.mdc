@@ -79,7 +79,8 @@ Before every final tool submission or user notification:
 
 ## 6. NODE V8 SOVEREIGNTY (Memory Limits)
 - **Global Constraints**: Node must NEVER be allowed to run unbounded on Apple Silicon. `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix all `dev`, `build`, and `test` scripts in `package.json` for Next.js and Vite.
-- **Next.js Compiler Locks**: All `next.config.ts` files MUST disable `productionBrowserSourceMaps` and force `experimental: { memoryBasedWorkersCount: true }` to prevent Rollup memory blowout during vectorization.
+- **Next.js Compiler Locks**: All `next.config.ts` files MUST disable `productionBrowserSourceMaps`. 
+- **CRITICAL BAN**: NEVER enable `experimental: { memoryBasedWorkersCount: true }`. On Apple Silicon unified memory, this setting miscalculates available RAM and spawns unbounded SWC compiler threads, guaranteeing a swap storm and system hang.
 
 ## 7. JVM SOVEREIGNTY (Firebase Emulator Memory)
 - **Mandate**: Firebase Emulators run on Java. `_JAVA_OPTIONS="-Xmx2048m"` MUST be set in `~/.zshenv` globally. Never allow JVM heap to expand beyond 2GB.
