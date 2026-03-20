@@ -3,7 +3,7 @@ alwaysApply: true
 description: REPO SOVEREIGNTY - Git hygiene, sync protocol, branch governance, and automation
 globs: .git/**/*, .gitignore, scripts/*.sh, package.json
 ---
-# REPO SOVEREIGNTY: INFINITY PROTOCOL v6.2
+# REPO SOVEREIGNTY: INFINITY PROTOCOL v6.2.15
 
 > Consolidates `repo_governance.mdc`. One rule, absolute authority.
 
@@ -29,7 +29,7 @@ git push origin main
 - **Purge before sync**: `.bak`, `tmp*`, `*.orig` files
 - **Gitignore Blueprint**:
 ```text
-# .gitignore (Infinity Protocol v6.2 Baseline)
+# .gitignore (Infinity Protocol v6.2.15 Baseline)
 node_modules/
 .next/
 dist/
@@ -46,6 +46,11 @@ yarn-error.log*
 .firebase
 firebase-debug.log
 .cursor/
+# Phase 43 — AI Agent artifacts (NEVER commit)
+watchdog.log
+test-results/
+playwright-report/
+coverage/
 ```
 
 ## 4. AUTOMATED DRIFT & SECRET DEFENSE (Husky + lint-staged)
@@ -74,5 +79,6 @@ firebase-debug.log
 
 ## 7. AUTOMATION
 - `dv broadcast` — propagate rules to all workspaces
-- `dv doctor` — workspace health check
+- `dv doctor` — workspace health check (now includes Phase 43 env law verification)
 - `dv locksheet` — regenerate SOVEREIGN_LOCK checksums
+- `dv purge` — canonical phantom purge: kills orphaned processes, incinerates media artifacts, releases APFS snapshots, reports disk state

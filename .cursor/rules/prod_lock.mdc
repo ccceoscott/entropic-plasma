@@ -3,7 +3,7 @@ description: PRODUCTION LOCK - Active Firebase Project ID enforcement and safegu
 globs: **/*deploy*, scripts/safe-deploy-guard.sh, package.json
 alwaysApply: true
 ---
-# PRODUCTION LOCK: INFINITY PROTOCOL v6.2
+# PRODUCTION LOCK: INFINITY PROTOCOL v6.2.15
 
 ## 1. THE MANDATE
 This file enforces Project Context Isolation. Before ANY destructive command (`deploy`, `delete`, `drop`), the system MUST verify the active Firebase project mathematically matches the authorized production target.
@@ -84,6 +84,18 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Phase 43 Pre-Deploy Sovereignty Check
+        run: |
+          echo "Verifying Phase 43 Machine Law compliance..."
+          [ -z "$NODE_OPTIONS" ] && echo "⚠️ NODE_OPTIONS unset — build may OOM" || echo "✅ NODE_OPTIONS: $NODE_OPTIONS"
+          echo "✅ NEXT_TELEMETRY_DISABLED: $NEXT_TELEMETRY_DISABLED"
+
+      - name: Build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: npm run build
+
       - name: Execute Safety Guard
         env:
           AUTHORIZED_PROJECT: ${{ secrets.FIREBASE_PROJECT_ID }}
@@ -99,4 +111,16 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           channelId: live
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+```
+
+## 6. PHASE 43 PRE-DEPLOY SOVEREIGNTY MANDATE
+Before ANY deployment executes, verify all Phase 43 machine laws are active:
+```bash
+# Embed in safe-deploy-guard.sh Phase 43 block
+echo "[Phase 43] Verifying sovereignty..."
+[ -z "$NODE_OPTIONS" ] && echo "❌ NODE_OPTIONS not set — deploy blocked" && exit 1
+[ "$NEXT_TELEMETRY_DISABLED" != "1" ] && echo "⚠️ Telemetry active — performance degraded"
+grep -q '"node": ">=22' package.json || { echo "❌ Node version not pinned to 22+"; exit 1; }
+grep -q 'productionBrowserSourceMaps.*false' next.config.* 2>/dev/null || echo "⚠️ Source maps not disabled — build RAM will spike"
+echo "✅ Phase 43 Sovereignty: PASS"
 ```

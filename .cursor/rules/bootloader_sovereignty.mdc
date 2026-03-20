@@ -3,7 +3,7 @@ alwaysApply: true
 description: BOOTLOADER SOVEREIGNTY - Next.js Setup, Providers, and Protocol Injection
 globs: "**/layout.tsx, **/App.tsx, **/_app.tsx, package.json, README.md, MISSION_STATE.md"
 ---
-# BOOTLOADER SOVEREIGNTY: INFINITY PROTOCOL v6.2
+# BOOTLOADER SOVEREIGNTY: INFINITY PROTOCOL v6.2.15
 
 > **THE FOUNDATION**: This rule ensures every project is correctly initialized with the required React 19 / Next.js 15 providers and that the Infinity Protocol is active and healthy.
 
@@ -77,13 +77,47 @@ export function Providers({ children }: { children: React.ReactNode }) {
 **Pre-build hook logic in package.json**:
 ```javascript
 // scripts/enforce-infinity.js
+const { execSync } = require('child_process');
 const fs = require('fs');
+
+// Gate 1: Protocol presence
 if (!fs.existsSync('.cursor/rules') || !fs.existsSync('MISSION_STATE.md')) {
   console.error('[FATAL] Infinity Protocol Not Detected! Run: dv upgrade');
   process.exit(1);
 }
+
+// Gate 2: Phase 43 Machine Laws (NODE_OPTIONS)
+const nodeOpts = process.env.NODE_OPTIONS || '';
+if (!nodeOpts.includes('max-old-space-size')) {
+  console.error('[FATAL] NODE_OPTIONS not set. Add NODE_OPTIONS=--max-old-space-size=4096 to ~/.zshenv');
+  process.exit(1);
+}
+
+console.log('✅ Infinity Protocol v6.2.15: HEALTH PASS');
 ```
 
 ## 5. REFACTORING LEGACY
 - Prohibit Redux or Pages Router in greenfield projects.
 - Migrate to Next.js App Router + Context/Zustand immediately.
+
+## 6. PHASE 43 BOOTLOADER SOVEREIGNTY
+On first entry to any workspace, the agent MUST perform this verification sequence BEFORE any other action:
+
+```bash
+# ⚠️ MANDATORY BOOT SEQUENCE (Phase 43)
+echo "[INFINITY PROTOCOL v6.2.15] Boot Sequence Initiated..."
+
+# 1. Protocol integrity
+[ -f "MISSION_STATE.md" ] || { echo "❌ MISSING: MISSION_STATE.md"; exit 1; }
+[ -f "GEMINI.md" ] && grep -q 'v6.2.15' GEMINI.md || echo "⚠️ WARNING: GEMINI.md drift detected. Run: dv fix-drift"
+
+# 2. Phase 43 Machine Laws
+[ -n "$NODE_OPTIONS" ] && echo "✅ NODE_OPTIONS: $NODE_OPTIONS" || echo "❌ NODE_OPTIONS MISSING — add to ~/.zshenv"
+[ -n "$_JAVA_OPTIONS" ] && echo "✅ _JAVA_OPTIONS: $_JAVA_OPTIONS" || echo "❌ _JAVA_OPTIONS MISSING — Firebase Emulators will OOM"
+[ "$NEXT_TELEMETRY_DISABLED" = "1" ] && echo "✅ Telemetry: KILLED" || echo "⚠️ NEXT_TELEMETRY_DISABLED not set"
+
+# 3. MCP Watchdog
+pgrep -f mcp_watchdog.sh > /dev/null && echo "✅ MCP Watchdog: ACTIVE" || echo "⚠️ MCP Watchdog not running"
+
+echo "[INFINITY PROTOCOL v6.2.15] Boot Sequence Complete."
+```
