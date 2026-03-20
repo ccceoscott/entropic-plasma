@@ -3,7 +3,7 @@ alwaysApply: true
 description: BUILD PROCESS MASTERY - Build Pipelines, CI/CD, Node 22 LTS, and ARMs Stability
 globs: "**/package.json, **/next.config.mjs, **/.github/workflows/*.yml, **/scripts/*.sh"
 ---
-# BUILD PROCESS MASTERY: INFINITY PROTOCOL v6.2
+# BUILD PROCESS MASTERY: INFINITY PROTOCOL v6.2.15
 
 > **THE SOVEREIGN BUILD MANDATE**: Production artifacts must be mathematically identical, fully verified, and globally persistent.
 
@@ -19,10 +19,14 @@ To prevent ARM64 (Mac Silicon) worker thread paralysis and silent build hangs du
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' next build"
+    "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "test": "NODE_OPTIONS='--max-old-space-size=4096' vitest run",
+    "test:e2e": "NODE_OPTIONS='--max-old-space-size=4096' playwright test"
   }
 }
 ```
+> **⚠️ NEVER use `--max-old-space-size=8192`.** Setting 8192 tells Node’s GC it has 8GB available, which causes catastrophic GC deferral and swap storms on Apple Silicon with unified memory. 4096 is the mathematically proven ceiling that forces timely garbage collection.
 
 ### ARM64 vs x86 Parity
 - **The Deadlock Trap**: PostCSS and Tailwind JIT can hang on ARM64 if `swc` is not properly configured. Prohibit `style={{}}` to reduce JIT complexity.
@@ -59,6 +63,9 @@ jobs:
         run: npm ci
         
       - name: Build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          NEXT_TELEMETRY_DISABLED: '1'
         run: npm run build
         
       - name: Artifact Integrity Check

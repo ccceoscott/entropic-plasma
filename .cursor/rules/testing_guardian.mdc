@@ -3,7 +3,7 @@ alwaysApply: true
 description: TESTING SOVEREIGNTY - E2E (Playwright), Unit (Vitest), Firebase Emulator, Coverage
 globs: **/*.{test,spec}.{ts,js,tsx}, playwright.config.ts, vitest.config.ts
 ---
-# TESTING SOVEREIGNTY: INFINITY PROTOCOL v6.2
+# TESTING SOVEREIGNTY: INFINITY PROTOCOL v6.2.15
 
 > Consolidates `testing.mdc` + `testing_guardian.mdc`. One rule, absolute authority.
 
@@ -57,7 +57,7 @@ beforeAll(() => {
 ## 3. PLAYWRIGHT E2E ARCHITECTURE
 
 ```typescript
-// ✅ REQUIRED: playwright.config.ts
+// ✅ REQUIRED: playwright.config.ts (Golden Ratio — Phase 43)
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
@@ -65,20 +65,28 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 3, // ⚠️ NEVER `undefined` — auto-detect causes swap storms on Apple Silicon
   reporter: 'html',
   use: {
-    // Target the emulator/local server combo
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     video: 'retain-on-failure',
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
+    launchOptions: {
+      args: [
+        '--disable-dev-shm-usage',       // Prevents /dev/shm overflow in CI
+        '--disable-site-isolation-trials', // Eliminates renderer memory leaks
+        '--disable-gpu',                 // No GPU needed in CI
+        '--no-sandbox',
+      ],
+    },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } },
   ],
-  // AUTO-START THE LOCAL SERVER AND EMULATOR
   webServer: {
     command: 'npm run dev:e2e',
     url: 'http://localhost:3000',
@@ -107,3 +115,9 @@ export default defineConfig({
 - Maintain `TEST_INDEX.md` as a living registry of test surface area.
 - `dv fix-drift` auto-heals rule alignment. `dv test-all` runs workspace-wide E2E.
 - `AI_DEBUG.md` persists architectural decisions that affect test design.
+
+## 8. PHASE 43 TEST INFRASTRUCTURE MANDATES
+- **JVM Sovereignty**: Firebase Emulators run on the JVM. `_JAVA_OPTIONS="-Xmx2048m"` MUST be in `~/.zshenv` before starting any test suite that uses emulators.
+- **EMFILE Guard**: `ulimit -n 65536` in `~/.zshenv`. Vitest's file watcher opens thousands of files simultaneously; without this, test runs panic with `EMFILE: too many open files`.
+- **NODE_OPTIONS**: ALL test scripts — `test`, `test:coverage`, `test:security`, `test:integrity`, `test:watch`, `test:e2e` — MUST prefix `NODE_OPTIONS=--max-old-space-size=4096`. Use `setup_testing.sh` to auto-inject.
+- **Video Bloat**: After any Playwright test session, run `dv purge` to destroy `.webm` session recordings in `browser_recordings/`.

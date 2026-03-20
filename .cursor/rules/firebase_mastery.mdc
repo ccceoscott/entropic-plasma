@@ -3,7 +3,7 @@ alwaysApply: true
 description: FIREBASE MASTERY - Functional Gen 2 Functions, Auth Hooks, & AppCheck
 globs: **/*{firebase,firestore,functions,auth}*.{ts,js,tsx,jsx}, functions/src/**/*.ts
 ---
-# FIREBASE MASTERY: INFINITY PROTOCOL v6.2
+# FIREBASE MASTERY: INFINITY PROTOCOL v6.2.15
 
 > Firebase is the backbone of Infinity Protocol backend architecture. Use modular SDKs, Gen 2 Cloud Functions, and AppCheck for zero-trust execution.
 
@@ -132,4 +132,19 @@ if (!getApps().length) {
 
 export const adminDb = getFirestore();
 export const adminAuth = getAuth();
+```
+
+## 5. FIREBASE EMULATOR PHASE 43 SOVEREIGNTY
+- **JVM Sovereignty**: Firebase Emulators run on the JVM. `_JAVA_OPTIONS="-Xmx2048m"` MUST be exported in `~/.zshenv`. Without this cap, the JVM will silently consume unbounded heap — up to 8GB+ — during integration test suites, causing system-wide memory exhaustion on Apple Silicon.
+- **Emulator-Only Tests**: NEVER run integration tests against production Firebase. The `setupTests.ts` guard must throw if `FIRESTORE_EMULATOR_HOST` is unset.
+- **EMFILE Guard**: `ulimit -n 65536` in `~/.zshenv`. The Firebase Emulator Suite opens thousands of file descriptors. Without this, emulator startup causes `EMFILE: too many open files` panics.
+- **Video Bloat on Emulator Tests**: Any Playwright test that starts the dev server alongside emulators MUST run `dv purge` afterward to destroy `.webm` session recordings.
+
+```bash
+# ✅ Required in ~/.zshenv (Phase 43 mandates)
+export _JAVA_OPTIONS="-Xmx2048m"
+export NEXT_TELEMETRY_DISABLED=1
+export ASTRO_TELEMETRY_DISABLED=1
+export NODE_OPTIONS=--max-old-space-size=4096
+ulimit -n 65536
 ```

@@ -3,7 +3,7 @@ alwaysApply: true
 description: PRODUCTION READINESS - Observability, Security Headers, Next.config
 globs: "**/next.config.mjs, **/sentry.*.config.ts, **/*.tsx"
 ---
-# PRODUCTION READINESS: INFINITY PROTOCOL v6.2
+# PRODUCTION READINESS: INFINITY PROTOCOL v6.2.15
 
 > **THE ZERO-TRUST EDGE**: Production builds must be mathematically secure, fully observable, and impenetrable to basic vector attacks.
 
@@ -92,3 +92,28 @@ Sentry.init({
   debug: false,
 });
 ```
+
+## 4. NEXT.CONFIG PHASE 43 SOVEREIGNTY
+These settings are non-negotiable in every `next.config.ts` file:
+
+```typescript
+// ✅ REQUIRED: next.config.ts
+const nextConfig = {
+  // MANDATORY: Eliminates 3-4x RAM spike during Rollup compilation
+  productionBrowserSourceMaps: false,
+
+  // MANDATORY: Redactive logging — never allow console bleed in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
+      ? { exclude: ['error', 'warn'] }
+      : false,
+  },
+
+  // Prevent exhaustive type-checking during production build
+  typescript: { ignoreBuildErrors: false }, // Keep strict
+  eslint: { ignoreDuringBuilds: false },    // Keep strict
+};
+export default nextConfig;
+```
+
+> **⚠️ Set in `~/.zshenv`**: `NEXT_TELEMETRY_DISABLED=1` — framework telemetry beacons execute synchronously on the CPU event loop and degrade cold-start build times by 8–15%.
