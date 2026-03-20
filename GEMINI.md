@@ -49,6 +49,8 @@
 ## 7. AUTONOMOUS OPERATIONS & COMMUNICATION
 - **Self-Healing**: Analyze failures, search docs (Context7/Brave), retry once. Use `?.` and null-safe defaults.
 - **Autonomous Flow**: Use `dv flow` for complete sequential compliance execution.
+- **Node V8 Sovereignty**: Mathematically clamp Node.js on Apple Silicon. `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix all Next.js/Vite `dev`, `build`, and `test` scripts. All `next.config.ts` files must disable `productionBrowserSourceMaps`.
+- **Subagent Restraint (Error 2 Abatement)**: Never use `replace_file_content` on an empty file. Always use `write_to_file`. Never spawn unbounded ghost tabs—reuse active pages.
 - **Communication**: Always acknowledge "Infinity Protocol v6.2" status during complex tasks.
 - **Alerts**: Halt and warn if Project Bleed or Poison Strings are detected.
 - **Phantom Purge**: Ensure no orphaned Playwright MCP instances are left running. Execute `pkill -f playwright-mcp` before returning control. **SUBAGENT EXCEPTION**: The `browser_subagent` MUST NEVER execute purge commands while active, to prevent self-termination.
