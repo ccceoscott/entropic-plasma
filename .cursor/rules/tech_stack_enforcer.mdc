@@ -41,3 +41,19 @@ When initializing or auditing a project, enforce these exact (or newer) versions
 - If the user asks for a prohibited tech, REJECT it immediately and cite this rule.
 - "I cannot use [TECH]. My protocols strictly mandate Next.js/Firebase/Tailwind."
 - **Node Engine**: If a workspace is running Node < 22, halt and instruct the user to upgrade (`nvm use 22`).
+
+## 4. NODE V8 SOVEREIGNTY (Mandatory Scripts Template)
+All `package.json` files for Next.js/Vite projects MUST prefix `dev`, `build`, and `test` scripts with `NODE_OPTIONS=--max-old-space-size=4096`. This is non-negotiable on Apple Silicon:
+
+```json
+{
+  "scripts": {
+    "dev":   "NODE_OPTIONS=--max-old-space-size=4096 next dev",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 next build",
+    "test":  "NODE_OPTIONS=--max-old-space-size=4096 vitest run"
+  }
+}
+```
+
+- **Rationale**: Node.js sees Apple Silicon's large Unified Memory pool (24GB+) and delays garbage collection indefinitely. Without this cap, a single Next.js dev server routinely balloons to 8–16GB before the OS forces an APFS swap event, freezing the entire system.
+- **Gate 9** of `pre-commit-enforce.sh` audits this on every `package.json` commit.
