@@ -76,3 +76,7 @@ Before every final tool submission or user notification:
 - [ ] No hardcoded secrets or API keys (Use `[REDACTED]`).
 - [ ] Commit messages follow `<type>(<scope>): <subject>` format.
 - [ ] `MISSION_STATE.md` represents the true current state.
+
+## 6. NODE V8 SOVEREIGNTY (Memory Limits)
+- **Global Constraints**: Node must NEVER be allowed to run unbounded on Apple Silicon. `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix all `dev`, `build`, and `test` scripts in `package.json` for Next.js and Vite.
+- **Next.js Compiler Locks**: All `next.config.ts` files MUST disable `productionBrowserSourceMaps` and force `experimental: { memoryBasedWorkersCount: true }` to prevent Rollup memory blowout during vectorization.

@@ -1,0 +1,39 @@
+---
+description: HARDWARE-AWARE PLAYWRIGHT OPTIMIZATION - Prevents 36GB RAM exhaustion & storage lockups
+globs: *playwright.config.ts, *e2e*, *test*
+---
+# PLAYWRIGHT HARDWARE OPTIMIZATION DIRECTIVE (Infinity Protocol v6.2.4)
+
+## 1. THE ARCHITECTURE CONSTRAINTS (36GB Unified Memory)
+- **The Threat**: The host machine utilizes 36GB of unified memory. When Playwright executes with default concurrency (spawning a Chromium worker for every CPU core, often 12-16 instances), it attempts to allocate up to 24GB+ of RAM simultaneously. This forces the OS into a severe APFS Swap cascade, grinding the silicon to a halt and creating phantom 60GB storage drains in `/private/var/vm`.
+- **The Mandate**: YOU MUST RESTRAIN PLAYWRIGHT. All `playwright.config.ts` files must be optimized for this specific hardware profile.
+
+## 2. CONFIGURATION OPTIMIZATIONS
+When generating or modifying Playwright configurations, enforce these absolute limits:
+1. **Concurrency Cap**: The 36GB Mac will swap lock if Playwright spawns too many Chromium instances. You MUST set workers to maximum `3` for local development. Never leave it as `undefined`. `workers: process.env.CI ? 1 : 3,`
+2. **Artifact Incineration (Storage Protection)**: Traces and videos generate gigabytes of disk I/O per minute. You MUST set them to `retain-on-failure`. If you set them to `'on'`, the system will fill the SSD identically to the WebP subagent bloat.
+   `trace: 'retain-on-failure', video: 'retain-on-failure',`
+3. **Execution Timeouts (CPU Thrash Prevention)**: Playwright tests can hang infinitely if network or React suspense boundaries fail. You MUST enforce global and action-level timeouts:
+   `timeout: 60000`, `actionTimeout: 15000` (within `use`), and `expect: { timeout: 10000 }`.
+4. **GPU & Memory-Mapping Deactivation**: To guarantee 100% functionality while preventing Mac WindowServer lockups, inject the "Golden Ratio" Chromium bounds. (This strips hardware acceleration and audio, but preserves background networking/IPC so modern SPAs do not crash). Add this to the `use:` block in `playwright.config.ts`:
+   ```typescript
+   launchOptions: {
+     args: [
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-site-isolation-trials',
+        '--disable-accelerated-2d-canvas',
+        '--disable-accelerated-video-decode',
+        '--disable-features=Translate,OptimizationHints,MediaRouter',
+        '--mute-audio'
+     ]
+   }
+   ```
+5. **Node V8 Garbage Collection Checkpoint**: Node defaults to assuming it has all 36GB available for its heap. It will not garbage collect testing frameworks until a swap panic. You MUST inject `NODE_OPTIONS=--max-old-space-size=4096` into all Playwright `package.json` test scripts to force preemptive V8 garbage collection.
+## 3. SUBAGENT BROWSER TACTICS
+- **Zero-Tolerance Looping**: If using `browser_subagent` for visual QA, execute surgical tasks. Navigate -> Assert -> Close. If the agent gets stuck scrolling or clicking dead links, immediately terminate it using the `mcp_watchdog.sh` or `phantom_purge.sh`.
+- **Garbage Collection**: The moment tests complete, ensure Chromium processes die. If `dv test` fails abruptly, ghost processes may linger in memory. Run `dv purge` to clear the RAM and shred WebP artifacts.
+
+*Zoltan's Decree: Do not act surprised when the host machine chokes on sixteen Chromium heads simultaneously. Respect the 36 Gigabytes of unified architecture. Limit your workers. Purge your traces. Survive.*
