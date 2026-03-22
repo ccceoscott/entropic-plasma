@@ -127,3 +127,25 @@ When the protocol version changes (e.g., v8.4.0 → v8.5.0):
 5. `git push origin master --no-verify`
 6. `bash scripts/dv rules` — broadcast to fleet
 7. On all other machines: `git pull --rebase origin master`
+
+---
+
+## § 7. VERSION SOVEREIGNTY COMMANDS (Auto-Sync System)
+
+```bash
+dv version-scan      # Read-only: show all stale version strings fleet-wide
+dv nuke-versions     # Fix all stale strings, auto-commit + push per project
+dv version:bump X.Y.Z # Atomic version bump across all config files
+dv rules             # Broadcast .cursorrules + auto-runs nuke-versions
+```
+
+**Machine Law**: `dv nuke-versions` runs automatically at the end of every `dv rules` broadcast.
+Every future fleet sync will auto-correct any version drift that has accumulated.
+You can also run `dv version-scan` at any time to audit without making changes.
+
+### Version Bump Procedure (v8.4.0 → v8.5.0)
+1. `dv version:bump 8.5.0` — atomically bumps all version files
+2. `dv nuke-versions` — purges residual old strings fleet-wide (auto-commits + pushes)
+3. `git push origin master --no-verify`
+4. `dv rules` — broadcasts + runs nuke-versions automatically
+5. On all other machines: `git pull --rebase origin master && dv nuke-versions`
