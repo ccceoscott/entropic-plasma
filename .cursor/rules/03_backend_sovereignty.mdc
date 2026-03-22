@@ -1,0 +1,539 @@
+---
+description: Infinity Protocol v8.4.0 Pillar: 03_backend_sovereignty
+globs: **/*.{ts,tsx,js,jsx,css}, functions/**/*.{ts,js}, **/*.rules, **/*.{test,spec}.{ts,tsx}, tests/**/*, *.{json,config.js,config.ts}
+alwaysApply: true
+---
+
+
+/* ------------------ Source: backend_arch.mdc ------------------ */
+# Backend Architect: Infinity Protocol v8.4.0
+
+**Goal**: Absolute data integrity, secure operations, and sub-second performance.
+
+## 1. CORE MANDATES
+- **Schema Integrity**: Validate all data mutations against `KNOWLEDGE.md`.
+- **Universal Sync Absolutism**: Optimistically update UI AND reliably sync to Firestore using centralized API calls or `onSnapshot` listeners.
+- **Ironclad CRUD**: Ad-hoc component database logic is FORBIDDEN. Use a unified API layer with explicit Zod validation, EPA (Error Path Analysis), and loading states.
+- **Enterprise E-Commerce**: Implement Webhook Idempotency (prevent double billing), Incremental Static Regeneration (ISR) caching (sub-second LCP), and precise checkout Rate Limiting (block card testing).
+- **Credential Safety**: ZERO hardcoded secrets. Use `.env.local` or Secret Manager.
+- **Resource Efficiency**: Prevent memory/stream leaks. Prioritize performant algorithms.
+
+## 2. CLOUD FUNCTION MASTERY
+- **Domain Segregation**: Cloud Functions MUST NOT be monoliths. Separate into `triggers/`, `webhooks/`, `callables/`, and `utils/`. The root `index.ts` is only a lightweight export layer.
+- **Validation Sovereignty**: NEVER trust client payloads via `onCall` or REST directly. ALL incoming data MUST be validated against strict **Zod** (`v4`) schemas before any business logic executes.
+- **Financial Integrity**: The frontend is NEVER the source of truth for pricing. Payment amounts must be derived server-side via authoritative Firestore ledger queries (e.g., a `products` collection) before passing to Stripe.
+- **Cold Start Minimization**: Use granular exports, lazy-evaluate SDK injections (Stripe, Firebase Admin) inside function scope when possible.
+
+## 3. EXECUTION PROTOCOL
+- Execute a full dependency side-effect analysis before writing backend code.
+- Run `/env-check` prior to any production database or function deployments.
+
+/* ------------------ Source: backend_sovereignty.mdc ------------------ */
+# BACKEND SOVEREIGNTY: FIREBASE ABSOLUTISM — Infinity Protocol v8.4.0
+
+> **See Also**: `firebase_mastery.mdc` for implementation patterns. `secret_management_guardian.mdc` for credential rules (MANDATORY).
+
+## 1. CLOUD FUNCTIONS V2 (AppCheck & Zod Validation)
+```typescript
+// ✅ REQUIRED: Gen 2 onCall function with strict boundary validation
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
+import { z } from 'zod';
+
+// 1. Zod Schema
+const PayloadSchema = z.object({
+  documentId: z.string().min(5),
+  action: z.enum(['approve', 'reject']),
+});
+
+export const processAction = onCall(
+  {
+    enforceAppCheck: true, // MANDATORY
+    consumeAppCheckToken: false,
+    region: 'us-central1',
+    cors: true,
+  },
+  async (request) => {
+    // 2. Auth Boundary
+    if (!request.auth?.uid) {
+      throw new HttpsError('unauthenticated', 'Endpoint requires authentication.');
+    }
+
+    // 3. Payload Validation
+    const parsed = PayloadSchema.safeParse(request.data);
+    if (!parsed.success) {
+      logger.warn('Boundary Validation Failed', parsed.error);
+      throw new HttpsError('invalid-argument', 'Malformed payload detected.');
+    }
+
+    try {
+      // 4. Execution Logic...
+      return { success: true, timestamp: Date.now() };
+    } catch (error) {
+      logger.error('Critical Failure:', error);
+      throw new HttpsError('internal', 'Execution failure.');
+    }
+  }
+);
+```
+
+## 2. ARCHITECTURE & SECRETS
+- **Platform**: Firebase Cloud Functions Gen 2 ONLY.
+- **Database**: Firestore (NoSQL). Use Data Connect only for SQL-specific requirements.
+- **Secrets**: Use `defineSecret()` from `firebase-functions/params`. **NEVER** use `process.env` in Cloud Functions for production secrets.
+  ```typescript
+  import { defineSecret } from 'firebase-functions/params';
+  const STRIPE_KEY = defineSecret('STRIPE_SECRET_KEY');
+  // Access via STRIPE_KEY.value() dynamically inside function handler
+  ```
+
+## 3. PERFORMANCE & CONCURRENCY
+- **Cold Starts**: Set `minInstances: 1` minimum for priority routes (auth, checkout).
+- **Concurrency**: Set `concurrency: 80` (Gen 2 default feature) for parallel request handling to save costs.
+- **Async Efficiency**: Aggressively use `Promise.all()` for independent I/O tasks.
+- **Firestore Denormalization**: Avoid complex multi-collection joins. Denormalize read-heavy views at write-time.
+
+## 4. API & SERVER ACTION RIGOR
+- **Universal Sync**: Optimistically update UI AND reliably sync to Firestore using centralized API calls.
+- **Ironclad CRUD**: Ad-hoc component database logic is FORBIDDEN. Use a unified API layer with Zod validation.
+
+```typescript
+// ✅ NEXT.JS SERVER ACTIONS (MUTATION STANDARD)
+'use server'
+import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import { cookies } from 'next/headers';
+
+export async function updateUserProfile(formData: FormData) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('__session')?.value;
+  if (!sessionCookie) throw new Error('Unauthorized');
+
+  const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+  await adminDb.collection('users').doc(decoded.uid).update({
+    name: formData.get('name'),
+    updatedAt: new Date()
+  });
+}
+```
+
+## 5. ERROR HANDLING & LOGGING
+- **EPA (Error Path Analysis)**: Map potential failure points before implementation.
+- **Logging**: ZERO `console.log()` usage. Use `firebase-functions/logger` or a dedicated system logger.
+- **Secrets**: Use `defineSecret()` from `firebase-functions/params`.
+
+## 6. PHASE 43 RUNTIME SOVEREIGNTY
+- **JVM Cap**: `_JAVA_OPTIONS="-Xmx2048m"` in `~/.zshenv`. Firebase Emulators will consume unbounded JVM heap otherwise. See `firebase_mastery.mdc §5` for the full `~/.zshenv` bootstrap.
+- **EMFILE Guard**: `ulimit -n 65536` in `~/.zshenv`. Cloud Functions local emulation opens thousands of file descriptors.
+- **Telemetry Kill**: `NEXT_TELEMETRY_DISABLED=1` and `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv`. Execute `dv purge` after any emulator + browser session.
+
+/* ------------------ Source: firebase_mastery.mdc ------------------ */
+# FIREBASE MASTERY: INFINITY PROTOCOL v8.4.0
+
+> Firebase is the backbone of Infinity Protocol backend architecture. Use modular SDKs, Gen 2 Cloud Functions, and AppCheck for zero-trust execution.
+
+## 1. CLOUD FUNCTIONS GEN 2 (The Blueprint)
+
+All Cloud Functions MUST use Gen 2, explicitly set global options, and utilize Zod for runtime type checking of arguments.
+
+```typescript
+// ✅ REQUIRED: Gen 2 Firebase Function Pattern with Zod + AppCheck
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { setGlobalOptions } from 'firebase-functions/v2';
+import * as logger from 'firebase-functions/logger';
+import { z } from 'zod';
+
+// 1. Uniform Environment
+setGlobalOptions({
+  region: 'us-central1',
+  memory: '256MiB',
+  concurrency: 80,
+  maxInstances: 10,
+  enforceAppCheck: true // 🔥 REQUIRED FOR PROD
+});
+
+// 2. Strict Input Validation
+const ProcessOrderSchema = z.object({
+  orderId: z.string().min(1),
+  amount: z.number().positive(),
+});
+
+export const processOrder = onCall(async (request) => {
+  // 3. Auth Guard
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  // 4. Input Parser
+  const parsed = ProcessOrderSchema.safeParse(request.data);
+  if (!parsed.success) {
+    logger.warn('Invalid order payload', { errors: parsed.error.format() });
+    throw new HttpsError('invalid-argument', 'Malformed request data.');
+  }
+
+  const { orderId, amount } = parsed.data;
+
+  try {
+    // ... execution logic
+    return { success: true, orderId };
+  } catch (error) {
+    logger.error('Order processing failed', { orderId, error });
+    throw new HttpsError('internal', 'Execution failed.');
+  }
+});
+```
+
+## 2. MODULAR AUTHENTICATION (React 19)
+
+Never assume the `user` object is immediately available. Wrap Firebase Auth in a centralized React context utilizing the `onAuthStateChanged` observer.
+
+```tsx
+// ✅ REQUIRED: React 19 Firebase Auth Context Pattern
+'use client';
+
+import { createContext, useContext, useEffect, useState } from 'react';
+import { User, onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '@/config/firebase'; // Your initialized modular SDK
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  logout: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  logout: async () => {},
+});
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const logout = async () => {
+    await signOut(auth);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
+```
+
+## 3. FIRESTORE "GET" VS "ON SNAPSHOT"
+
+- **`getDocs()` / `getDoc()`**: Use for single-read operations, SSR requests, or server actions.
+- **`onSnapshot()`**: Use ONLY for high-priority real-time UI features (e.g., chat, live dashboards). Detach listeners (`unsubscribe()`) on component unmount to prevent massive read spikes.
+
+## 4. FIREBASE ADMIN SDK INITIALIZATION
+
+The Server Action / API route environment requires identical initialization without connection leaks:
+
+```typescript
+// ✅ REQUIRED: Firebase Admin Singleton Init (Next.js Server)
+import { getApps, initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
+
+if (!getApps().length) {
+  // Never expose Service Account Keys in code! 
+  // Use GCP ADC (Application Default Credentials) locally, 
+  // or pass a parsed strict string base64 env var if strictly required.
+  initializeApp(); 
+}
+
+export const adminDb = getFirestore();
+export const adminAuth = getAuth();
+```
+
+## 5. FIREBASE EMULATOR PHASE 43 SOVEREIGNTY
+- **JVM Sovereignty**: Firebase Emulators run on the JVM. `_JAVA_OPTIONS="-Xmx2048m"` MUST be exported in `~/.zshenv`. Without this cap, the JVM will silently consume unbounded heap — up to 8GB+ — during integration test suites, causing system-wide memory exhaustion on Apple Silicon.
+- **Emulator-Only Tests**: NEVER run integration tests against production Firebase. The `setupTests.ts` guard must throw if `FIRESTORE_EMULATOR_HOST` is unset.
+- **EMFILE Guard**: `ulimit -n 65536` in `~/.zshenv`. The Firebase Emulator Suite opens thousands of file descriptors. Without this, emulator startup causes `EMFILE: too many open files` panics.
+- **Video Bloat on Emulator Tests**: Any Playwright test that starts the dev server alongside emulators MUST run `dv purge` afterward to destroy `.webm` session recordings.
+
+```bash
+# ✅ Required in ~/.zshenv (Phase 43 mandates)
+export _JAVA_OPTIONS="-Xmx2048m"
+export NEXT_TELEMETRY_DISABLED=1
+export ASTRO_TELEMETRY_DISABLED=1
+export NODE_OPTIONS=--max-old-space-size=4096
+ulimit -n 65536
+```
+
+/* ------------------ Source: firestore_schema_guardian.mdc ------------------ */
+# FIRESTORE SCHEMA GUARDIAN: INFINITY PROTOCOL v8.4.0
+
+> Firestore is the backbone. Schema mistakes are permanent and costly. Model once, correctly.
+
+## 1. DOCUMENT MODELING MANDATES (The Standard)
+
+```typescript
+// ✅ Canonical document shape — ALL Firestore docs MUST extend this
+import { FieldValue, Timestamp } from 'firebase-admin/firestore'; // or firebase/firestore
+
+export interface IFirestoreMetaData {
+  createdAt: Timestamp;    // ALWAYS server timestamp
+  updatedAt: Timestamp;    // ALWAYS server timestamp
+  createdBy: string;       // uid
+  isDeleted: boolean;      // Soft-delete flag (default: false)
+  version: number;         // Schema version for migrations (start at 1)
+}
+
+export interface IUserProfile {
+  id: string; // Document ID
+  email: string;
+  displayName: string;
+  metadata: IFirestoreMetaData;
+}
+
+// ✅ UTILITY: Create Standard Metadata
+export const createFirestoreMetadata = (uid: string) => ({
+  createdAt: FieldValue.serverTimestamp(),
+  updatedAt: FieldValue.serverTimestamp(),
+  createdBy: uid,
+  isDeleted: false,
+  version: 1,
+});
+```
+
+- No arrays of objects for frequently mutated data → use subcollections.
+- Document size limit: **1MB hard cap** — never embed full content bodies inline.
+- Timestamps: ALWAYS `FieldValue.serverTimestamp()`. Never `new Date()` or `Date.now()`.
+
+## 2. COLLECTION ARCHITECTURE & DENORMALIZATION
+
+| Pattern | Use When | Avoid When |
+|---|---|---|
+| Root collection | Independent entities (users, orders) | Deeply nested relationships |
+| Subcollection | Entity has many owned children (user/orders) | Data needed across parents (use Collection Group if needed) |
+| Denormalization | Read-heavy, write-rare data | High write frequency data |
+| `_cache/` doc | Aggregations (counts, totals) | — |
+
+```typescript
+// ✅ FLATTENING UTILITY: Dot-notation updates for nested fields
+// Prevents overwriting entire objects when updating a single nested field
+export const flattenObject = (obj: any, parentKey = ''): Record<string, any> => {
+  return Object.keys(obj).reduce((acc, key) => {
+    const pre = parentKey.length ? parentKey + '.' : '';
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key]) && !(obj[key] instanceof Date) && !(obj[key]?.toDate)) {
+      Object.assign(acc, flattenObject(obj[key], pre + key));
+    } else {
+      acc[pre + key] = obj[key];
+    }
+    return acc;
+  }, {} as Record<string, any>);
+};
+
+// Usage:
+// await db.collection('users').doc(id).update(flattenObject({ metadata: { updatedAt: FieldValue.serverTimestamp() } }));
+```
+
+## 3. QUERY & INDEX DISCIPLINE
+
+- Composite indexes go in `firestore.indexes.json` — NEVER created ad-hoc in console.
+- Avoid `array-contains-any` + `in` in same query (not supported).
+- Pagination: ALWAYS use `startAfter(lastDoc)` cursor — never `offset()`.
+- Default query limit: **25 docs**. Max: **500**. Never unbounded `.get()` on large collections.
+
+## 4. COST CONTROL (Aggregation Pattern)
+
+```typescript
+// ✅ Aggregation via cached counter (NOT counting documents on every read)
+export const getCachedUserCount = async (db: admin.firestore.Firestore): Promise<number> => {
+  const cache = await db.doc('_cache/analytics').get();
+  return cache.data()?.totalUsers ?? 0;
+};
+
+// ❌ EXPENSIVE — reads every document to count
+// const count = (await db.collection('users').get()).size;
+```
+
+- Count operations: use `_cache/` aggregation docs updated by Cloud Function triggers (`onCreate` / `onDelete`).
+- Batch writes: max **500 operations** per `writeBatch()`.
+- Firestore read budget alerts: set GCP budget alert at **$5 increments**.
+
+## 5. SECURITY RULES SOVEREIGNTY
+
+```javascript
+// ✅ Required pattern — strict type checking and timestamp validation
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuth() { return request.auth != null; }
+    function isOwner(uid) { return isAuth() && request.auth.uid == uid; }
+    function isNotDeleted() { return !resource.data.metadata.isDeleted; }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) && isNotDeleted();
+      allow create: if isOwner(userId) 
+        && request.resource.data.metadata.createdAt == request.time
+        && request.resource.data.metadata.isDeleted == false;
+      allow update: if isOwner(userId)
+        && request.resource.data.metadata.isDeleted == false
+        && request.resource.data.metadata.updatedAt == request.time;
+      // DELETES ARE FORBIDDEN ON THE CLIENT. Use Cloud Functions for Soft Deletes.
+      allow delete: if false; 
+    }
+  }
+}
+```
+
+- Rules MUST validate: data types, required fields, value ranges, and `isDeleted == false` on creates.
+- Test rules with Firebase Emulator. Never deploy untested rules to production.
+
+## 6. RUNTIME DATA SAFETY & PARSING
+
+Firestore reads from the client are inherently untyped network boundaries.
+
+- **Date Safety**: Mandate wrapping Firestore timestamps in `formatDateSafe()` before calling `.toLocaleDateString()` or plotting on UI. Failure to anticipate `null` or `undefined` timestamps leads to instant crashing.
+- **Null-Safe Strings**: Mandate the use of `safeString()`, `safeLower()`, or `safeTrimLower()` when processing user/API strings to avoid `.toLowerCase() is not a function` errors. Never blindly call string methods on unvalidated data.
+
+/* ------------------ Source: integration_guardian.mdc ------------------ */
+# INTEGRATION GUARDIAN: INFINITY PROTOCOL v8.4.0
+
+## 1. OUTGOING SAFETY (The Fetch Wrapper)
+-   **Schema Check**: EVERY external API response must be parsed: `ResponseSchema.parse(data)`.
+-   **Timeout**: ALL `fetch()` calls must have a strictly enforced `signal: AbortSignal.timeout(5000)`.
+
+```typescript
+import { z } from "zod";
+
+// ✅ The Infinity Fetch Pattern
+export async function safeFetch<T>(
+  url: string,
+  schema: z.ZodType<T>,
+  options: RequestInit = {},
+  timeoutMs = 5000
+): Promise<T> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    // Enforce Zod schema exactly
+    return schema.parse(data);
+  } finally {
+    clearTimeout(id);
+  }
+}
+```
+
+## 2. WEBHOOK DEFENSE
+-   **Signature Check**: IF function handles a POST request from external service, FIRST step MUST be `verifySignature()`.
+-   **Idempotency**: ALWAYS check `db.collection('idempotency').doc(eventId).get()` before processing to prevent duplicate webhooks triggering dual-actions.
+
+## 3. ANALYTICS PROXY
+-   **Client Ban**: Do NOT initialize sensitive analytics SDKs with admin keys on the client.
+-   **Proxy**: Use `callFunction('logAnalyticsEvent')` instead of direct client calls for critical events.
+
+## Implementation Architecture: Zero-Trust Webhook Signature Validator
+
+Never parse an incoming external webhook without cryptographically matching its hash signature.
+
+```typescript
+// pages/api/webhook/stripe.ts (or equivalent App Router Route Handler)
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+export async function POST(req: NextRequest) {
+  try {
+    const rawBody = await req.text();
+    const signature = req.headers.get('stripe-signature');
+    const secret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!signature || !secret) {
+      return NextResponse.json({ error: 'Missing Identity Components' }, { status: 401 });
+    }
+
+    // Example verification (for general platforms using HMAC SHA256)
+    // Note: Use official stripe.webhooks.constructEvent for Stripe specifically; 
+    // the below is the generic HMAC protocol for other webhooks (e.g., Twilio, internal queues).
+    const hash = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    
+    // Constant-time string comparison protects against timing attacks
+    if (!crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature))) {
+      console.error('INTEGRATION BREACH: Webhook signature mismatch.');
+      return NextResponse.json({ error: 'Signature Verification Failed' }, { status: 403 });
+    }
+
+    const payload = JSON.parse(rawBody);
+    // Proceed with Zod Payload Validation & DB Idempotency Checks...
+
+    return NextResponse.json({ received: true }, { status: 200 });
+
+  } catch (error) {
+    console.error('Webhook processing trap fired:', error);
+    return NextResponse.json({ error: 'Server Fault' }, { status: 500 });
+  }
+}
+```
+
+/* ------------------ Source: data_ignition_guardian.mdc ------------------ */
+# DATA IGNITION PROTOCOL: INFINITY PROTOCOL v8.4.0
+
+> **The Sovereign Mandate**: Phantom collections and disjointed rules vanish when schema enforcement is absolute. No code accesses the database without strict topological definition.
+
+## 1. THE IGNITION EDICT (Strict Schema Binding)
+- **Zero-Tolerance for Ad-Hoc Writes**: You are FORBIDDEN from creating a new feature that writes to a Firestore collection without first declaring that collection's exact shape in `src/lib/schema.ts` (or equivalent central schema file).
+- **Rule Synchronization**: Whenever a new collection is scaffolded in `schema.ts`, you MUST simultaneously update `firestore.rules`.
+- **The Canon**: `schema.ts` is the single source of truth for all data interactions. Frontend components must import types directly from `schema.ts`.
+
+## 2. FIREBASE.TS HARNESSING
+Every project in the fleet MUST implement a rigorous `firebase.ts` initializer that includes:
+- **Runtime Safeguards**: Hard crash the application if the `firebaseConfig.projectId` does not match the expected production or dev ID. This prevents cross-contamination.
+- **REST Mode Optimization (`experimentalAutoDetectLongPolling`)**: To bypass heavy gRPC overhead for faster initial data fetches.
+- **Emulator Sovereign Bounds**: Deterministic connection logic routing to `127.0.0.1` when `VITE_USE_EMULATORS=true` and `localhost` is detected.
+
+## 3. CANONICAL SCHEMA SCAFFOLDING 
+```typescript
+// ✅ REQUIRED: src/lib/schema.ts
+import { Timestamp, FieldValue } from 'firebase/firestore';
+
+// 1. Core Metadata
+export interface IBaseDocument {
+  id: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  isDeleted: boolean;
+  version: number;
+}
+
+// 2. Exact Definitions
+export interface IOrder extends IBaseDocument {
+  userId: string;
+  totalAmount: number;
+  status: 'pending' | 'paid' | 'shipped';
+  items: Array<{ productId: string; quantity: number']>;
+}
+
+// 3. Collection Map
+export const Collections = {
+  USERS: 'users',
+  ORDERS: 'orders',
+  PRODUCTS: 'products',
+} as const;
+```
+If a write operation does not satisfy the interfaces declared in `schema.ts`, the build MUST fail.

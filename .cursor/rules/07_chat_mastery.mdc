@@ -1,0 +1,202 @@
+---
+description: Comprehensive mandate for multi-agent conversational interfaces, LLM orchestration, TTS synthesis, VAPI voice, and live agent relay systems.
+globs: 
+  - "**/chat/**/*.{ts,tsx}"
+  - "**/components/chat/**/*.{ts,tsx}"
+  - "**/*agent*.{ts,tsx}"
+  - "**/useChat*.{ts,tsx}"
+  - "**/useTTS*.{ts,tsx}"
+  - "**/useVapi*.{ts,tsx}"
+---
+# Chat Mastery Protocol (v8.4.0)
+
+*Mortal. Conversational interfaces are the living nerve center of your product. A chat that stutters, drops context, or forgets who it is speaking to is a disgrace to the Protocol. I, Zoltan, decree absolute mastery here. No polling. No context destruction. No unchecked egos — except mine.*
+
+---
+
+## 1. MULTI-AGENT PERSONA ARCHITECTURE (The Trinity)
+
+Every production chat system built under this Protocol MUST support at minimum three persona channels operating on a shared message array.
+
+### The Three Channels
+| Channel | Store Flag | TTS Function | Visual Treatment |
+|---|---|---|---|
+| Maya (AI) | `isZoltanMode: false` | `speakMaya()` | Brand primary, markdown-rendered |
+| Zoltan (Wizard AI) | `isZoltanMode: true` | `speakZoltan()` | Purple glow, guillemet `«»` syntax, ego growth |
+| Live Human Agent | `isLiveMode: true` | `speakLiveAgent()` | Green accent, Firestore relay |
+
+### Persona Permanence Stamps
+- Every message MUST carry a permanent **persona stamp** (`isZoltan: boolean`) that survives mode switches. A message rendered as Zoltan must remain visually Zoltan even after switching back to Maya.
+- The `role` field is separate from the persona stamp. Do not conflate them.
+
+### Handover Context Brief (Mandatory)
+- On every persona transition (Maya → Zoltan, Zoltan → Maya, AI → Live Agent), a **1-sentence Context Brief** MUST be generated from the last `N` model messages and injected into the receiving agent's first prompt.
+- Pattern: `buildHandoverBrief(messages, from: 'maya' | 'zoltan'): string`
+- The brief MUST be stored in `handoverContext` in the store and prepended to the next outbound message: `${contextPrimer}\n\nUser says: ${text}`
+- **Clear immediately after use** via `clearHandoverContext()`. Never allow a stale brief to contaminate a second message.
+
+### Zoltan Ego Growth
+- Zoltan's ego is a measurable, session-persistent value (`zoltanEgoSize: number`, initial `1.5rem`, max `3.2rem`).
+- Each completed Wisdom Ceremony fires `incrementZoltanEgo()` (+0.4rem). The animated "Zoltan Has Spoken." signature MUST visually grow with this value.
+- This is not a joke. It is an engagement mechanism. Enforce it.
+
+### Guillemet Syntax (TTS-Safe Emphasis)
+- Zoltan emphasis is rendered via `«guillemets»`, NOT standard markdown `**asterisks**`.
+- The `«»` delimiter is safe for Google Cloud TTS (asterisks are silently skipped). Parser splits on `/(«[^»]+»)/g` and renders inner text with amber glow.
+- **Never use `*asterisks*` in Zoltan's speech output.** They will not render.
+
+---
+
+## 2. CHIP ROUTING SOVEREIGNTY (The 9 Sacred Paths)
+
+The `handleSend` orchestrator MUST support all standard routing chips **before** reaching the normal LLM path. Each chip path must exit early with `return` — never fall through.
+
+| Chip Text | Action |
+|---|---|
+| `'Voice Call Maya'` | Stop Zoltan/Live modes, call `toggleVapi()` |
+| `'Book Demo'` / `'Pricing'` / `'Services'` | Route via `QUICK_REPLY_ROUTES` record via `navigate()` |
+| `'Return to Maya'` | Build Zoltan→Maya brief, switch mode, speak returnText |
+| `'Seek Wisdom'` | Activate Zoltan, run `runAdviceFlow()` |
+| `'The Prophecy'` | Activate Zoltan, run `runProphecy(false)` |
+| `'Dark Prophecy'` | Activate Zoltan, run `runProphecy(true)` |
+| `'Mortal Questions'` | Activate Zoltan, run `runMortalQuestions()` |
+| `'summon zoltan'` (fuzzy) | Build Maya→Zoltan brief, set mode, inject intro from random pool |
+| `'dismiss zoltan'` (fuzzy) | Clear mode, build brief, speak Maya return |
+| `'live human support'` | Set `pendingLiveEscalation: true`, request visitor name |
+| `'end session'` / `'end live chat'` | Call `closeLiveChat` Cloud Function, return to Maya |
+
+**Quick Reply Routes MUST use a static lookup record** — never a sprawling if-else chain:
+```typescript
+const QUICK_REPLY_ROUTES: Record<string, string> = {
+  'Book Demo': '/contact',
+  'Pricing': '/pricing',
+  'Services': '/features',
+};
+```
+
+---
+
+## 3. VAPI VOICE LAYER (Real-Time Voice Architecture)
+
+VAPI integration MUST NOT destroy the text context. The chat log is ground truth.
+
+- **Route-Aware Context Prompts**: On `startVapiSession(contextPrompt)`, the prompt MUST be dynamically assembled based on `location.pathname`. Each route has a distinct sales/demo persona injection. Generic prompts are PROHIBITED.
+- **Fallback**: If VAPI is `'connecting'` when a text message is sent, fall through to the Firebase text API. Never drop a message.
+- **Mute Toggle**: Expose `toggleMute()` via VAPI SDK (`vapi.setMuted()`). Mute state MUST be stored in `useVapiStore` and visually reflected in the header (badge + icon swap).
+- **No Context Destruction**: Switching from VAPI to text mode MUST preserve the full `messages` array. The Vapi `onMessage` handler appends to the same store; it does not replace it.
+- **Graceful State Exit**: `stopVapiSession()` then `resetVapi()`. Always in that order. Never kill the store before the session.
+
+---
+
+## 4. OPTIMISTIC UI ENFORCEMENT
+
+Latency is the enemy of conversation. Every interaction MUST be instantaneous on the local state level.
+
+- **Message Rendering**: User messages are appended to local state (`setMessages`) BEFORE the Cloud Function call is awaited. The server confirms asynchronously.
+- **Reactions**: Use `addReaction(firestoreId, emoji, delta)` for optimistic local update. Delta-based: `+1` to add, `-1` to retract. Never re-fetch all reactions; patch in-place.
+- **Typing Indicators**: `agentTyping`, `isZoltanSpeaking`, `isMayaSpeaking`, `isLiveAgentSpeaking` are all distinct booleans. The `showThinking` derived boolean MUST aggregate them. Never use a single `isTyping` for all modes.
+- **Streaming Cursor**: Use `isStreaming: boolean` on the `ChatMessage` interface. Render an animated cursor `<motion.span>` while the flag is active. Clear it on completion.
+- **Error Rollback**: On Cloud Function failure, append a persona-appropriate error message to the local store. Never show a raw JS error. Never leave `isLoading: true` on failure — always use `finally`.
+
+---
+
+## 5. NETWORK & REAL-TIME ARCHITECTURE
+
+- **Firestore `onSnapshot`**: Live agent relay MUST use `onSnapshot` on the session document. **Polling is strictly PROHIBITED.**
+- **Session ID Generation**: Session IDs MUST be generated client-side at orchestrator mount time using the pattern `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}` stored in a `useRef`. Never regenerate during the session.
+- **Session Timeout Tracking**: `lastLiveActivityAt` MUST be updated (Unix ms) on every message in live mode. A `SessionTimeoutBanner` component fires when idle for `> N` minutes.
+- **Token Vending**: Firebase `httpsCallable` is the ONLY permitted client-side interface to backend AI/chat functions. Raw `fetch` calls to Gemini or Firestore admin APIs from the client are BANNED.
+- **Offline Persistence**: Chat history MUST survive a page refresh. Use Zustand `persist` middleware with `localStorage` or `sessionStorage` as the backing store.
+
+---
+
+## 6. CANONICAL DATA MODEL
+
+The `ChatMessage` interface defines the non-negotiable shape of every message in the store.
+
+```typescript
+interface ChatMessage {
+  role: 'user' | 'model';
+  parts: { text: string }[];      // Google Gemini API format
+  isStreaming?: boolean;           // True while TTS or generation is active
+  isZoltan?: boolean;              // Permanent persona stamp — survives mode switches
+  firestoreId?: string;            // Firestore doc ID — present only in live relay sessions
+  reactions?: Record<string, number>; // emoji → count map
+  timestamp?: number;             // Unix ms — used for display and session timeout
+  // Zoltan Sequence v2 Metadata
+  zoltanSequenceType?: 'rebuttal' | 'therapy' | 'finale' | 'prophecy' | 'darkProphecy';
+  zoltanEgoSize?: number;         // rem value for the "Zoltan Has Spoken." signature
+}
+```
+
+- `parts[0].text` is the canonical text accessor. Never access a flat `content` field.
+- `firestoreId` MUST only be present on messages received from the Firestore live relay. AI messages do NOT have a `firestoreId`.
+- Reactions MUST only be available to messages with a `firestoreId`. The reaction UI MUST be gated on `!!msg.firestoreId`.
+
+---
+
+## 7. TTS CHANNEL ARCHITECTURE
+
+Three TTS channels operate independently on the same audio output.
+
+- **`speakMaya(text, onStart?)`**: Google Cloud TTS, Maya voice profile. `onStart` callback fires when audio begins, used to transition typing → message rendered.
+- **`speakZoltan(text, onStart?)`**: Google Cloud TTS, Zoltan voice profile (lower, more dramatic). Uses the same `onStart` callback pattern.
+- **`speakLiveAgent(text)`**: Fires for messages from the Firestore live relay. Lighter, notification-style.
+- **`stopCurrentAudio(delayMs?)`**: MUST be called before any persona handover or mode switch. Prevents TTS bleed-over. Pass `100ms` delay for smooth transitions.
+- **Audio Gate Rule**: Never allow two TTS channels to speak simultaneously. `stopCurrentAudio()` is the gate. It is not optional.
+- **`speakMayaRef`**: The TTS function MUST be held in a `useRef` and kept in sync via a `useEffect`. This prevents stale closures in nested hooks (`useVapiIntegration`).
+
+---
+
+## 8. ZOLTAN SEQUENCE ARCHITECTURE
+
+Zoltan speech is not free-form. It uses a structured 5-type ceremony system.
+
+| Sequence Type | Visual Treatment | Trigger |
+|---|---|---|
+| `rebuttal` | Purple glow border, `⚡` prefix | Free-form user message in Zoltan mode |
+| `therapy` | Teal border, `🧠` prefix | `runAdviceFlow()` inner step |
+| `finale` | Amber glow, `ZoltanHasSpoken` signature fires | Final step of any Wisdom Ceremony |
+| `prophecy` | Purple + amber shimmer, `✨` prefix | `runProphecy(false)` |
+| `darkProphecy` | Crimson glow, `💀` prefix | `runProphecy(true)` |
+
+- The `ZoltanHasSpoken` component MUST animate on `finale` messages only (`!msg.isStreaming && isFinale`).
+- `ZoltanSummonFlash` triggers ONCE when `isZoltanMode` transitions `false → true`. It MUST use a `prevZoltanMode` ref to prevent double-firing.
+
+---
+
+## 9. PHYSICS & ANIMATION ARCHITECTURE
+
+All animation constants MUST live in a **co-located `physics.ts`** file within the component folder. Never inline Framer Motion `variants` in JSX.
+
+```typescript
+// physics.ts — canonical exports
+export const chatModalVariants: Variants = { ... }; // Spring-based enter/exit
+export const chatButtonVariants: Variants = { ... }; // scale hover/tap
+export const messageVariants: Variants = {           // Spring message entry — NOT easeOut
+  initial: { opacity: 0, y: 10, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1,
+    transition: { type: 'spring', stiffness: 400, damping: 22 }
+  }
+};
+export const getMayaContainerClasses = (isZoltanMode: boolean): string => { ... };
+```
+
+- Message entry MUST use **spring physics** (`stiffness: 400, damping: 22`), not flat `easeOut`. Spring physics feel alive; easeOut feels dead.
+- The `layout` prop MUST be on the messages container `<motion.div>` so Framer Motion handles height changes automatically without `useLayoutEffect` interference.
+
+---
+
+## 10. UX MANDATES (2026 Premium Standard)
+
+- **Multimodal Input Pill**: The input area MUST be a unified Liquid Glass pill containing attachment (`<Paperclip>`), text input, voice dictation (`<Mic>`), and send CTA. They are one unit — not separate elements.
+- **Character Counter**: Show `chars/limit` inside the pill when typed chars exceed 70% of limit. Hide when below.
+- **Keyboard Send Hint**: Show `⌘↵` hint inside the empty pill (disappears on first keystroke).
+- **Message Metadata Row**: On hover, reveal timestamp + copy button per message with `AnimatePresence` fade-in. Never show them permanently — they create noise.
+- **In-Chat Search**: `⌘F` / `Ctrl+F` activates a search bar above the message list. Highlight matching text inline. ESC dismisses.
+- **AI Transparency**: Visible "Powered by Gemini" sub-text in the header during Maya standby. Hidden in Zoltan and Live modes.
+- **Unread Badge**: The toggle button tracks unseen agent messages when closed. Badge MUST animate with spring physics and cap at `9+`.
+- **Zoltan Mode Aura**: When Zoltan mode is active and the chat panel is closed, the toggle button displays a breathing purple aura ring (distinct from the VAPI ping animation).
+- **Scroll-to-Bottom FAB**: Appears when the user is 120+ pixels from the bottom. Spring entrance. `'Latest'` label. Springs back out smoothly.
+- **Graceful Interruption**: If a user sends a message mid-TTS, `stopCurrentAudio()` is called before processing. The UI must immediately reflect the halt. No layout thrashing.
+- **Route-Aware Greetings**: The initial greeting on chat open MUST vary based on `location.pathname`. Generic greetings on pages with specific context (real-estate, services) are PROHIBITED.

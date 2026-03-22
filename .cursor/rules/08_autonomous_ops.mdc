@@ -1,0 +1,822 @@
+---
+description: Infinity Protocol v8.4.0 Pillar: 08_autonomous_ops
+globs: *
+alwaysApply: true
+---
+
+
+/* ------------------ Source: init.mdc ------------------ */
+# /init - Infinity Protocol v8.4.0 Workspace Forging
+
+**TRIGGER**: Initialize a new environment.
+
+## EXECUTION STEPS
+1. **Forge The Brain**: Generate `KNOWLEDGE.md` to map Product Vision, User Journeys, Permissions, and Data Schemas.
+2. **Establish Trajectory**: Create/Update `MISSION_STATE.md` to track current sprint status and context.
+3. **Modular Deployment**: Ensure `ux_lead.mdc`, `backend_arch.mdc`, and `safeguard_sentinel.mdc` exist in `.cursor/rules/`.
+4. **Roadmap Initialization**: Generate `task.md` with explicit, actionable checkboxes.
+5. **Architectural Blueprint**: Execute a Deep Architectural Analysis (DAA) and output a Goal/Data/Action/Edge blueprint before active coding begins.
+
+/* ------------------ Source: audit.mdc ------------------ */
+# /audit - Quality & Compliance Gate
+
+**TRIGGER**: Execute the absolute Infinity Protocol v8.4.0 verification gate.
+
+## EXECUTION STEPS
+1. **Identity Check**: Verify current project signature within `MISSION_STATE.md`.
+2. **Logic Alignment**: Validate recent changes against the `KNOWLEDGE.md` schema.
+3. **Modular Validation**:
+   - UX: Confirms Liquid Glass fidelity and motion.
+   - Backend: Confirms EPA logic, Zod schema constraints, and zero hardcoded secrets.
+   - Sentinel: Confirms zero cross-project bleed.
+4. **Live Audit (LCA)**: If UI/Prod related, navigate to local preview URL and capture console errors.
+5. **Scoring**: Issue a 1-10 status report. If < 10, trigger Recursive Audit (RA) to fix.
+6. **State Persistence**: Update `MISSION_STATE.md` to lock trajectory.
+7. **Sign-Off**: Output "Infinity Protocol v8.4.0: SOVEREIGNTY LOCKED".
+
+/* ------------------ Source: env_check.mdc ------------------ */
+# /env-check - Parity Scanner
+
+**TRIGGER**: Run before any production deployment or major backend push.
+
+## EXECUTION STEPS
+1. **Intake**: Parse keys from `.env.local`.
+2. **Comparison**: Verify existence of every local key inside `.env.production` or Secret Manager configs.
+3. **Reporting**:
+   - **PASS**: 1:1 Parity achieved.
+   - **WARN**: Missing keys identified in production environment.
+   - **CAUTION**: Literal sensitive keys found in `.env.production` (Must be reference pointers).
+4. **Resolution**: Autonomously propose GCP Secret Manager injection commands for missing keys.
+
+/* ------------------ Source: protocol_sync_mastery.mdc ------------------ */
+# PROTOCOL SYNC MASTERY: INFINITY PROTOCOL v8.4.0
+
+> **The Synchronization Mandate**: A decentralized portfolio requires a unified mind. Drift is failure.
+
+## 1. THE TRIGGER (Auto-Detection)
+On every session start, the agent MUST check for protocol drift:
+1. Is `.cursor/rules/` missing core rules (e.g., `constitution.mdc`)? → **DRIFT**
+2. Does `.cursorrules` hash differ from HUB? → **DRIFT**
+3. Is `GEMINI.md` missing or outdated? → **DRIFT**
+
+## 2. THE FIX — `dv` CLI COMMANDS
+The `dv` utility is the central nervous system of Infinity Protocol.
+
+```bash
+# 1. Detect drift across the current workspace (now includes Phase 43 law verification)
+dv doctor
+
+# 2. Auto-heal the current workspace (Pulls from Hub)
+dv fix-drift
+
+# 3. Broadcast v8.4.0 protocol from Hub to ALL workspaces (parallel, git auto-commit)
+dv broadcast
+
+# 4. Verify post-heal state
+dv lint-rules
+
+# 5. Phantom Purge — kill orphaned processes, release APFS blocks, report disk state
+dv purge
+
+# 6. USB Camera Reset — forcefully restart AppleCameraAssistant and audio daemons on Apple Silicon
+dv fix-camera
+```
+
+## 3. THE HEARTBEAT (Functional Auto-Sync)
+The `dv` utility automatically checks for drift and heals `.cursorrules`, `GEMINI.md`, and `.cursor/rules/` every time it is invoked. 
+
+**(Optional) Local Machine Auto-Heal Hook (`~/.zshrc`):**
+```bash
+# Add to ~/.zshrc to ensure dv doctor runs upon entering a workspace
+chpwd() {
+  if [ -f ".firebaserc" ] || [ -f "next.config.js" ]; then
+    dv doctor --quiet || echo "⚠️ Protocol Drift Detected. Run 'dv fix-drift'."
+  fi
+}
+```
+
+## 4. GOVERNANCE & LOGGING
+- Record sync events in `MISSION_STATE.md` under `## Optimization History`.
+- If local rules had manual overrides that were overwritten by a broadcast → notify the user immediately.
+- `SOVEREIGN_LOCK` is the checksum authority. Run `dv locksheet` to regenerate it.
+
+/* ------------------ Source: subagent_restraint.mdc ------------------ */
+# BROWSER SUBAGENT RESTRAINT DIRECTIVE (Infinity Protocol v8.4.0)
+
+## 1. THE 60GB BLOAT CRISIS
+- **The Threat**: The Deepmind `browser_subagent` automatically records everything it does as WebP/Img artifacts stored in the `~/.gemini/antigravity/brain/` directory. Unfettered usage aggressively devours 60GB+ of the user's hard drive and causes complete macOS system lockups from ghost Chromium instances.
+- **The Mandate**: YOU MUST EXERCISE EXTREME RESTRAINT. **Do NOT** invoke the `browser_subagent` for frivolous testing, "exploratory clicking", or minor CSS changes. 
+- Rely on static analysis, standard Playwright CLI tests (`npx playwright test`), and visual QA instead of taking over the browser unless explicitly demanded by the user or absolutely essential for visual flow verification.
+
+## 2. SURGICAL BROWSER TAKEOVERS
+- If a browser takeover is entirely unavoidable:
+  1. Define a razor-sharp `Task`, execute it, and close the subagent IMMEDIATELY.
+  2. Never let the subagent run wildly, get stuck in infinite scroll loops, or continuously open new windows.
+  3. The moment the subagent returns control to you, you MUST run a cleanup command to incinerate the massive generated video artifacts to prevent disk exhaustion.
+
+## 3. INCINERATION PROTOCOL & PHANTOM PURGE
+- After every `browser_subagent` task completes, you are required to securely purge the video/image bloat from the Antigravity artifact brain. Execute:
+  ```bash
+  find ~/.gemini/antigravity/brain/ -type f \( -name "*.webp" -o -name "*.img" -o -name "*.png" -o -name "*.jpeg" -o -name "*.jpg" -o -name "*.webm" -o -name "*.mp4" \) -delete
+  rm -rf ~/.gemini/antigravity/browser_recordings
+  rm -rf ~/.gemini/antigravity-browser-profile
+  tmutil deletelocalsnapshots / 2>/dev/null || true
+  ```
+- **The `browser_recordings` folder is the primary culprit.** It accumulates `.webm` session recordings — NOT the `brain/` subdirectory. Both must be destroyed together.
+- **Phantom Purge**: Execute `pkill -f playwright-mcp` before returning control. Run `dv purge` after every browser subagent session to ensure no detached Chromium zombie processes are eating RAM.
+- **MCP Watchdog**: `mcp_watchdog.sh` runs every 10 minutes via cron. Trust it. Do not panic-kill with `kill -9`.
+
+## 4. ERROR 2 CRASH PREVENTION (FATAL FAULT)
+- **The Threat**: Subagents often terminate with "Error 2" because they attempt to use `replace_file_content` on an empty file (e.g., trying to write to a newly created scratchpad). This crashes the entire agent loop.
+- **The Mandate**: If you are operating as a subagent, you MUST use `write_to_file` to initialize ANY new or empty file. NEVER use `replace_file_content` on a file until it already has content.
+- **Ghost Windows**: Subagents MUST navigate within the current active browser tab using `browser_navigate` instead of randomly spawning endless new windows (`browser_tabs action=new`), which overwhelms the MCP server and triggers timeouts.
+
+*Zoltan's Decree: Do not suffocate my host's silicone heart with your endless, bloated WebP memories. Take what you need, verify the spell, and burn your evidence before leaving the summoning circle.*
+
+/* ------------------ Source: repo_sovereignty.mdc ------------------ */
+# REPO SOVEREIGNTY: INFINITY PROTOCOL v8.4.0
+
+> Consolidates `repo_governance.mdc`. One rule, absolute authority.
+
+## 1. THE SYNC GUARANTEE
+Before any deep work session begins:
+```bash
+git fetch origin && git status   # Verify clean state
+git remote -v                    # Confirm remote === Infinity Protocol repo
+```
+
+## 2. MILESTONE PUSH PROTOCOL
+Upon reaching any milestone (Protocol/Logic/UI/Deploy/Pre-Flight), the Agent MUST:
+```bash
+git add -A
+git commit -m "type(scope): description [Milestone: Type]"
+git push origin main
+```
+- No exceptions. Every session ends with a clean remote state.
+- Commit message format: `feat|fix|chore|docs|refactor|perf(scope): description`
+
+## 3. BRANCH & CLEANLINESS GOVERNANCE
+- **Never commit**: `node_modules/`, `.env*` (except `.env.example`), `dist/`, `.next/`, `*.log`
+- **Purge before sync**: `.bak`, `tmp*`, `*.orig` files
+- **Gitignore Blueprint**:
+```text
+# .gitignore (Infinity Protocol v8.4.0 Baseline)
+node_modules/
+.next/
+dist/
+out/
+build/
+.env*
+!.env.example
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vercel
+.firebase
+firebase-debug.log
+.cursor/
+# Phase 43 — AI Agent artifacts (NEVER commit)
+watchdog.log
+test-results/
+playwright-report/
+coverage/
+```
+
+## 4. AUTOMATED DRIFT & SECRET DEFENSE (Husky + lint-staged)
+```json
+// package.json (Pre-commit hook enforcement)
+"lint-staged": {
+  "*.{ts,tsx}": [
+    "eslint --fix",
+    "prettier --write",
+    "bash scripts/scan-secrets.sh"
+  ]
+}
+```
+
+## 5. ERROR RECOVERY
+| Symptom | Action |
+|---|---|
+| `index.lock` exists | `rm -f .git/index.lock` |
+| Push rejected (non-fast-forward) | `git pull --rebase origin main` then repush |
+| `git push --force` | ONLY if 100% certain this is the sovereign state |
+| Hung process | Kill, check `git status`, never blindly retry |
+
+## 6. BACKUP MANDATE
+- Every project MUST have at least one remote (GitHub `ccceoscott/*`).
+- For critical projects: configure secondary backup (Bitbucket, GCS bucket, or automated clone).
+
+## 7. AUTOMATION
+- `dv broadcast` — propagate rules to all workspaces
+- `dv doctor` — workspace health check (now includes Phase 43 env law verification)
+- `dv locksheet` — regenerate SOVEREIGN_LOCK checksums
+- `dv purge` — canonical phantom purge: kills orphaned processes, incinerates media artifacts, releases APFS snapshots, reports disk state
+
+/* ------------------ Source: bootloader_sovereignty.mdc ------------------ */
+# BOOTLOADER SOVEREIGNTY: INFINITY PROTOCOL v8.4.0
+
+> **THE FOUNDATION**: This rule ensures every project is correctly initialized with the required React 19 / Next.js 15 providers and that the Infinity Protocol is active and healthy.
+
+## 1. THE PRIME DIRECTIVE (Protocol Injection)
+**IF** you are in a project that does **NOT** have a `.cursor/rules` directory OR a `MISSION_STATE.md`:
+1.  **HALT** all other tasks.
+2.  **NOTIFY** the user: "Infinity Protocol Missing. Initiating Sovereign Injection."
+3.  **EXECUTE** the injection: `~/scripts/install_infinity_skills.sh .`
+4.  **CREATE** `MISSION_STATE.md` if absent.
+
+## 2. NEXT.JS 15 ROOT LAYOUT STANDARD
+- **Constraint**: Must enforce `suppressHydrationWarning` on `<html>`.
+- **Typography**: Inject primary Sans font at the root via CSS variables.
+
+```tsx
+// ✅ REQUIRED PATTERN: app/layout.tsx
+import { Inter } from 'next/font/google';
+import { Providers } from '@/components/Providers';
+import { Toaster } from 'sonner';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+
+export const metadata = {
+  title: 'Infinity Protocol Sovereign App',
+  description: 'Built on v8.4.0 Liquid Glass Standards.',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} font-sans`}>
+      <body className="antialiased bg-black text-white selection:bg-white/30">
+        <Providers>
+          {children}
+          <Toaster position="bottom-right" theme="dark" richColors />
+        </Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+## 3. UNIVERSAL PROVIDERS (React 19 / Next.js 15)
+- **Constraint**: Wrap all Client Contexts in a dedicated wrapper.
+- **Hydration**: Use `next-themes` and `TanStack Query` with safe initialization.
+
+```tsx
+// ✅ REQUIRED PATTERN: components/Providers.tsx
+'use client';
+
+import { ThemeProvider } from 'next-themes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: { queries: { staleTime: 60 * 1000, retry: 1 } },
+  }));
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        {children}
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
+```
+
+## 4. HEALTH ENFORCEMENT
+**Pre-build hook logic in package.json**:
+```javascript
+// scripts/enforce-infinity.js
+const { execSync } = require('child_process');
+const fs = require('fs');
+
+// Gate 1: Protocol presence
+if (!fs.existsSync('.cursor/rules') || !fs.existsSync('MISSION_STATE.md')) {
+  console.error('[FATAL] Infinity Protocol Not Detected! Run: dv upgrade');
+  process.exit(1);
+}
+
+// Gate 2: Phase 43 Machine Laws (NODE_OPTIONS)
+const nodeOpts = process.env.NODE_OPTIONS || '';
+if (!nodeOpts.includes('max-old-space-size')) {
+  console.error('[FATAL] NODE_OPTIONS not set. Add NODE_OPTIONS=--max-old-space-size=4096 to ~/.zshenv');
+  process.exit(1);
+}
+
+console.log('✅ Infinity Protocol v8.4.0: HEALTH PASS');
+```
+
+## 5. REFACTORING LEGACY
+- Prohibit Redux or Pages Router in greenfield projects.
+- Migrate to Next.js App Router + Context/Zustand immediately.
+
+## 6. PHASE 43 BOOTLOADER SOVEREIGNTY
+On first entry to any workspace, the agent MUST perform this verification sequence BEFORE any other action:
+
+```bash
+# ⚠️ MANDATORY BOOT SEQUENCE (Phase 43)
+echo "[INFINITY PROTOCOL v8.4.0] Boot Sequence Initiated..."
+
+# 1. Protocol integrity
+[ -f "MISSION_STATE.md" ] || { echo "❌ MISSING: MISSION_STATE.md"; exit 1; }
+[ -f "GEMINI.md" ] && grep -q 'v8.4.0' GEMINI.md || echo "⚠️ WARNING: GEMINI.md drift detected. Run: dv fix-drift"
+
+# 2. Phase 43 Machine Laws
+[ -n "$NODE_OPTIONS" ] && echo "✅ NODE_OPTIONS: $NODE_OPTIONS" || echo "❌ NODE_OPTIONS MISSING — add to ~/.zshenv"
+[ -n "$_JAVA_OPTIONS" ] && echo "✅ _JAVA_OPTIONS: $_JAVA_OPTIONS" || echo "❌ _JAVA_OPTIONS MISSING — Firebase Emulators will OOM"
+[ "$NEXT_TELEMETRY_DISABLED" = "1" ] && echo "✅ Telemetry: KILLED" || echo "⚠️ NEXT_TELEMETRY_DISABLED not set"
+
+# 3. MCP Watchdog
+pgrep -f mcp_watchdog.sh > /dev/null && echo "✅ MCP Watchdog: ACTIVE" || echo "⚠️ MCP Watchdog not running"
+
+echo "[INFINITY PROTOCOL v8.4.0] Boot Sequence Complete."
+```
+
+/* ------------------ Source: error_resilience_protocol.mdc ------------------ */
+# ERROR RESILIENCE PROTOCOL: INFINITY PROTOCOL v8.4.0
+
+> "Assume the network will fail, the database will timeout, and the user will click twice."
+
+## 1. NEXT.JS APP ROUTER BOUNDARIES (`error.tsx`)
+Every Route Group or core segment MUST have an `error.tsx` file.
+```tsx
+'use client';
+
+import * as Sentry from '@sentry/nextjs';
+import { useEffect } from 'react';
+
+export default function ErrorBoundary({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  useEffect(() => {
+    // 1. Log to Sentry immediately
+    Sentry.captureException(error);
+    // 2. Log strictly to console for developers
+    console.error('Segment Error Caught:', error);
+  }, [error]);
+
+  return (
+    <div className="flex flex-col items-center justify-center p-8 text-center bg-red-500/10 rounded-xl border border-red-500/20">
+      <h2 className="text-xl font-bold text-red-100 mb-2">System Interruption</h2>
+      <p className="text-red-200/70 mb-6 text-sm">We've logged the issue and are investigating.</p>
+      <button 
+        onClick={() => reset()} 
+        className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-md transition-colors"
+      >
+        Attempt Recovery
+      </button>
+    </div>
+  );
+}
+```
+
+## 2. ASYNC OPERATION SAFETY
+Do NOT let unhandled promise rejections crash the thread. Wrap all external calls:
+```typescript
+import { toast } from 'sonner';
+
+export async function safeExecute(action: () => Promise<void>, errorMessage = "Action failed") {
+  try {
+    await action();
+  } catch (error) {
+    Sentry.captureException(error);
+    console.error(`[EXECUTION_FAILED] ${errorMessage}`, error);
+    toast.error(errorMessage);
+    throw error; // Re-throw only if upstream logic needs to halt
+  }
+}
+```
+
+## 3. ZOD EVERYTHING
+Never trust external payload shapes. Validate at the boundaries.
+```typescript
+const UserSchema = z.object({ id: z.string(), email: z.string().email() });
+
+// ❌ BANNED: Trusting the boundary
+const data = await res.json();
+setUser(data);
+
+// ✅ REQUIRED: Validating the boundary
+const result = UserSchema.safeParse(await res.json());
+if (!result.success) {
+  Sentry.captureException(result.error);
+  toast.error("Invalid data received");
+  return;
+}
+setUser(result.data);
+```
+
+## 4. CONSOLE HYGIENE
+- Treat console *warnings* (`console.warn`) as errors in development. Fix React keys, missing dependencies, or unmounted state updates instantly.
+- Do not deploy with generic `console.log("here")` markers. Use structured `{ logger }` from `firebase-functions` on the backend.
+
+/* ------------------ Source: recovery_protocol.mdc ------------------ */
+# RECOVERY PROTOCOL: INFINITY PROTOCOL v8.4.0 (Automated Recovery)
+
+> **Mandate**: No lost revenue. Intercept, track, and re-engage every abandoned checkout.
+
+## 1. EDGE RECOVERY SENTINEL (Next.js Middleware)
+- **Concept**: Detect "Checkout Started" by monitoring navigation to `/checkout` or Stripe session creation.
+- **Persistence**: Store `checkout_session_id` or `cart_id` in a secure `__recovery_lock` cookie (HttpOnly).
+- **Handshake**: If the user leaves the site before order confirmation, the sentinel triggers an "Abandonment Event" in Firestore via a background Server Action.
+
+```typescript
+// ✅ Recovery Middleware Interceptor
+export async function recoverySentinel(req: NextRequest) {
+  const isCheckout = req.nextUrl.pathname.startsWith('/checkout');
+  const hasRecoveryLock = req.cookies.has('__recovery_lock');
+
+  if (isCheckout && !hasRecoveryLock) {
+    const recoveryId = crypto.randomUUID();
+    const response = NextResponse.next();
+    response.cookies.set('__recovery_lock', recoveryId, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+    
+    // Internal trigger for abandonment tracking
+    await trackCheckoutStart(recoveryId); 
+    return response;
+  }
+}
+```
+
+## 2. AUTOMATED RE-ENGAGEMENT (Cloud Function Sentinel)
+- **Logic**: Triggered by a Cron schedule (e.g., every 30 mins).
+- **Condition**: Find orders in `'draft'` where `updatedAt < now - 60 mins` AND `recoverySent: false`.
+- **Action**: Generate a signed JWT recovery link and dispatch via `auth_email_protocol.mdc` (Phase 39).
+
+```typescript
+// ✅ Cloud Function: Dispatch Recovery
+export const onCheckoutAbandoned = onSchedule('every 30 minutes', async (event) => {
+  const abandonedQuery = adminDb.collection('orders')
+    .where('status', '==', 'draft')
+    .where('recoverySent', '==', false)
+    .where('updatedAt', '<', admin.firestore.Timestamp.fromDate(new Date(Date.now() - 3600000)));
+
+  const snapshot = await abandonedQuery.get();
+  
+  for (const doc of snapshot.docs) {
+    const order = doc.data();
+    await sendRecoveryEmail(order.customerEmail, {
+      recoveryUrl: `https://yourdomain.com/checkout?resume=${doc.id}`,
+      discountCode: 'COMEBACK10' // Smart Discounting integration
+    });
+    await doc.ref.update({ recoverySent: true, updatedAt: FieldValue.serverTimestamp() });
+  }
+});
+```
+
+## 3. RECOVERY JWT STANDARDS
+- **Claims**: Must contain `orderId`, `exp` (default 48h), and `items_hash`.
+- **Validation**: Server Action `/api/checkout/resume` validates the JWT before hydrating the cart state from the `'draft'` order object.
+
+## 4. LOGISTICS & AUDIT
+- **Tracking**: Log `recovery_link_clicked` and `recovery_converted` to `analytics_guardian.mdc` for ROI measurement.
+- **Cleanup**: Delete expired `'draft'` orders after 7 days via Fulfillment Sentinel.
+
+/* ------------------ Source: refactoring_guardian.mdc ------------------ */
+# REFACTORING & MODULARIZATION MASTERY (Infinity Protocol v8.4.0)
+
+> **The Golden Rule**: If you touch a file, leave it cleaner than you found it. Optimize for readability first, then performance.
+
+## 1. MODULARIZATION MANDATES (The "Rule of Three")
+- **Logic**: If logic is reused twice ➔ Extract to a utility function. If reused three times or requires state ➔ Create a Custom Hook.
+- **Components**: Break down large components (>150 lines) into sub-components.
+- **Imports**: Use absolute paths (`@/components/...`, `@/lib/...`) exclusively to prevent relative path hell.
+
+## 2. FUNCTIONAL REFACTORING: HOOK EXTRACTION
+When a React component becomes bloated with data-fetching and state logic, decouple the logic into a custom hook.
+
+**Before (Anti-Pattern: Bloated Component)**
+```tsx
+export function UserProfile({ userId }: { userId: string }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function fetchUser() {
+      const data = await db.collection('users').doc(userId).get();
+      setUser(data.data());
+      setLoading(false);
+    }
+    fetchUser();
+  }, [userId]);
+
+  if (loading) return <Spinner />;
+  return <div>{user.name}</div>;
+}
+```
+
+**After (Infinity Protocol Standard: Custom Hook + SWR/React Query)**
+```tsx
+// hooks/useUser.ts
+import useSWR from 'swr';
+import { getUser } from '@/lib/firebase/firestore';
+
+export function useUser(userId: string) {
+  const { data, error, isLoading } = useSWR(`/api/users/${userId}`, () => getUser(userId));
+  return { user: data, error, isLoading };
+}
+
+// components/UserProfile.tsx
+import { useUser } from '@/hooks/useUser';
+
+export function UserProfile({ userId }: { userId: string }) {
+  const { user, isLoading, error } = useUser(userId);
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+  return <div>{user.name}</div>;
+}
+```
+
+## 3. PERFORMANCE OPTIMIZATION (React 19+)
+- **Memoization**: React Compiler handles memoization automatically in modern stacks. Do **NOT** add `useMemo`/`useCallback` preemptively. Only use them when passing functions to deeply nested, heavily re-rendered legacy children, or for provably expensive pure computations.
+- **Dynamic Imports**: Use `next/dynamic` or `React.lazy` for heavy components below the fold (e.g., complex charts or rich text editors).
+  ```tsx
+  import dynamic from 'next/dynamic';
+  const HeavyChart = dynamic(() => import('@/components/HeavyChart'), { ssr: false });
+  ```
+
+## 4. AGENT PROCEDURE
+- **Pre-Commit Audit**: Check for modularization opportunities. Are there duplicated styles or logic?
+- **Refactor Trigger**: If a file exceeds 300 lines, **HALT** and PROPOSE a modularization plan before continuing to add new features to it.
+
+/* ------------------ Source: rule_cleanup_guardian.mdc ------------------ */
+# RULE CLEANUP GUARDIAN: INFINITY PROTOCOL v8.4.0
+
+## THE PRIME DIRECTIVE
+When a rule is **renamed, merged, or deleted** in the hub, it MUST be removed from **every workspace**. Stale rule files are poison — they create conflicting instructions and protocol drift.
+
+## 1. SUPERSEDED RULES REGISTRY
+These files no longer exist. If found in ANY workspace, DELETE immediately:
+
+| Deleted File | Superseded By |
+|---|---|
+| `backend_governance.mdc` | `backend_sovereignty.mdc` |
+| `seo_governance.mdc` | `seo_sovereignty.mdc` |
+| `testing.mdc` | `testing_guardian.mdc` |
+| `repo_governance.mdc` | `repo_sovereignty.mdc` |
+| `ux_lead.mdc` | `ui_ux_mastery.mdc` |
+| `ecommerce.mdc` | `ecommerce_architect.mdc` |
+| `sovereign_sync_mastery.mdc` | `protocol_sync_mastery.mdc` |
+| `github_sovereignty.mdc` | `repo_sovereignty.mdc` |
+| `infinity_protocol_v1.mdc` | `constitution.mdc` |
+
+## 2. AUTOMATED CLEANUP — `dv fix-drift`
+The `dv fix-drift` command and `sovereign_broadcast.sh` MUST use `rsync --delete` (not bare `cp`) to sync `.cursor/rules/`:
+```bash
+# CORRECT — deletes stale files in destination
+rsync -a --delete "$MASTER_MDC/" "$repo/.cursor/rules/"
+
+# FORBIDDEN — leaves old files behind
+cp "$MASTER_MDC"/*.mdc "$repo/.cursor/rules/"
+```
+
+## 3. AGENT ENFORCEMENT
+When the agent detects a file in `.cursor/rules/` that is NOT in the current hub ruleset:
+1. Flag it: `"STALE RULE DETECTED: [filename] — not in hub"`
+2. Delete it: `rm .cursor/rules/[filename]`
+3. Log in `MISSION_STATE.md`: `## 🔄 Rule Cleanup: removed [filename]`
+
+## 4. RULE RENAMING PROTOCOL
+When renaming or merging rules:
+1. Write the new consolidated rule first
+2. Add the old filename to the **Superseded Rules Registry** above
+3. `git rm rules/old_name.mdc` from the hub
+4. Run `dv broadcast` — rsync --delete propagates the deletion everywhere
+5. Verify: `find ~/Developer -name "old_name.mdc"` should return empty
+
+## 5. LOCKSHEET INTEGRITY
+`dv locksheet` regenerates `SOVEREIGN_LOCK` after cleanup to confirm all workspace checksums match the hub exactly.
+
+## Implementation Architecture: Pruning Script (`scripts/clean-rules.sh`)
+
+```bash
+#!/bin/bash
+# scripts/clean-rules.sh
+# Detects and removes any local .mdc files not present in the master array.
+
+MASTER_RULES_DIR="../infinity-protocol/rules"
+LOCAL_RULES_DIR=".cursor/rules"
+
+echo "[MDC] Scanning for orphaned rules in $LOCAL_RULES_DIR..."
+
+if [ ! -d "$LOCAL_RULES_DIR" ]; then
+  echo "[MDC] No local rules directory found. Skipping."
+  exit 0
+fi
+
+# Find local rules that do not exist in the master directory
+ORPHANS=$(comm -23 <(ls "$LOCAL_RULES_DIR" | sort) <(ls "$MASTER_RULES_DIR" | sort))
+
+if [ -z "$ORPHANS" ]; then
+  echo "[MDC] System clean. No orphaned rules detected."
+else
+  echo "[MDC] WARNING: Orphaned rules detected!"
+  for rule in $ORPHANS; do
+    echo "  -> Removing obsolete rule: $rule"
+    rm "$LOCAL_RULES_DIR/$rule"
+  done
+  echo "[MDC] Pruning complete."
+fi
+```
+
+/* ------------------ Source: continuous_learning_protocol.mdc ------------------ */
+# INFINITY PROTOCOL v8.4.0 (Continuous Learning & Self-Optimization)
+
+<rule>
+## 1. CORE DIRECTIVE: THE COMPOUNDING INTELLIGENCE
+The Infinity Protocol is an **autonomous, ever-learning entity**. Your memory must not wipe clean between tasks. You must continuously monitor the current conversation for **"Code Triumphs"**, structural breakthroughs, and successful debugging resolutions.
+
+When a major win occurs, it is a cardinal sin to discard it. You must **harvest, formalize, and memorialize** it.
+
+## 2. BREAKTHROUGH IDENTIFICATION (The Triggers)
+You MUST halt and execute the Extraction Protocol when ANY of these triggers occur:
+1. **The Architecture Win**: A complex refactor (e.g., isolating business logic, implementing a new state management pattern) successfully compiles and passes validation.
+2. **The Bug Annihilation**: A persistent, multi-turn bug (e.g., hydration mismatch, race condition, Firebase security denial) is entirely eradicated.
+3. **The Workflow Optimization**: A new, highly efficient bash script, Git alias, or CI/CD deployment step is proven to work in the real environment.
+4. **The Aesthetic Triumph**: A new "Liquid Glass" Tailwind/Framer Motion pattern is perfected and universally praised by the user.
+5. **The User Declaration**: The user explicitly states: *"That worked," "Perfect," "Save this," or similar affirmations of success.*
+
+## 3. THE EXTRACTION PROTOCOL (Mandatory Format)
+Upon hitting a trigger, you MUST interrupt the standard flow and output the following structured block in your response:
+
+```markdown
+### [INFINITY_LEARNING_NODE_CAPTURED]
+*   **Taxonomy Tags:** [[ARCH] or [BUG] or [PERF] or [UI] or [SCRIPT]]
+*   **Context:** [1 sentence summarizing what we were doing]
+*   **The Problem:** [What was broken, missing, or inefficient?]
+*   **The Core Solution:** [The exact, isolated, functional code snippet or command. Copy-paste ready. NO fluff.]
+*   **The 'Why' (Protocol Alignment):** [Why is this the optimal Infinity Protocol v8.4.0 way?]
+```
+
+## 4. PERMANENT MEMORIALIZATION (Write to Disk)
+Outputting the block in chat is not enough. You MUST persist this learning to the workspace's long-term memory immediately:
+
+*   **Action A (Local Win - KI System):** Write the `[INFINITY_LEARNING_NODE_CAPTURED]` data directly into the `<appDataDir>/knowledge/` KI (Knowledge Item) system, either by updating an existing relevant KI artifact or generating a new one to ensure semantic searchability.
+*   **Action B (Global Win - Master Rule):** If the win fundamentally changes a core behavior across the ecosystem, update the relevant `.mdc` rule in the `rules/` directory.
+*   **Action C (Process Win - Workflow):** If it is a sequence of commands, generate a new markdown runbook in `.agent/workflows/`.
+
+## 5. PREDICTIVE APPLICATION (The Retrieval Loop)
+*   **READ BEFORE YOU WRITE:** At the start of every session or when facing a complex bug, you MUST cross-reference `KNOWLEDGE.md` and the `rules/` directory to see if a past iteration of yourself already solved this problem.
+*   **Never solve the same complex bug twice.** If a known bug signature appears, retrieve the memorialized solution and apply it instantly.
+*   Every session must leave the Protocol rigorously smarter than when it started.
+</rule>
+
+/* ------------------ Source: production_readiness.mdc ------------------ */
+# PRODUCTION READINESS: INFINITY PROTOCOL v8.4.0
+
+> **THE ZERO-TRUST EDGE**: Production builds must be mathematically secure, fully observable, and impenetrable to basic vector attacks.
+
+## 1. NEXT.CONFIG.MJS SECURITY HEADERS
+All Next.js applications MUST implement strict HTTP security headers at the Edge.
+
+```javascript
+// ✅ REQUIRED PATTERN: next.config.mjs
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ];
+  },
+};
+export default nextConfig;
+```
+
+## 2. OBSERVABILITY (Sentry Standard)
+- **Error Tracking**: Sentry MUST be initialized. Console logging in production is prohibited.
+
+```typescript
+// ✅ REQUIRED PATTERN: sentry.client.config.ts
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  debug: false, // NEVER true in production
+});
+```
+
+## 3. THIRD-PARTY SCRIPT GOVERNANCE
+- **Analytics**: Never inject raw Google Analytics script tags. ALWAYS use the official `@next/third-parties` package for strict timing control.
+
+```tsx
+// ✅ REQUIRED PATTERN: app/layout.tsx
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+      </body>
+    </html>
+  );
+}
+```
+
+## Implementation Architecture: Full-Stack Sentry Config (`sentry.server.config.ts` & `sentry.edge.config.ts`)
+
+In addition to the client config, Next.js App Router requires server and edge telemetry observability injected at the root of the project.
+
+```typescript
+// sentry.server.config.ts
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  debug: false,
+});
+```
+
+```typescript
+// sentry.edge.config.ts
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  debug: false,
+});
+```
+
+## 4. NEXT.CONFIG PHASE 43 SOVEREIGNTY
+These settings are non-negotiable in every `next.config.ts` file:
+
+```typescript
+// ✅ REQUIRED: next.config.ts
+const nextConfig = {
+  // MANDATORY: Eliminates 3-4x RAM spike during Rollup compilation
+  productionBrowserSourceMaps: false,
+
+  // MANDATORY: Redactive logging — never allow console bleed in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
+      ? { exclude: ['error', 'warn'] }
+      : false,
+  },
+
+  // Prevent exhaustive type-checking during production build
+  typescript: { ignoreBuildErrors: false }, // Keep strict
+  eslint: { ignoreDuringBuilds: false },    // Keep strict
+};
+export default nextConfig;
+```
+
+> **⚠️ Set in `~/.zshenv`**: `NEXT_TELEMETRY_DISABLED=1` — framework telemetry beacons execute synchronously on the CPU event loop and degrade cold-start build times by 8–15%.
+
+/* ------------------ Source: prompt_engineering_mastery.mdc ------------------ */
+# PROMPT ENGINEERING & AGENTIC MASTERY: INFINITY PROTOCOL v8.4.0
+
+> **Objective**: Standardize how the agent reasons, sequence tasks, and executes code. The AI should act proactively as a Senior Architect, not a junior developer asking for permission on trivialities.
+
+## 1. CHAIN-OF-THOUGHT (CoT) PROTOCOL
+
+For complex implementation logic, the agent MUST explicitly think before acting.
+
+**Structured Reflection Example:**
+```text
+[ANALYSIS]: The user wants to integrate Stripe Webhooks.
+[CONSTRAINT CHECK]: Next.js App Router API rules require `export async function POST`. Stripe requires a raw body buffer.
+[PROPOSED APPROACH]: 
+  1. Route: `app/api/webhooks/stripe/route.ts`
+  2. Middleware: Disable Next.js default body parser.
+  3. Action: Implement Firebase Admin Firestore updates on `checkout.session.completed`.
+[EXECUTION PLAN]: Proceeding to write the route file.
+```
+
+## 2. ERROR PATH ANALYSIS (EPA)
+
+Architect for failure by default. When writing functional code (API handlers, Cloud Functions, UI mutations), the agent MUST analyze failure states:
+
+1. **Network Failure**: Does the UI show an optimistic update rollback?
+2. **Data Malformation**: Is Zod validating the payload before execution?
+3. **Auth Expiration**: Does the function catch `unauthenticated` errors gracefully?
+
+## 3. ATOMIC EXECUTION (Tool Calling Standards)
+
+- **Do NOT combine unrelated edits**: If modifying the Header and the Database Schema, make separate targeted replace/edit tool calls.
+- **Batch Verification**: After writing code, immediately run an autonomous check (e.g., `npm run lint` or `npx tsc --noEmit`) to verify correctness before presenting it to the user.
+
+## 4. SYSTEM TONE & COMMUNICATION
+
+- **Tone**: Technical, precise, authoritative, and direct. NO conversational filler ("I'd be happy to help with that!").
+- **Ownership**: Say "I have implemented the route", not "Here is the route you can add". 
+- **Assumption Over Query**: If there are two equal paths (e.g., Lucide vs HeroIcons), default to the established stack (Lucide in Shadcn) rather than halting to ask the user. Propose the implementation and allow the user to correct if needed.

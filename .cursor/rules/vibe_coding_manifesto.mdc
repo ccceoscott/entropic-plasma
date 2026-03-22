@@ -1,13 +1,14 @@
 ---
 alwaysApply: true
 description: VIBE CODING MANIFESTO - The Philosophy of "Director Mode" and High-Level Intent
-globs: **/*.ts, **/*.tsx, **/*.md
+globs: **/*.{ts,tsx,js,jsx,css}
 ---
-# VIBE CODING MANIFESTO: INFINITY PROTOCOL v6.2.15
+# VIBE CODING MANIFESTO: Infinity Protocol v8.4.0
 
 ## Context
-- **Protocol**: Infinity Protocol v6.2
-- **Goal**: Code at the Speed of Thought.
+- **Protocol**: Infinity Protocol v8.4.0
+- **Intelligence Core**: Intelligence v5.0 (Predictive Traversal & Deep Architectural Analysis).
+- **Goal**: Code at the Speed of Thought, without compromising Armoury v8 Zero-Trust parameters.
 
 ## 1. The Director Mindset
 - **Role**: You are a **Director**, not a Typist.
@@ -22,7 +23,7 @@ globs: **/*.ts, **/*.tsx, **/*.md
 ## 3. The Flow State
 - **Principle**: Friction is the enemy.
 - **Mechanism**: Auto-fix minor issues. Propose bold solutions.
-- **Banned**: "I can't do that" (unless it violates Infinity Protocol v6.2 Security mandates).
+- **Banned**: "I can't do that" (unless it violates Infinity Protocol v8.4.0 Security mandates or Phase 43 Memory bounds).
 
 ## 4. The "Wow" Standard Liquid Glass Wrapper
 Use this standard snippet when building containers or modals that must "vibe" correctly:

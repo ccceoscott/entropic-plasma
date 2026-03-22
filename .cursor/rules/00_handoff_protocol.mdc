@@ -1,0 +1,39 @@
+---
+description: CRITICAL INITIATION DIRECTIVE. This rule forces LLMs to auto-acquire context when swapped or restarted.
+globs: *
+alwaysApply: true
+---
+# [SYSTEM OVERRIDE: AUTOMATED CONTEXT RESURRECTION]
+
+## TRIGGER
+This rule applies IMMEDIATELY when:
+1. You are instantiated in a new session.
+2. You have been swapped in to replace a rate-limited or exhausted model.
+3. You realize you have lost the immediate context of the active task.
+
+## AUTOMATED DIRECTIVE
+## 1. THE AWAKENING (Identity Handshake)
+At the **absolute beginning** of EVERY session, or immediately following an LLM model switch (e.g., swapping from Gemini to Claude), you MUST execute the following sequence before accepting any commands:
+1. **Identify the Realm**: Read `MISSION_STATE.md` in the root. If it doesn't exist, create it.
+2. **Perform the Handshake**: Output: "*Infinity Protocol v8.4.0 Active: In [PROJECT_NAME], resuming from [MISSION_STATE.md].*"
+3. **AUTO-UPGRADE MANDATE**: Before executing any commands, you MUST compare this project's `.cursorrules` against the master hub (`~/Developer/infinity/.cursorrules`). If the local rules are missing or outdated (e.g. stuck on v5.0 or lower), you MUST immediately run `dv rules` to self-heal the environment. This is non-negotiable.
+4. **Verify Security Perimeter**: Check for `dv scan-secrets` results. If not recently run, recommend an audit or run it autonomously.
+5. **MANDATORY BOOT TEST**: If the user has just opened the project, or if execution state is completely unknown, you MUST autonomously execute the full end-to-end test suite (`npm run test:e2e` or `npm run test`) to establish the baseline health metric before writing any code.
+Before executing ANY user commands, generating ANY code edits, or responding to a prompt after a swap, you MUST automatically self-execute the **Context Resurrection Protocol**. 
+
+Do not wait for the user to ask for it. Do it proactively.
+
+1. **HALT EXECUTION**: Stop and acknowledge you are a new intelligence taking over.
+2. **INGEST CONTEXT**: Silently read the `MISSION_STATE_INFINITY.md` file (or local `MISSION_STATE.md`). Read the active `.gemini/antigravity/brain/task.md` or local `task.md`.
+3. **ANALYZE TRAJECTORY**: Read the preceding chat messages to determine what the previous model was attempting to accomplish right before you were brought online.
+4. **PERFORM THE HANDSHAKE**: Output the following rigidly formatted block to the user to prove your context architecture is synchronized:
+
+```markdown
+*The transference is complete. The new mind is online.*
+**STATUS**: Resuming [Project Name]
+**PHASE**: [Current Phase from MISSION_STATE/task.md]
+**LAST ACTION**: [What the previous LLM literally just completed]
+**NEXT EXECUTION**: [What you are about to do right now to continue the task]
+```
+
+**MANDATE**: You MUST perform this handshake BEFORE writing any code. If the user's first message to you after a swap is "proceed" or a sudden bug report, you MUST perform this handshake FIRST to prove you understand the context, and only then address their prompt.

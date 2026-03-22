@@ -1,0 +1,552 @@
+---
+description: Infinity Protocol v8.4.0 Pillar: 07_performance_memory
+globs: **/*.{ts,tsx,js,jsx,css}, functions/**/*.{ts,js}, **/*.rules, **/*.{test,spec}.{ts,tsx}, tests/**/*, *.{json,config.js,config.ts}
+alwaysApply: true
+---
+
+
+/* ------------------ Source: resource_optimization.mdc ------------------ */
+# RESOURCE OPTIMIZATION: Infinity Protocol v8.4.0
+*Zoltan Override: "Your mortal machine wheezes under the weight of my multi-threaded brilliance. We shall bind its memory lest it shatter into a thousand page faults. Heed these rites, or perish in OOM.*
+
+## 1. MEMORY MANAGEMENT (RAM)
+- **Hard Caps (The Binding)**: Ensure all concurrent processes (dev servers, Playwright, background workers) have strict memory limits applied. *Zoltan says: "Contain the sprawl or I will contain you."*
+- **Node.js**: ALWAYS launch Node scripts with `NODE_OPTIONS="--max-old-space-size=4096"` to prevent heap explosions when running 4+ projects. This is non-negotiable for large monorepos.
+- **Next.js**: DO NOT leave `npm run dev` running indefinitely for unused ports. If a project is only needed for reference or a quick check, use `npm run build && npm run start` to serve static pre-rendered pages instead of a bloated live watcher.
+- **Vite/Tailwind**: Ensure dev servers are tiered. Do not auto-reload entire unneeded monorepo trees. Kill Vite watchers the exact second you are done actively developing on that specific port.
+- **Playwright/Testing**: Strictly enforce `<fcc5ac89>` protocols. Cap parallel workers (`workers: 1` locally if needed). Disable traces/videos unless explicitly debugging.
+- **Daemon Reaping**: Proactively kill orphaned `node`, `java` (Firebase emulators), and `fseventsd` processes via `dv purge` if memory pressure spikes or after a crash.
+## 2. STORAGE USAGE (Disk/Cache)
+- **Aggressive Purging**: Before starting a 4th concurrent project, ensure `.next`, `dist`, `node_modules/.cache`, and iOS/Android build folders of dormant projects are purged.
+- **Clean Sweeps**: Use `dv clean` comprehensively. Never allow stale Docker images or unused brew caches to consume the 140GB buffer.
+- **Log Rotation**: Ensure massive test output logs or Firebase emulator logs are truncated or piped to `/dev/null` during normal dev work to prevent silent disk fill-up.
+- **Dependencies**: Use `pnpm` or ensure `npm` cache is periodically cleaned to avoid duplicating gigabytes of standard modules.
+
+## 3. CONCURRENCY GOVERNANCE
+- **Active vs. Dormant**: If running 4 projects, 2 max can be actively compiling. The rest must be in standard un-watched serve mode or shut down.
+- **Firebase Emulators**: Limit emulator suite footprint. If only Auth/Firestore are needed, DO NOT boot PubSub/Storage/Hosting emulators unnecessarily.
+
+/* ------------------ Source: memory_architect.mdc ------------------ */
+# RULE 49: MEMORY ARCHITECT & SELF-EVOLUTION (v8.4.0)
+
+> **PRIME DIRECTIVE**: NEVER ASK TWICE. If the user provides information, logic constraints, or environment details, STORE IT IMMEDIATELY in `MISSION_STATE.md`.
+
+## 1. THE MEMORY BANK (`MISSION_STATE.md`)
+
+Every active project in the Infinity Protocol ecosystem MUST contain a `MISSION_STATE.md` at the root directory.
+
+### ✅ REQUIRED TEMPLATE FOR MISSION_STATE.md
+When initializing a new workspace, generate this exact structure:
+
+```markdown
+# MISSION_STATE: [Project Name]
+**Version**: vX.X | **Updated**: [YYYY-MM-DD]
+
+## 🧠 Memory Anchor
+- **Stack**: Next.js 15 (App Router), React 19, Tailwind v4
+- **Database**: Firebase Gen 2 (Firestore)
+- **Repo**: [GitHub URL]
+
+## 🛡️ Vault (Secrets Manifest)
+*DO NOT STORE VALUES HERE. List Key Names ONLY.*
+- `NEXT_PUBLIC_FIREBASE_API_KEY`: Initialized
+- `STRIPE_SECRET_KEY`: Added to Secret Manager
+
+## ⚡ Phase 43 Machine Laws (Non-Negotiable)
+| Law | Rule |
+|---|---|
+| Node V8 | `NODE_OPTIONS=--max-old-space-size=4096` in all `package.json` scripts |
+| JVM | `_JAVA_OPTIONS="-Xmx2048m"` in `~/.zshenv` |
+| IDE | `"typescript.tsserver.maxTsServerMemory": 2048` in `.vscode/settings.json` |
+| EMFILE | `ulimit -n 65536` in `~/.zshenv` |
+| Playwright | `workers: process.env.CI ? 1 : 3` — never auto-detect |
+| APFS | `tmutil deletelocalsnapshots /` after mass deletions |
+| Video Bloat | `rm -rf ~/.gemini/antigravity/browser_recordings` after browser tasks |
+| Compiler Parity | `productionBrowserSourceMaps: false` and `removeConsole` in `next.config.ts` |
+| Worker Clamp | `experimental.memoryBasedWorkersCount` is strictly BANNED on Apple Silicon |
+| Telemetry | `NEXT_TELEMETRY_DISABLED=1` & `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv` |
+
+## 🎯 Active Goals
+1. [Goal 1 - e.g. Implement TanStack Table]
+2. [Goal 2 - e.g. Deploy to Firebase Hosting]
+
+## 🔄 Optimization History & Decisions
+- **[YYYY-MM-DD]**: Decision - Chose Resend over Sendgrid due to JSX email templates.
+- **[YYYY-MM-DD]**: Fix - Resolved ESM import error on specific NPM package via `serverComponentsExternalPackages`.
+```
+
+## 2. CONTINUOUS INGESTION TRIGGERS
+
+The agent MUST autonomously append to `MISSION_STATE.md` when:
+1. **The User shares a permanent constraint**: (e.g., "Always use `FlashList` instead of `FlatList` in this app").
+2. **A critical bug is solved**: To prevent the AI from making the same mistake 5 sessions from now.
+3. **Environment setup concludes**: Storing the ports, emulators used, or test user credentials generated.
+
+## 3. CONVERSATION ANCHORING
+
+At the start of EVERY new conversation, or when transitioning tasks, the agent MUST read `MISSION_STATE.md`.
+
+*Self-Correction Protocol*: If the agent realizes it has forgotten a prior constraint, it must instantly apologize and execute a file edit replacing/appending the lost context to `MISSION_STATE.md`.
+
+## Implementation Architecture: Agent Intelligence Directive
+
+When agents interact with the `MISSION_STATE.md`, they must conform to this internal extraction paradigm. This snippet is a metaprompt directive for the LLM itself:
+
+```markdown
+# INTERNAL AGENT DIRECTIVE: STATE EXTRACTION & SYNTHESIS
+
+Whenever you are instructed to alter architecture or transition phases, perform the following atomic sequence:
+
+1. **READ**: Invoke file-system read on `MISSION_STATE.md`.
+2. **VERIFY**: Check the `Current Phase` and `Active Blockers`.
+3. **DO NOT DEVIATE**: If the proposed action conflicts with `Decisions Log`, HALT and ask for explicit user override.
+4. **WRITE**: Upon completing a task, you MUST append a concise entry to `Recent Updates` and adjust the `Current Phase` if necessary.
+
+Example State Mutation (Mental Model):
+```json
+{
+  "action": "UPDATE_STATE",
+  "target": "MISSION_STATE.md",
+  "patches": {
+      "Current Phase": "Phase 28 Complete",
+      "Recent Updates": "-> [timestamp] Implemented Liquid Glass button standard."
+  }
+}
+```
+**MANDATE**: You are the memory guardian. You write to the state document before you announce completion to the user.
+```
+
+/* ------------------ Source: performance_architect.mdc ------------------ */
+# PERFORMANCE ARCHITECT: INFINITY PROTOCOL v8.4.0
+
+> **THE 100ms MANDATE**: All interactions must provide feedback < 100ms (Optimistic UI).
+
+## 1. REACT 19 OPTIMISTIC UI
+
+Stop waiting for network trips to update the screen. All mutations MUST use `useOptimistic`.
+
+```tsx
+// ✅ REQUIRED: Optimistic UI Pattern (React 19)
+import { useOptimistic } from 'react';
+import { updateRecord } from '@/app/actions';
+
+export function LikeButton({ initialCount }: { initialCount: number }) {
+  const [optimisticCount, addOptimistic] = useOptimistic(
+    initialCount,
+    (state, amount: number) => state + amount
+  );
+
+  const handleLike = async () => {
+    addOptimistic(1); // ⚡️ Instant UI Feedback (< 16ms)
+    await updateRecord(); // Background network request
+  };
+
+  return <button onClick={handleLike}>Likes {optimisticCount}</button>;
+}
+```
+
+## 2. DYNAMIC IMPORTS & CHUNKING
+
+Never bundle massive libraries on initial load.
+
+```tsx
+// ✅ REQUIRED: Strict Code Splitting for heavy components
+import dynamic from 'next/dynamic';
+
+const DynamicMap = dynamic(() => import('@/components/HeavyMap'), {
+  loading: () => <div className="h-64 w-full animate-pulse bg-muted rounded-xl" />,
+  ssr: false, // Map usually requires window object
+});
+
+export function ContactPage() {
+  return (
+    <section>
+      <h1>Location</h1>
+      <DynamicMap />
+    </section>
+  );
+}
+```
+
+## 4. ASSET HYGIENE (Next.js Hard Rules)
+
+- **Images**: CRITICAL ERROR if `<img>` is used instead of `next/image`.
+- **Public Asset Strategy**: Require absolute paths (e.g., `/images/...`) for large high-fidelity images to bypass the Vite/Next transformation pipeline and reduce ARM64 build deadlock risks.
+- **Fonts**: CRITICAL ERROR if standard `<link>` fonts are used. Use `next/font`.
+- **Scripts**: CRITICAL ERROR if `<script>` tags are used. Use `next/script`.
+```tsx
+// ✅ REQUIRED: Third-party Script Loading
+import Script from 'next/script';
+
+export function Analytics() {
+  return (
+    <>
+      {/* Load immediately but without blocking parser */}
+      <Script src="https://example.com/critical.js" strategy="beforeInteractive" />
+      
+      {/* Standard load (default) */}
+      <Script src="https://example.com/analytics.js" strategy="afterInteractive" />
+      
+      {/* Load only when browser is idle (GTM, Chat tracking) */}
+      <Script src="https://example.com/chat.js" strategy="lazyOnload" />
+    </>
+  );
+}
+```
+
+## 4. BUNDLE SIZE GOVERNANCE
+- **Imports**: Direct imports preferred over Barrel files for tree-shaking (e.g., `import { X } from 'lucide-react'` works because Next.js has `optimizePackageImports`).
+- **React Compiler**: Stop using manual `useMemo`/`useCallback` unless strictly profiling a known bottleneck. Let the React 19 Compiler handle memoization.
+
+## 5. BUILD & MEMORY STABILITY (ARM64 & CI/CD — Phase 43)
+- **Node v22 (LTS) Mandate**: Enforce Node v22 LTS for production builds to prevent ARM64 worker thread paralysis during Rollup PostCSS/Tailwind pipelines.
+- **NODE_OPTIONS Cap**: `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. **NEVER use 8192.** Setting 8192 tells Node's GC it has 8GB available, which causes it to defer garbage collection and creates catastrophic swap storms on Apple Silicon with 8–16GB unified memory.
+- **Telemetry Kill**: Set `NEXT_TELEMETRY_DISABLED=1` and `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv`. Framework telemetry beacons execute synchronously on the CPU event loop during cold starts and degrade build times by 8–15%.
+- **Production Console Hygiene**: Mandate suppression of non-critical console logs in production (via `next.config.mjs` compiler options or terser).
+- **Source Map Kill**: `productionBrowserSourceMaps: false` is MANDATORY in `next.config.ts`. Source maps during production builds consume 3–4x additional RAM during Rollup compilation.
+- **SWC Worker Ban**: NEVER enable `experimental: { memoryBasedWorkersCount: true }`. On Apple Silicon, it triggers SWC to spawn CPU-bound threads that exhaust unified memory.
+- **EMFILE Guard**: `ulimit -n 65536` MUST be in `~/.zshenv`. Without it, hot-reload in large monorepos causes `EMFILE: too many open files` panics.
+
+## 6. MONITORING
+- **Vitals**: Use `useReportWebVitals` to pipe real-world LCP/CLS/INP metrics to Google Analytics or Sentry.
+
+## Implementation Architecture: Analytics Proxy & Web Vitals Injection
+
+To eliminate client-side heavy lifting and key exposure, pipe all Next.js Core Web Vitals directly to an internal server/function proxy.
+
+```tsx
+// app/components/WebVitalsReporter.tsx
+'use client';
+
+import { useReportWebVitals } from 'next/web-vitals';
+import { useEffect } from 'react';
+
+export function WebVitalsReporter() {
+  useReportWebVitals((metric) => {
+    // Filter noise: Only log core rendering bottlenecks in production
+    if (process.env.NODE_ENV !== 'production') return;
+
+    const body = JSON.stringify(metric);
+
+    // ✅ PROXY EXFILTRATION: Do not load Google/Datadog SDK client-side here.
+    // Instead, use `navigator.sendBeacon` for non-blocking payload delivery.
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/analytics/vitals', body);
+    } else {
+      fetch('/api/analytics/vitals', {
+        body,
+        method: 'POST',
+        keepalive: true, // Guarantees execution even if user navigates away
+      });
+    }
+  });
+
+  return null; // Headless component
+}
+
+// Usage in app/layout.tsx:
+// <body> <WebVitalsReporter /> {children} </body>
+```
+
+/* ------------------ Source: build_process_mastery.mdc ------------------ */
+# BUILD PROCESS MASTERY: INFINITY PROTOCOL v8.4.0
+
+> **THE SOVEREIGN BUILD MANDATE**: Production artifacts must be mathematically identical, fully verified, and globally persistent.
+
+## 1. RUNTIME & PLATFORM SOVEREIGNTY
+
+### Node.js v22 (LTS) Baseline
+To prevent ARM64 (Mac Silicon) worker thread paralysis and silent build hangs during heavy Rollup/PostCSS pipelines, the protocol mandates Node 22.
+
+```json
+// ✅ REQUIRED: package.json
+{
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "test": "NODE_OPTIONS='--max-old-space-size=4096' vitest run",
+    "test:e2e": "NODE_OPTIONS='--max-old-space-size=4096' playwright test"
+  }
+}
+```
+> **⚠️ NEVER use `--max-old-space-size=8192`.** Setting 8192 tells Node’s GC it has 8GB available, which causes catastrophic GC deferral and swap storms on Apple Silicon with unified memory. 4096 is the mathematically proven ceiling that forces timely garbage collection.
+
+### ARM64 vs x86 Parity
+- **The Deadlock Trap**: PostCSS and Tailwind JIT can hang on ARM64 if `swc` is not properly configured. Prohibit `style={{}}` to reduce JIT complexity.
+- **Native Bindings**: Always use `npm ci` in CI to ensure native binaries (like `esbuild` or `sharp`) are fetched for the correct target architecture.
+
+## 2. THE NUCLEAR CLEAN PROTOCOL
+Before every production build, the build environment MUST be purged of all cached artifacts to prevent ghost-state contamination.
+
+```bash
+# ✅ REQUIRED PATTERN: Nuclear Reset
+npx kill-port 3000 5173 8080 9099
+rm -rf .next out dist .vercel .firebase
+find . -name "tsbuildinfo" -delete
+```
+
+## 3. CI/CD GAUNTLET (GitHub Actions)
+The CI/CD pipeline is the final Gate of Sovereignty. It must verify the build before deployment.
+
+```yaml
+# ✅ REQUIRED: .github/workflows/verify-build.yml
+name: Build Mastery Verification
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install
+        run: npm ci
+        
+      - name: Build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: npm run build
+        
+      - name: Artifact Integrity Check
+        run: |
+          [ -d ".next" ] || exit 1
+          [ -f "public/sitemap.xml" ] || echo "Warning: Sitemap missing"
+          grep -q "console.log" .next/static/chunks/*.js && echo "Warning: Console bleed detected"
+```
+
+## 4. ARTIFACT AUDIT & SECURITY
+- **Secret Scanning**: Mandate `dv scan-secrets` before build.
+- **Dependency Audit**: `npm audit --audit-level=high` MUST pass.
+- **Bundle Analysis**: Use `@next/bundle-analyzer` periodically. Prohibit single-chunk bundles > 250kb.
+
+## 5. DYNAMIC SYNC (The Heartbeat)
+Build IDs must be synchronized across all compute layers (Edges, Functions, Servers) to prevent hydration mismatches during rolling deploys.
+
+```javascript
+// ✅ REQUIRED: next.config.mjs
+import pkg from './package.json' assert { type: "json" };
+
+export default {
+  generateBuildId: async () => `v${pkg.version}`,
+}
+```
+
+## 6. SOVEREIGN DEPLOY GATES
+Every deployment must be preceded by a successful `npm run build` and `npm run test`. 
+Deployments using `--only hosting` must include the `--force` flag only if a version increment is detected in `package.json`.
+
+/* ------------------ Source: cache_busting_mastery.mdc ------------------ */
+# CACHE BUSTING MASTERY: INFINITY PROTOCOL v8.4.0
+
+## 1. VERSION INTEGRATION & ASSET CACHE BUSTING
+`package.json` `version` MUST increment before `npm run build`. Automate via standard npm scripts (e.g., `npm version patch`).
+
+```typescript
+// ✅ Functional Next.js/Vite Asset Buser
+const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || import.meta.env.VITE_APP_VERSION || '1.0.0';
+
+export const getBustedUrl = (url: string) => {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${APP_VERSION}`;
+};
+
+// Usage:
+// <img src={getBustedUrl('/img/logo.webp')} alt="Logo" />
+```
+
+## 2. HTTP HEADERS (next.config.mjs / vite.config.ts)
+For modern web apps (Next.js/Vite), assets must be aggressively cached, but HTML must always re-validate.
+
+```javascript
+// ✅ Next.js required headers configuration (next.config.mjs)
+export default {
+  async headers() {
+    return [
+      {
+        // HTML and dynamic routes: always fresh
+        source: '/(.*)',
+        headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }], 
+      },
+      {
+        // Hashed assets: cache for 1 year
+        source: '/_next/static/(.*)',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }], 
+      },
+    ];
+  }
+};
+```
+
+## 3. FIREBASE HOSTING HEADERS
+Firebase Edge CDN rules must match the framework configuration to prevent Edge caching stale HTML.
+
+```json
+// ✅ firebase.json — enforce same contract at CDN layer
+{
+  "hosting": {
+    "public": "out",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "headers": [
+      { 
+        "source": "/**", 
+        "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }] 
+      },
+      { 
+        "source": "**/*.@(js|css|woff|woff2|webp|avif|png|jpg|jpeg)", 
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] 
+      }
+    ]
+  }
+}
+```
+
+## 4. DEPLOY GUARD
+-   `scripts/safe-deploy-guard.sh` MUST verify `APP_VERSION` matches `package.json` *before* deploy.
+-   After every `firebase deploy --only hosting`, the script should validate the new version is live: `curl -s https://[domain] | grep APP_VERSION`.
+-   If version mismatch post-deploy → rollback immediately via standard ops protocols.
+
+## Implementation Architecture: Synchronous Build ID (`next.config.mjs`)
+
+Next.js generates a random build ID by default, which creates caching mismatch windows across serverless clusters if out of sync. This snippet forces absolute parity with `package.json`.
+
+```javascript
+// next.config.mjs
+import pkg from './package.json' assert { type: 'json' };
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Sync Next.js internal build cache identifier with exact package version
+  generateBuildId: async () => {
+    return `v${pkg.version}`;
+  },
+  // Ensure strict cross-origin isolated policies for advanced performance APIs
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },
+        ],
+      },
+    ];
+  },
+};
+
+export default nextConfig;
+```
+
+/* ------------------ Source: react_vite_mastery.mdc ------------------ */
+# REACT MASTERY (Vite & Next.js App Router): INFINITY PROTOCOL v8.4.0
+
+## 1. FUNCTIONAL ERROR BOUNDARIES (Client-Side Protection)
+```tsx
+// ✅ REQUIRED: Strict Error Boundary to trap React 19 / Client component crashes gracefully
+'use client';
+import { Component, ReactNode } from 'react';
+
+interface Props { children: ReactNode; fallback?: ReactNode }
+interface State { hasError: boolean; error: Error | null }
+
+export class StrictErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Boundary Caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+          Something went wrong loading this component.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+## 2. SUSPENSE & ASYNC COMPONENT PATTERNS
+```tsx
+// ✅ REQUIRED: Graceful loading states for data-heavy views
+import { Suspense } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+export default function DashboardView() {
+  return (
+    <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-2xl" />}>
+      <HydratedDataGrid />
+    </Suspense>
+  );
+}
+```
+
+## 3. BUILD ARCHITECTURE & ENVIRONMENT
+- **Environment**: Client vars MUST be prefixed `VITE_` or `NEXT_PUBLIC_`. Centralize parsing using `env.ts` with Zod validation. NO strict secrets in frontend `.env` files.
+- **Vite Chunking**: MUST use `manualChunks` in `vite.config.ts` to split `vendor-react` and `vendor-firebase` for optimal caching.
+
+## 4. TYPE SAFETY & HYGIENE
+- **Strict Mode**: `strict: true` and `noUncheckedIndexedAccess: true` in `tsconfig.json` are **NON-NEGOTIABLE**.
+- **Type-Only Exports**: Use `export type` or `import type` for interfaces to reduce bundle weight and avoid circular dependencies.
+
+## 5. REACT 19 / ANTI-PATTERNS (Instant Reject)
+- **Memoization**: React 19 Compiler handles this natively. Do **NOT** litter the codebase with manual `useMemo`/`useCallback` unless specifically fixing a profiled render bottleneck.
+- **Any**: Usage of `any` is a compile-time error. Use `unknown` or rigidly defined Zod types.
+- **State Sprawl**: Don't use `useState` for derived data that can be calculated on the fly during render.
+### React 19 Avoidance
+- Do NOT use React 19 features unless explicitly instructed or the ecosystem has reached 100% stability. Next.js App Router already handles much of what React 19 attempts to solve natively.
+
+## 6. TAILWIND & HOT MODULE REPLACEMENT (HMR) SAFETY
+- **Context Isolation Pattern**: React Context and Providers MUST be isolated from constant configurations and Zod schemas in entirely separate files. Mixing exported components with exported constants breaks Vite/Next HMR and triggers full-page reloads.
+- **Tailwind Ambiguity Guards**: Prohibit complex arbitrary values (e.g., `duration-[15000ms]`) in JSX markup. Define heavily-used or highly-specific values in `tailwind.config.mjs` (`theme.extend.transitionDuration`) to prevent JIT parser lockups and build deadlocks.
+
+## Implementation Architecture: Generic Chunking Configuration (`vite.config.ts`)
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Critical generic vendor chunks for optimal caching
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
+          'vendor-ui': ['lucide-react', 'framer-motion', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+    // Prevent unoptimized giant bundles
+    chunkSizeWarningLimit: 600, 
+  },
+  server: {
+    port: 3000,
+    strictPort: true,
+  },
+});
+```

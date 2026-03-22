@@ -1,0 +1,45 @@
+# INFINITY PROTOCOL: AI CONTEXT SHIELD
+# Prevents catastrophic token-bloat by blocking massive auto-generated files from LLM indexing.
+
+# Dependency Lockfiles (Massive Token Drains)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build & Cache Directories
+.next/
+dist/
+build/
+out/
+.cache/
+.vite/
+.turbo/
+coverage/
+
+# Firebase & Serverless
+.firebase/
+.serverless/
+firebase-debug.log
+*-debug.log
+
+# Native Mobile & OS
+ios/
+android/
+.DS_Store
+
+# Media & Assets (Binary encoding destroys context limits)
+**/*.svg
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.webp
+**/*.gif
+**/*.mp4
+**/*.webm
+**/*.woff
+**/*.woff2
+**/*.ttf
+
+# Database Files
+**/*.sqlite
+**/*.db

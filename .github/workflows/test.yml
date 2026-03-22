@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, master, develop]
 
+# ── INFINITY PROTOCOL v8.4.0 — DATA SOVEREIGNTY SEED GATE ──────────────
+# All jobs must complete. seed_integrity blocks deploy if _seedMeta is stale.
+# ────────────────────────────────────────────────────────────────────────
+
 jobs:
   # ─── Job 1: Unit Tests, Linting & Type Checking (runs in parallel with e2e) ───
   unit_and_lint:
@@ -25,7 +29,7 @@ jobs:
       - name: Install Root Dependencies
         run: npm ci
 
-      - name: Security & Secret Scanning (Sovereign Security v6.2)
+      - name: Security & Secret Scanning (Sovereign Security v8.4.0)
         continue-on-error: true
         # Native CI execution of audit policies
         run: |
@@ -136,3 +140,50 @@ jobs:
           name: playwright-videos
           path: test-results/
           retention-days: 7
+
+  # ─── Job 3: Firestore Seed Integrity Gate (Data Sovereignty v8.4.0) ──
+  seed_integrity:
+    name: Firestore Seed Integrity (Data Sovereignty)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [unit_and_lint]  # Only runs if unit tests pass
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Root Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Write GCP Service Account Credentials
+        # Store the full JSON content as a GitHub secret: GCP_SA_KEY_JSON
+        run: echo '${{ secrets.GCP_SA_KEY_JSON }}' > /tmp/gcp-sa.json
+
+      - name: Verify Firestore Seed Integrity (Law 9 — Data Sovereignty v8.4.0)
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp-sa.json
+        run: |
+          node -e "
+            const admin = require('firebase-admin');
+            if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.applicationDefault() });
+            const db = admin.firestore();
+            db.collection('_seedMeta').doc('products').get().then(snap => {
+              if (!snap.exists) {
+                console.error('[SEED GATE FAIL] _seedMeta/products document is MISSING from Firestore.');
+                console.error('Run: npm run seed  — to seed the catalog before deploying.');
+                process.exit(1);
+              }
+              const d = snap.data();
+              console.log('[SEED GATE] ✅ Firestore catalog verified at version', d.version, '| Seeded:', d.seededAt?.toDate?.() ?? d.seededAt);
+              process.exit(0);
+            }).catch(e => { console.error('[SEED GATE ERROR]', e.message); process.exit(1); });
+          "
+
+      - name: Cleanup Credentials
+        if: always()
+        run: rm -f /tmp/gcp-sa.json

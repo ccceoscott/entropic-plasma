@@ -1,0 +1,129 @@
+---
+description: Auto-Upgrade Protocol — Mandatory session-start version sync and drift enforcement
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# RULE 10: AUTO-UPGRADE PROTOCOL (v8.4.0)
+> **MACHINE LAW**: On every new session or model switch, you MUST verify that `infinity-protocol` is current with `origin/master`. This is non-negotiable.
+
+---
+
+## § 1. SESSION-START MANDATE (Every Connection)
+
+**On every new conversation or IDE session start**, execute the following in order BEFORE any other action:
+
+### Step 1 — Identity Handshake
+```
+"Infinity Protocol v8.4.0 Active: In [PROJECT_NAME], resuming from MISSION_STATE.md."
+```
+
+### Step 2 — Protocol Freshness Check (MANDATORY)
+```bash
+cd ~/Developer/infinity-protocol
+git fetch origin --quiet
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/master)
+if [ "$LOCAL" != "$REMOTE" ]; then
+  echo "[AUTO-UPGRADE] Drift detected — pulling origin/master..."
+  git pull --rebase origin master --no-verify -q
+  cp scripts/dv ~/Developer/dv
+  bash scripts/dv rules
+  echo "[AUTO-UPGRADE] Protocol upgraded. Reloading context."
+fi
+```
+
+**If you detect drift (local SHA ≠ remote SHA), you MUST:**
+1. Pull `origin/master` immediately
+2. Copy the updated `dv` binary to `~/Developer/dv`
+3. Re-run `dv rules` to broadcast updated `.cursorrules` to all projects
+4. Re-read `MISSION_STATE.md` and `KNOWLEDGE.md` before proceeding
+
+**Do not proceed with any task until sync is confirmed.**
+
+### Step 3 — Version Declaration
+After sync is confirmed, state the current version:
+```
+"Protocol verified: v8.4.0 (SHA: [short_sha]). Drift: [NONE | RESOLVED]."
+```
+
+---
+
+## § 2. DRIFT TRIGGERS — AUTO-UPGRADE CONDITIONS
+
+Run the upgrade check automatically when ANY of these are true:
+
+| Trigger | Action |
+|---------|--------|
+| New session or model switch | Full sync check |
+| `git log --oneline -1` shows non-genesis commit | Pull + rebase |
+| `.cursorrules` version ≠ `v8.4.0` | Run `dv rules` immediately |
+| `~/Developer/dv` version ≠ `scripts/dv` | Copy `scripts/dv → ~/Developer/dv` |
+| `GEMINI.md` version ≠ `v8.4.0` | Broadcast updated GEMINI.md fleet-wide |
+| `package.json` version ≠ `8.4.0` | Warn + run `dv upgrade` |
+
+---
+
+## § 3. MULTI-MACHINE SOVEREIGNTY
+
+The `mcp_watchdog.sh` cron runs every 30 minutes on all machines and:
+- Detects SHA drift vs `origin/master`
+- Auto-pulls if behind
+- Copies updated `dv` binary to `~/Developer/dv`
+- Fires macOS notification on sync
+
+**This is your passive enforcement layer. The session-start check is your active enforcement layer.**
+
+On machines that were offline or fell behind:
+```bash
+cd ~/Developer/infinity-protocol && git fetch origin && git reset --hard origin/master && bash scripts/dv rules
+```
+This single command is the recovery spell. Run it when drift is detected.
+
+---
+
+## § 4. FORBIDDEN STATES
+
+The following states are protocol violations and MUST trigger an immediate upgrade:
+
+```
+❌ package.json version: "6.7.0"    → VIOLATION: run dv upgrade
+❌ .cursorrules: "INFINITY PROTOCOL v6.7.0"  → VIOLATION: run dv rules
+❌ .cursorrules: "INFINITY PROTOCOL v8.4.0"  → VIOLATION: run dv rules
+❌ git log shows any commit not prefixed "feat(protocol): v8.4.0" as HEAD → VIOLATION: pull
+❌ ~/Developer/dv header ≠ v8.4.0   → VIOLATION: cp scripts/dv ~/Developer/dv
+```
+
+---
+
+## § 5. UPGRADE COMMAND REFERENCE
+
+```bash
+# Full recovery from any drift state (run as one block):
+cd ~/Developer/infinity-protocol
+git fetch origin
+git reset --hard origin/master
+bash scripts/dv rules
+cp scripts/dv ~/Developer/dv
+echo "[SOVEREIGN] Protocol restored to $(grep -m1 'version' package.json | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
+
+# Check fleet-wide version compliance:
+for dir in ~/Developer/*/; do
+  ver=$(grep -m1 "INFINITY PROTOCOL v" "${dir}.cursorrules" 2>/dev/null | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+" | head -1)
+  [ "$ver" = "v8.4.0" ] && echo "✓ $(basename $dir)" || echo "✗ $(basename $dir) → ${ver:-MISSING}"
+done
+```
+
+---
+
+## § 6. VERSION BUMP PROCEDURE
+
+When the protocol version changes (e.g., v8.4.0 → v8.5.0):
+
+1. `sed -i '' 's/v8\.4\.0/v8.5.0/g' .cursorrules GEMINI.md scripts/dv README.md`
+2. `python3 -c "import json; d=json.load(open('package.json')); d['version']='8.5.0'; json.dump(d, open('package.json','w'), indent=2)"`
+3. `sed -i '' 's/v8\.4\.0/v8.5.0/g' rules/*.mdc`
+4. `git add -A && git commit --no-verify -m "feat(protocol): v8.5.0 — [description]"`
+5. `git push origin master --no-verify`
+6. `bash scripts/dv rules` — broadcast to fleet
+7. On all other machines: `git pull --rebase origin master`

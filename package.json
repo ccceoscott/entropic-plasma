@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS=--max-old-space-size=4096 next dev",
-    "build": "NODE_OPTIONS=--max-old-space-size=4096 next build",
+    "test:e2e": "NODE_OPTIONS=--max-old-space-size=4096 ./scripts/test-watchdog.sh",
+          "dev": "NODE_OPTIONS=--max-old-space-size=4096 next dev",
+          "build": "NODE_OPTIONS=--max-old-space-size=4096 next build",
     "start": "next start",
     "lint": "eslint"
   },

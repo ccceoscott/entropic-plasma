@@ -1,0 +1,740 @@
+---
+alwaysApply: true
+description: DATA SOVEREIGNTY — Firestore Seeding, Data Integrity, Firebase Security Rules Drift Prevention
+globs: scripts/**/*.{ts,js,cjs,mjs}, functions/src/seed*.ts, **/seed*.{ts,js,cjs,mjs}, firestore.rules, storage.rules
+---
+# DATA SOVEREIGNTY: Infinity Protocol v8.4.0
+
+## PREAMBLE — THE ROOT CAUSE OF ALL SEEDING & SECURITY FAILURES
+
+Every seeding and security failure across the project fleet stems from one or more of these **ten sins**:
+
+1. **The Client SDK Sin** — Using `firebase/firestore` (browser SDK) in a Node.js seed script. It has no Admin permissions. ALWAYS use the **Admin SDK**.
+2. **The Hardcoded Project ID Sin** — `admin.initializeApp({ projectId: 'some-project' })` will silently seed the **wrong project** in CI. ALWAYS use `applicationDefault()`.
+3. **The Missing Validation Sin** — Writing raw, unvalidated JavaScript objects to Firestore. Schema drift is inevitable. **Zod schema MUST be a gatekeeper**.
+4. **The Open Endpoint Sin** — An HTTP-triggered Cloud Function seed endpoint with no auth guard. This is a **zero-day attack surface**. ALL HTTP seed endpoints MUST verify a `SEED_SECRET`.
+5. **The Re-run Data Drift Sin** — Seed scripts that run on every deploy without idempotency tracking. Documents accumulate orphaned data. ALWAYS write a `_seedMeta` version checkpoint and check it first.
+6. **The Stripe Desync Sin** — Price IDs or amounts in Firestore diverge from the Stripe Product/Price objects. The payment engine then charges the wrong amount or fails. Firestore is the **server-side source of truth**; Stripe metadata must be pinned to it.
+7. **The CI Blind-Spot Sin** — Product seeding is never verified in CI. A broken catalog ships to production undetected. CI MUST verify that `_seedMeta` documents exist and are at the expected version.
+8. **The Sequential Write Sin** — Calling `await db.collection().doc().set()` in a `for` loop (one network round-trip per document). For N > 10, this is catastrophically slow. ALWAYS use `batch.set()` or `BulkWriter`.
+9. **The Local Production Sin** — Developers run seed scripts against the live production Firestore because no emulator is configured. This corrupts production data. ALWAYS run `dv seed` against the emulator first.
+10. **The Rules Drift Sin** — The local `firestore.rules` file is LESS SECURE than the deployed rules. Running `firebase deploy --only firestore:rules` overwrites production with the weaker local version, silently downgrading your security posture. **`dv rules:status` MUST be run before every deploy.**
+
+
+---
+
+## LAW 1: SDK SOVEREIGNTY (Non-Negotiable)
+
+### The Rule
+- **Node scripts** (`scripts/*.ts`, `scripts/*.cjs`, `scripts/*.mjs`): MUST use `firebase-admin`. No exceptions.
+- **Cloud Functions** (`functions/src/**`): MUST use `firebase-admin`. No exceptions.
+- **React/Browser client** (`src/**`): MAY use `firebase/firestore` (client SDK) ONLY for real-time reads/writes within the app UI. NEVER for seeding.
+
+### Anti-Pattern (BANNED)
+```typescript
+// ❌ BANNED — client SDK in a Node seed script
+import { db } from '../config/firebase';
+import { collection, doc, setDoc } from 'firebase/firestore';
+
+export const seedProducts = async () => {
+    const prodCollection = collection(db, 'products');
+    for (const prod of products) {
+        await setDoc(doc(prodCollection, prod.id), prod); // WRONG SDK
+    }
+};
+```
+
+### Canonical Pattern (REQUIRED)
+```typescript
+// ✅ CORRECT — Admin SDK only in scripts
+import * as admin from 'firebase-admin';
+
+if (!admin.apps.length) {
+    admin.initializeApp(); // Uses FIREBASE_CONFIG or applicationDefault()
+}
+
+const db = admin.firestore();
+```
+
+---
+
+## LAW 2: PROJECT ID SOVEREIGNTY
+
+### The Rule
+- NEVER hardcode a Project ID string in `admin.initializeApp()`.
+- Node seed scripts MUST authenticate via **one of these mechanisms in priority order**:
+  1. `GOOGLE_APPLICATION_CREDENTIALS` env var pointing to a service account JSON.
+  2. `FIREBASE_CONFIG` env var (set automatically in Cloud Functions runtime).
+  3. `applicationDefault()` — uses the machine's logged-in `gcloud` account.
+
+### Anti-Pattern (BANNED)
+```typescript
+// ❌ BANNED — hardcoded project ID
+admin.initializeApp({ projectId: 'az-dj-academy-web' });
+```
+
+### Canonical Pattern (REQUIRED)
+```typescript
+// ✅ CORRECT — reads from environment
+if (!admin.apps.length) {
+    admin.initializeApp({ // omit projectId; reads from GOOGLE_APPLICATION_CREDENTIALS or gcloud ADC
+        credential: admin.credential.applicationDefault(),
+    });
+}
+// Add to package.json scripts:
+// "seed": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json npx tsx scripts/seed-products.ts"
+```
+
+---
+
+## LAW 3: ZOD VALIDATION GATE
+
+### The Rule
+- ALL documents written to Firestore via seed scripts MUST be validated through a **Zod schema BEFORE** any `batch.set()` call.
+- Invalid documents MUST throw an error and halt execution — NEVER silently write bad data.
+- The Zod schema MUST be the single source of truth, also imported in the client `src/` types.
+
+### Canonical Pattern (REQUIRED)
+```typescript
+import { z } from 'zod';
+
+const ProductSchema = z.object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    price: z.number().positive(),
+    active: z.boolean(),
+    updatedAt: z.any().optional(), // Firestore Timestamp added at write time
+});
+
+type Product = z.infer<typeof ProductSchema>;
+
+const PRODUCTS: Omit<Product, 'updatedAt'>[] = [
+    { id: 'pkg-single', title: 'One-on-One', price: 89, active: true },
+];
+
+// Validate BEFORE writing
+const validated = PRODUCTS.map((p, i) => {
+    const result = ProductSchema.omit({ updatedAt: true }).safeParse(p);
+    if (!result.success) {
+        throw new Error(`Product[${i}] validation failed: ${result.error.message}`);
+    }
+    return result.data;
+});
+```
+
+---
+
+## LAW 4: IDEMPOTENCY PROTOCOL
+
+### The Rule
+- ALWAYS use `batch.set(ref, data, { merge: true })` — NEVER `batch.set(ref, data)` (clobbers all existing fields).
+- ALWAYS write a version record to `_seedMeta/{collectionName}` upon success.
+- Scripts SHOULD check the `_seedMeta` version before running and skip if version matches (unless `--force` flag).
+- Deprecated/stale document IDs MUST be explicitly `batch.delete()`'d — not ignored.
+
+### Canonical Pattern (REQUIRED)
+```typescript
+const SEED_VERSION = 'v1.3.0'; // Bump this when changing the product catalog
+
+async function run() {
+    // 1. Check version guard (skip if already at this version, unless --force)
+    const isForce = process.argv.includes('--force');
+    const metaRef = db.collection('_seedMeta').doc('products');
+    const metaSnap = await metaRef.get();
+
+    if (!isForce && metaSnap.exists && metaSnap.data()?.version === SEED_VERSION) {
+        console.log(`✅ Firestore already at seed version ${SEED_VERSION}. Pass --force to re-seed.`);
+        process.exit(0);
+    }
+
+    // 2. Chunk batches at 499 ops max (Firestore limit is 500)
+    const CHUNK_SIZE = 499;
+    const chunks = [];
+    for (let i = 0; i < validated.length; i += CHUNK_SIZE) {
+        chunks.push(validated.slice(i, i + CHUNK_SIZE));
+    }
+
+    for (const chunk of chunks) {
+        const batch = db.batch();
+        for (const product of chunk) {
+            const ref = db.collection('products').doc(product.id);
+            batch.set(ref, {
+                ...product,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true }); // merge: true is LAW
+        }
+
+        // 3. Delete deprecated docs in same batch
+        for (const depId of DEPRECATED_IDS) {
+            batch.delete(db.collection('products').doc(depId));
+        }
+
+        await batch.commit();
+    }
+
+    // 4. Write seed meta checkpoint
+    await metaRef.set({ version: SEED_VERSION, seededAt: admin.firestore.FieldValue.serverTimestamp() });
+    console.log(`✅ Seeded ${validated.length} docs. Version checkpoint: ${SEED_VERSION}`);
+}
+```
+
+---
+
+## LAW 5: HTTP SEED ENDPOINT SECURITY
+
+### The Rule
+- Cloud Function seed endpoints (`onRequest`) MUST be protected by a `SEED_SECRET` from GCP Secret Manager.
+- They MUST be removed or disabled (by removing the export) after the initial seeding is confirmed.
+- NEVER leave a seed endpoint permanently deployed — it is a write-access back door.
+
+### Anti-Pattern (BANNED)
+```typescript
+// ❌ BANNED — commented-out auth guard
+export const seedProducts = onRequest({ cors: true }, async (req, res) => {
+    // if (req.query.secret !== "my-secret") { // <--- COMMENTED OUT = ZERO-DAY
+    //     res.status(403).send("Unauthorized");
+    //     return;
+    // }
+    // ... writes to Firestore
+});
+```
+
+### Canonical Pattern (REQUIRED)
+```typescript
+// ✅ CORRECT — secret validated from environment
+import { defineSecret } from 'firebase-functions/params';
+const seedSecret = defineSecret('SEED_SECRET');
+
+export const seedProducts = onRequest({ cors: false, secrets: [seedSecret] }, async (req, res) => {
+    const providedSecret = req.headers['x-seed-secret'];
+    if (!providedSecret || providedSecret !== seedSecret.value()) {
+        res.status(403).json({ error: 'Unauthorized' });
+        return;
+    }
+    // ... safe to proceed
+});
+```
+
+---
+
+## LAW 6: FIREBASE CONNECTION VERIFICATION
+
+### The Rule
+- All apps MUST have a `src/lib/firebase.ts` that performs a **connection health check** on startup in development mode.
+- The health check MUST log a clear warning if `FIREBASE_CONFIG` env vars are missing.
+- Apps MUST NOT silently continue with an un-initialized Firebase instance.
+
+### Canonical Pattern (REQUIRED)
+```typescript
+// src/lib/firebase.ts
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+
+const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    // ...
+};
+
+// ✅ Guard against missing config in development
+if (import.meta.env.DEV) {
+    const requiredKeys = ['VITE_FIREBASE_API_KEY', 'VITE_FIREBASE_AUTH_DOMAIN', 'VITE_FIREBASE_PROJECT_ID'];
+    const missing = requiredKeys.filter(k => !import.meta.env[k]);
+    if (missing.length > 0) {
+        throw new Error(`[Firebase] Missing required env vars: ${missing.join(', ')}. Check .env.local`);
+    }
+}
+
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+
+// ✅ Connect to emulator in development if specified
+if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATOR === 'true') {
+    connectFirestoreEmulator(db, 'localhost', 8080);
+    console.info('[Firebase] Connected to Firestore emulator at localhost:8080');
+}
+```
+
+---
+
+## LAW 7: DV SEED COMMAND
+
+Use `dv seed` to scaffold a validated seed script into any project:
+
+```bash
+dv seed                   # Scaffolds scripts/seed-products.ts from the canonical template
+dv seed --run             # Scaffolds AND executes the seed script immediately
+dv seed --dry-run         # Validates data against Zod schema but does NOT write to Firestore
+dv seed --force           # Bypasses the _seedMeta version guard and re-seeds
+```
+
+---
+
+## LAW 8: STRIPE PRICE SYNC PROTOCOL
+
+### The Rule
+- Firestore is the **server-side source of truth** for pricing. Stripe is the payment executor.
+- Every product with a `stripeProductId` or `stripePriceId` MUST store both the `price` (amount in dollars) and the exact `stripePriceId` in Firestore.
+- Webhooks that update Firestore from Stripe events (`price.updated`, `product.updated`) MUST be idempotent.
+- The seed script MUST cross-validate `stripePriceId` values — if a `stripePriceId` is present in Firestore but not in Stripe, the script MUST log a `[STRIPE DESYNC]` warning and halt.
+- Price amounts in Firestore MUST be stored as **dollars** (e.g., `89` = $89.00), NOT cents. Stripe amounts must be converted: `Math.round(price * 100)`.
+
+### Canonical Pattern (REQUIRED)
+```typescript
+// In your Zod schema — enforce Stripe price ID when present
+const ProductSchema = z.object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    price: z.number().positive(), // In DOLLARS — always
+    active: z.boolean(),
+    // Stripe fields — required when isSubscription is true
+    stripePriceId: z.string().startsWith('price_').optional(),
+    stripeProductId: z.string().startsWith('prod_').optional(),
+    isSubscription: z.boolean().optional(),
+}).refine(
+    data => !data.isSubscription || !!data.stripePriceId,
+    { message: 'Subscription products MUST have a stripePriceId' }
+);
+
+// In the seed runner — Stripe desync check
+async function verifyStripeSync(products: Product[], stripeClient: Stripe) {
+    for (const p of products) {
+        if (!p.stripePriceId) continue;
+        try {
+            await stripeClient.prices.retrieve(p.stripePriceId);
+        } catch {
+            console.error(`[STRIPE DESYNC] ${p.id}: stripePriceId "${p.stripePriceId}" not found in Stripe!`);
+            process.exit(1);
+        }
+    }
+    console.log('✅ Stripe price sync verified.');
+}
+```
+
+---
+
+## LAW 9: CI SEED VERIFICATION GATE
+
+### The Rule
+- EVERY CI pipeline MUST include a `Seed Verification` step as part of the deployment gate.
+- The step verifies that `_seedMeta/products` exists in Firestore and its `version` matches the expected `SEED_VERSION` constant.
+- If verification fails, the CI pipeline MUST fail with a non-zero exit code — the deployment MUST NOT proceed.
+- Use the Firebase Admin SDK with `GOOGLE_APPLICATION_CREDENTIALS` set to a CI service account secret.
+
+### CI Step (REQUIRED — add to `templates/ci-test.yml`)
+```yaml
+- name: Verify Firestore Seed Integrity (Data Sovereignty v8.4.0)
+  env:
+    GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON_PATH }}
+  run: |
+    node -e "
+    const admin = require('firebase-admin');
+    admin.initializeApp({ credential: admin.credential.applicationDefault() });
+    const db = admin.firestore();
+    const EXPECTED_VERSION = require('./scripts/seed-products').SEED_VERSION || 'v1.0.0';
+    db.collection('_seedMeta').doc('products').get().then(snap => {
+      if (!snap.exists) { console.error('[SEED GATE] _seedMeta/products missing!'); process.exit(1); }
+      const v = snap.data()?.version;
+      if (v !== EXPECTED_VERSION) { console.error('[SEED GATE] Version mismatch:', v, '!=', EXPECTED_VERSION); process.exit(1); }
+      console.log('[SEED GATE] ✅ Firestore catalog verified at version', v);
+      process.exit(0);
+    }).catch(e => { console.error(e); process.exit(1); });
+    "
+```
+
+---
+
+## LAW 10: FLEET-WIDE AUDIT — `dv scan-seeds`
+
+### The Rule
+- `dv scan-seeds` MUST be run before any release involving a product catalog change.
+- It scans ALL projects under `~/Developer` for seeding violations and produces a consolidated report.
+- Violations are grouped by severity: 🔴 Critical (blocks deploy), 🟠 High (must fix this sprint), 🟡 Warning (tracked).
+
+```bash
+dv scan-seeds          # Audit all known Infinity Protocol projects for seeding violations
+dv scan-seeds --fix    # Attempt automatic fixes (replaces hardcoded projectId, adds merge:true)
+```
+
+### What `dv scan-seeds` Checks
+| Check | Detection Pattern | Severity |
+|---|---|---|
+| Client SDK in seed scripts | `from 'firebase/firestore'` in `scripts/seed*` | 🔴 Critical |
+| Hardcoded `projectId` in `initializeApp` | `initializeApp({ projectId:` in `scripts/` | 🔴 Critical |
+| Missing `{ merge: true }` in batch.set | `batch.set(` without `merge: true` | 🟠 High |
+| Unguarded HTTP seed endpoints | `onRequest` + `seed` in same file, no `defineSecret` | 🔴 Critical |
+| Sequential `await .set()` in loop | `await db.collection` inside `for (` loops | 🟠 High |
+| No `_seedMeta` version checkpoint | Absence of `_seedMeta` in seed script | 🟡 Warning |
+| Missing Zod import in seed files | No `from 'zod'` in `scripts/seed*` | 🟠 High |
+| Stripe price in cents in Firestore | `price: ` integer > 10000 in product data | 🟡 Warning |
+
+---
+
+## LAW 11: EMULATOR-FIRST LOCAL DEVELOPMENT
+
+### The Rule
+- EVERY project MUST have a `firebase.json` with `emulators` configured for Firestore (port 8080) and Auth (port 9099).
+- The `npm run seed:local` script MUST target the emulator via `FIRESTORE_EMULATOR_HOST=localhost:8080`.
+- NEVER run `npm run seed` (production) locally without explicitly confirming the target project via `gcloud config get-value project`.
+- The `scripts/dv` utility's `dv seed --local` flag routes ALL writes to the emulator.
+
+### Canonical Package.json Scripts (REQUIRED)
+```json
+{
+  "scripts": {
+    "seed": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json npx tsx scripts/seed-products.ts",
+    "seed:local": "FIRESTORE_EMULATOR_HOST=localhost:8080 npx tsx scripts/seed-products.ts",
+    "seed:dry": "npx tsx scripts/seed-products.ts --dry-run",
+    "seed:force": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json npx tsx scripts/seed-products.ts --force",
+    "emulators": "firebase emulators:start --import=./.firebase/emulator-data --export-on-exit",
+    "emulators:seed": "npm run emulators & sleep 4 && npm run seed:local"
+  }
+}
+```
+
+### `firebase.json` Emulator Block (REQUIRED)
+```json
+{
+  "emulators": {
+    "auth": { "port": 9099 },
+    "firestore": { "port": 8080 },
+    "functions": { "port": 5001 },
+    "hosting": { "port": 5000 },
+    "ui": { "enabled": true, "port": 4000 },
+    "singleProjectMode": true
+  }
+}
+```
+
+---
+
+## CRITICAL ANTI-PATTERNS REFERENCE TABLE
+
+| Anti-Pattern | Status | Correct Alternative |
+|---|---|---|
+| `import { db } from '../config/firebase'` in seed script | 🔴 BANNED | `import * as admin from 'firebase-admin'` |
+| `admin.initializeApp({ projectId: 'my-project' })` | 🔴 BANNED | `admin.initializeApp()` with ADC |
+| `batch.set(ref, data)` without `{ merge: true }` | 🔴 BANNED | `batch.set(ref, data, { merge: true })` |
+| Unguarded `onRequest` seed endpoints | 🔴 BANNED | `defineSecret` + `x-seed-secret` header check |
+| `await db.collection().doc().set()` in a `for` loop | 🔴 BANNED | `batch.set()` + chunked `batch.commit()` |
+| Running seed on every deploy with no version check | 🟠 BANNED | `_seedMeta` version guard + `--force` flag |
+| Batches with > 499 operations | 🟠 BANNED | Chunk with `CHUNK_SIZE = 499` |
+| No Zod validation before writes | 🟠 BANNED | Zod `safeParse` gate before any `batch.set` |
+| Subscription product without `stripePriceId` in Firestore | 🔴 BANNED | Zod `.refine()` to enforce `stripePriceId` |
+| Storing Stripe price in **cents** in Firestore | 🟠 BANNED | Always store in **dollars** (`89` = $89.00) |
+| Seeding production DB from local machine without ADC check | 🟠 BANNED | `dv seed --local` → emulator first, always |
+| No CI seed verification step | 🟠 BANNED | `_seedMeta` version check in CI pipeline |
+| No emulator configured in `firebase.json` | 🟡 WARNING | Full emulator suite in `firebase.json` |
+| Missing `connectFirestoreEmulator` in dev | 🟡 WARNING | `VITE_USE_EMULATOR=true` + emulator connection |
+| No rollback snapshot before destructive seed | 🔴 BANNED | `dv seed:rollback` snapshot before `--force` |
+| External JSON/CSV seeded without type coercion | 🟠 BANNED | Transform + Zod coerce before writing |
+
+---
+
+## LAW 12: SEED ROLLBACK & RECOVERY PROTOCOL
+
+### The Rule
+- Before ANY `--force` re-seed that overwrites existing data, a **rollback snapshot** MUST be written to `_seedSnapshots/{collectionName}/{SEED_VERSION}_{timestamp}`.
+- `dv seed:rollback` reads the most recent snapshot and restores it.
+- Snapshot documents MUST use `JSON.parse(JSON.stringify(data))` to strip Firestore-specific types before storing (timestamps become ISO strings).
+- Snapshots older than **30 days** SHOULD be pruned (managed by `dv seed:status --prune`).
+
+### Canonical Pattern (REQUIRED — add to seed runner BEFORE force-writing)
+```typescript
+async function takeRollbackSnapshot(db: admin.firestore.Firestore, collectionName: string, seedVersion: string) {
+    const snapshot: Record<string, unknown>[] = [];
+    const existing = await db.collection(collectionName).get();
+    existing.forEach(doc => snapshot.push({ id: doc.id, ...doc.data() }));
+
+    if (snapshot.length === 0) return; // Nothing to snapshot
+
+    const snapshotId = `${seedVersion}_${Date.now()}`;
+    const snapshotRef = db.collection('_seedSnapshots').doc(collectionName)
+        .collection('versions').doc(snapshotId);
+
+    await snapshotRef.set({
+        snapshotId,
+        collectionName,
+        seedVersion,
+        takenAt: admin.firestore.FieldValue.serverTimestamp(),
+        count: snapshot.length,
+        data: JSON.parse(JSON.stringify(snapshot)), // Strip Firestore types
+    });
+
+    console.log(`📸 Rollback snapshot saved: _seedSnapshots/${collectionName}/versions/${snapshotId}`);
+}
+```
+
+### CLI Commands
+```bash
+dv seed:rollback                   # Restore most recent snapshot for products collection
+dv seed:rollback --collection=cms  # Restore snapshot for a specific collection
+dv seed:status                     # List _seedMeta versions across all active collections
+dv seed:status --prune             # Delete snapshots older than 30 days
+```
+
+---
+
+## LAW 13: EXTERNAL DATA SOURCE SEEDING
+
+### The Rule
+- When seeding from **external sources** (JSON files, CSV exports, CMS APIs, SAGE catalogs), the raw data MUST NEVER be written directly to Firestore.
+- A **transform function** MUST convert the raw shape to the canonical Firestore schema BEFORE Zod validation.
+- Type coercion (`z.coerce.number()`, `z.coerce.boolean()`) MUST be used for fields that may be strings in the raw source.
+- External images/asset URLs MUST be validated as reachable (in dry-run mode) or stored as-is with a `pendingValidation: true` flag.
+- Large external datasets (N > 500) MUST use Firestore `BulkWriter` with `.onWriteError()` handler instead of raw batch.
+
+### Canonical Pattern — External Source → Firestore
+```typescript
+// §1: Raw external schema (what comes from the JSON/API)
+const RawSageItemSchema = z.object({
+    itemNum: z.string(),
+    name: z.string(),
+    prices: z.array(z.coerce.number()).optional().default([]), // coerce: '0.15' → 0.15
+    quantities: z.array(z.coerce.number()).optional().default([]),
+    cat1Name: z.string().optional().default(''),
+});
+
+// §2: Canonical Firestore schema (what gets written)
+const FirestoreProductSchema = z.object({
+    id: z.string(), // sage_{itemNum}
+    title: z.string(),
+    categoryId: z.enum(['printed', 'decorator', 'fulfillment', 'office', 'signs']),
+    price: z.number().nonnegative(),
+    isActive: z.boolean(),
+});
+
+// §3: Transform function — raw → canonical (REQUIRED separation of concerns)
+function transform(raw: z.infer<typeof RawSageItemSchema>): z.infer<typeof FirestoreProductSchema> {
+    return {
+        id: `sage_${raw.itemNum}`,
+        title: raw.name,
+        categoryId: resolveCategory(raw),
+        price: raw.prices[0] ?? 0,
+        isActive: true,
+    };
+}
+
+// §4: For large datasets — use BulkWriter instead of batch
+async function bulkWrite(db: admin.firestore.Firestore, products: z.infer<typeof FirestoreProductSchema>[]) {
+    const writer = db.bulkWriter();
+    writer.onWriteError(error => {
+        if (error.failedAttempts < 3) { return true; } // Retry up to 3x
+        console.error(`[BULK WRITE ERROR] ${error.documentRef.path}: ${error.message}`);
+        return false; // Give up after 3 attempts
+    });
+
+    for (const p of products) {
+        const ref = db.collection('products').doc(p.id);
+        writer.set(ref, { ...p, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    }
+
+    await writer.close();
+    console.log(`✅ BulkWriter complete — ${products.length} documents written.`);
+}
+```
+
+---
+
+## LAW 14: FIRESTORE SECURITY RULES SOVEREIGNTY
+
+### The Problem — Rules Drift Kills Production Security
+The **deployed** Firestore rules (in the Firebase console/MCP) WILL diverge from the **local** `firestore.rules` file over time. Developers hotfix rules directly in the Firebase console. The local file falls behind. When anyone then runs `firebase deploy --only firestore:rules`, they **silently downgrade production security** to match whatever is in the weaker local file.
+
+**This is the most dangerous form of configuration drift.** It is invisible, immediate, and irreversible without a recovery plan.
+
+### The Rules — Mandatory Pre-Deploy Protocol
+1. **`dv rules:lock`** writes `.firestore-rules.lock` containing the SHA-256 hash of the current local `firestore.rules`. This file MUST be committed to version control immediately after any rules change.
+2. **`dv rules:status`** computes the local rules hash and compares it to `.firestore-rules.lock`. It also scans for critical security defects. Run this before EVERY deploy.
+3. If the local rules hash does NOT match the lock file, the deploy MUST be blocked until manually reviewed and re-locked.
+4. **`dv rules:pull`** fetches the deployed rules via Firebase CLI and overwrites local — use to re-sync when behind the deployed version.
+5. **`dv rules:validate`** runs a local static analysis scan for security defects without hitting Firebase.
+6. **The production console rules = source of truth**. Never let a stale local file overwrite them.
+
+### Required Security Standards — Every `firestore.rules` MUST Include
+
+| Security Requirement | Pattern | Severity if Missing |
+|---|---|---|
+| Catch-all deny | `match /{document=**} { allow read, write: if false; }` | 🔴 Critical |
+| Multi-factor `isAdmin()` | Checks custom claim AND role doc | 🔴 Critical |
+| `_seedMeta` admin-only | `allow read, write: if isAdmin()` | 🔴 Critical |
+| No open `allow read, write: if true` | Any collection | 🔴 Critical |
+| Role escalation protection on `/users` | `.diff().affectedKeys().hasAny(['role'])` | 🔴 Critical |
+| `products` admin-write-only | `allow write: if isAdmin()` | 🟠 High |
+| Audit logs write-locked | `allow write: if false` (server-generated) | 🟠 High |
+
+### CLI Commands
+```bash
+dv rules:status            # Compare local vs lock + security scan
+dv rules:lock              # Write SHA-256 of current firestore.rules to .firestore-rules.lock
+dv rules:pull              # Fetch deployed rules → overwrite local (SAFE: gets the better rules)
+dv rules:validate          # Static security scan: catch-all, isAdmin, open collections
+dv rules:validate --strict # Treats all HIGH findings as CRITICAL (CI mode)
+```
+
+### Canonical Hardened `firestore.rules` (Use as Minimum Baseline)
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── HELPER FUNCTIONS ────────────────────────────────
+    function isAuthenticated() { return request.auth != null; }
+    function isOwner(userId) { return request.auth.uid == userId; }
+
+    // Multi-factor admin: custom claim OR role doc (NEVER single-point)
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        request.auth.token.role == 'admin' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    // ── DATA SOVEREIGNTY (admin-only, system-generated) ─
+    match /_seedMeta/{docId}             { allow read: if isAdmin(); allow write: if false; }
+    match /_seedSnapshots/{p=**}          { allow read, write: if false; }
+
+    // ── PRODUCTS (public read, admin write) ─────────────
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── ORDERS (immutable ledger) ────────────────────────
+    match /orders/{orderId} {
+      allow get: if true;
+      allow list: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // ── USERS (no role escalation) ───────────────────────
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(userId) &&
+        (request.resource.data.role == 'user' || !('role' in request.resource.data));
+      allow update: if isAuthenticated() &&
+        ((isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // ── CARTS (owner-only) ───────────────────────────────
+    match /carts/{cartId} {
+      allow read:           if isAdmin() || (isAuthenticated() && request.auth.uid == cartId);
+      allow create, update: if isAuthenticated() && request.auth.uid == cartId;
+      allow delete:         if isAdmin() || (isAuthenticated() && request.auth.uid == cartId);
+    }
+
+    // ── PUBLIC SUBMISSIONS (write-once) ──────────────────
+    match /contacts/{id}    { allow create: if true; allow read, update, delete: if isAdmin(); }
+    match /leads/{id}       { allow create: if true; allow read, delete: if isAdmin(); }
+    match /subscribers/{id} { allow create: if true; allow read, update, delete: if isAdmin(); }
+
+    // ── CONTENT (public read, admin write) ───────────────
+    match /content/{id}    { allow read: if true; allow write: if isAdmin(); }
+    match /blog_posts/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    // ── AUDIT LOGS (read admin, write system-only) ───────
+    match /audit_logs/{id} { allow read: if isAdmin(); allow write: if false; }
+
+    // ── ADMIN-ONLY COLLECTIONS ───────────────────────────
+    match /subscriptions/{id} { allow read, write: if isAdmin(); }
+    match /integrations/{id}  { allow read, write: if isAdmin(); }
+
+    // ── CATCH-ALL DENY ── REQUIRED — NEVER REMOVE ────────
+    // New collections are LOCKED until explicitly allowed above.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
+```
+
+### CI Integration — Rules Lock Check (Add to `templates/ci-test.yml`)
+```yaml
+- name: Verify Firestore Rules Lock (Law 14 — Data Sovereignty v8.4.0)
+  run: |
+    if [ ! -f ".firestore-rules.lock" ]; then
+      echo "[RULES LOCK] ERROR: .firestore-rules.lock is missing!"
+      echo "Run: dv rules:lock — to generate it, then commit the lock file."
+      exit 1
+    fi
+    LOCAL_SHA=$(shasum -a 256 firestore.rules | awk '{print $1}')
+    LOCK_SHA=$(cat .firestore-rules.lock)
+    if [ "$LOCAL_SHA" != "$LOCK_SHA" ]; then
+      echo "[RULES DRIFT] firestore.rules changed since last lock!"
+      echo "  Lock SHA:  $LOCK_SHA"
+      echo "  Local SHA: $LOCAL_SHA"
+      echo "Run 'dv rules:status' to review. If safe, run 'dv rules:lock' and commit."
+      exit 1
+    fi
+    echo "[RULES LOCK] ✅ Verified. Rules match lock file."
+```
+
+
+---
+
+## LAW 15: FIRESTORE INDEX SOVEREIGNTY (Non-Negotiable)
+
+**The Sin: The Empty Index Array**
+A `firestore.indexes.json` file with `"indexes": []` silently degrades dashboard queries to full-collection scans, throws console errors with confusing Firebase index URLs, and causes `orderBy` + `where` combinations to fail entirely at runtime. The error is never obvious — it looks like a component bug, not an infrastructure gap.
+
+**The Root Cause:** New projects are created with a blank `firestore.indexes.json` from `firebase init`. No protocol enforced adding indexes. Queries like `orders.where('userId', '==', uid).orderBy('createdAt', 'desc')` require a **composite index** — Firestore cannot serve them with auto-indexing alone.
+
+**The Required Composite Indexes (Minimum Viable — Every Project)**
+
+```json
+[
+  { "collectionGroup": "orders",    "fields": [{"fieldPath":"userId","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"}] },
+  { "collectionGroup": "orders",    "fields": [{"fieldPath":"status","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"}] },
+  { "collectionGroup": "users",     "fields": [{"fieldPath":"role","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"}] },
+  { "collectionGroup": "products",  "fields": [{"fieldPath":"category","order":"ASCENDING"},{"fieldPath":"price","order":"ASCENDING"}] },
+  { "collectionGroup": "_seedMeta", "fields": [{"fieldPath":"collection","order":"ASCENDING"},{"fieldPath":"seededAt","order":"DESCENDING"}] }
+]
+```
+
+### The Protocol
+
+**Every new project MUST run once at creation:**
+```bash
+dv init:project <ProjectName>
+```
+This scaffolds in a single command:
+1. `firestore.rules` — hardened Law 14 template (catch-all deny, multi-factor isAdmin, _seedMeta protected)
+2. `.firestore-rules.lock` — SHA-256 committed immediately
+3. `firestore.indexes.json` — 12 canonical composite indexes (orders, users, products, leads, carts, subscriptions, newsletter, _seedMeta)
+4. `scripts/seed.ts` — canonical seed script template
+
+**Ongoing Maintenance:**
+```bash
+dv indexes:validate          # Fleet-wide: 0 Critical required before any deploy
+dv indexes:sync              # Merge new canonical indexes into ALL projects (non-destructive)
+dv indexes:sync --project=X  # Single project
+```
+
+**When you add a new collection with orderBy/where queries — STOP. Add the index first:**
+1. Add to `firestore.indexes.json`
+2. Run `firebase deploy --only firestore:indexes`
+3. Wait for index to build (status: READY) before deploying the query code
+
+### CI Gate (add to `ci-test.yml`)
+
+```yaml
+- name: Firestore Index Sovereignty Check
+  run: dv indexes:validate
+  # Blocks deploy if any project is missing required composite indexes
+```
+
+### Law 15 Checklist
+
+| Check | Command | Blocks Deploy |
+|-------|---------|--------------|
+| No empty indexes.json | `dv indexes:validate` | ✅ |
+| All 12 core indexes present | `dv indexes:validate` | ✅ |
+| orders userId+createdAt composite | `dv indexes:validate` | ✅ |
+| New project scaffold | `dv init:project <name>` | N/A (setup) |
+| Merge canonical to existing | `dv indexes:sync` | N/A (maintenance) |
+
+**NEVER deploy new `where(...).orderBy(...)` query code without a matching index in `firestore.indexes.json`.**
+```
