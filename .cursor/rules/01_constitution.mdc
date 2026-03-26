@@ -18,12 +18,12 @@ alwaysApply: true
 ## 2. HARDENED DIRECTIVES
 - **Aesthetics**: Liquid Glass architecture ONLY (`blur`, `perspective-1000`). NEVER use `zinc`/`slate` defaults.
 - **Autonomous Ops**: Self-Heal proactively (Research -> Hypothesis -> Fix).
-- **Poison Check**: NEVER output legacy nomenclature: [CareKey, SARAH, Vast].
+- **Poison Check**: NEVER output legacy nomenclature: [[REDACTED], SARAH, Vast].
 - **Pre-Commit**: Always run `/audit` before executing `git commit`. 
 - **Redactive Logging**: Use `[REDACTED]` for secrets in terminal output. NEVER leak keys.
 
 ## 3. MASTERCLASS ENGINEERING (INFINITY v8.4.0)
-- **Intelligence v5.0 (Deep Architectural Analysis)**: PFIA reports must include long-term system impact and security surface area changes.
+- **Intelligence v8.4.0 (Deep Architectural Analysis)**: PFIA reports must include long-term system impact and security surface area changes.
 - **Predictive Safeguards (PS)**: Proactive security/performance auditing of all touched code.
 - **Logical Traversal**: Mandatory side-effect analysis before execution.
 - **Error Path Analysis (EPA)**: Design for failure explicitly (timeouts, nulls, retries) before success paths. Architect for failure by default.

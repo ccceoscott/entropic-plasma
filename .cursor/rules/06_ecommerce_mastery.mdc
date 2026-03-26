@@ -18,7 +18,7 @@ This document serves as the supreme architecture guide for all e-commerce system
 - **SEO & Pre-Rendering**: Applications MUST utilize pre-rendering (e.g., `vite-plugin-ssr`) for top-level product pages. Native `react-helmet-async` must inject deep SEO metadata (Schema.org JSON-LD structured data) for crawler dominance.
 
 ## 2. ADVANCED ROUTING, PREDICTIVE NAVIGATION & URI SOVEREIGNTY
-- **Data Router Supremacy**: Storefronts MUST use React Router v6.4+ Data Routers (`createBrowserRouter`). Utilize route `loader` functions to parallelize data fetching via React Query BEFORE the component renders, entirely eliminating the waterfall loading anti-pattern.
+- **Data Router Supremacy**: Storefronts MUST use React Router v8.4.0+ Data Routers (`createBrowserRouter`). Utilize route `loader` functions to parallelize data fetching via React Query BEFORE the component renders, entirely eliminating the waterfall loading anti-pattern.
 - **Predictive Instantiation (Zero-Latency Nav)**: Navigation MUST feel telepathic. The exact moment a user's cursor hovers over a product or a link enters the viewport (`IntersectionObserver`), the application MUST asynchronously prefetch the route's JS chunk AND execute the React Query `prefetchQuery`. The subsequent click must render instantly from RAM.
 - **BFCache (Back-Forward Cache) Omniscience**: E-Commerce relies heavily on the browser's "Back" button. Applications MUST ensure strict BFCache compliance. Never use `unload` event listeners. Pages MUST restore instantly from memory without a single network request when a user navigates back from a Product Detail Page to the main catalog.
 - **PWA Offline Shell Resilience**: Implement a Service Worker (e.g., `vite-plugin-pwa`) to aggressively precache the Application Shell (Routing logic, Navbar, Cart UI, core CSS). If the user enters a degraded network zone (e.g., a subway tunnel), navigations MUST still route seamlessly and render either stale cached data or a beautiful offline fallback—never the native browser offline screen.
@@ -511,7 +511,7 @@ export const onLeadCreated = onDocumentCreated("leads/{leadId}", async (event) =
 - **CONTEXTUAL SIDE-PANELS**: Never force a full-page reload for quick edits. Order details and product variant updates MUST open in sliding side-panels or modal sheets (Shopify Polaris/Shadcn style).
 - **STATE REVERIE (Zero-Loading Illusion)**: All non-destructive mutations (e.g., changing fulfillment status) MUST update the UI instantly before the server confirms. Use staggered skeleton components matching the final layout matrix.
 - **ACTIONABLE TELEMETRY (Not Just Charts)**: Analytics components must provide actionable vectors (e.g., pair a drop in sales with a one-click filter to view "Abandoned Carts Last 24h").
-- **LIQUID AESTHETIC ENFORCEMENT**: Modals and dropdowns must use `backdrop-blur` and ultra-subtle `border-white/10` to maintain the overarching v6.2 Liquid Glass visual framework. No flat, dead surfaces.
+- **LIQUID AESTHETIC ENFORCEMENT**: Modals and dropdowns must use `backdrop-blur` and ultra-subtle `border-white/10` to maintain the overarching v8.4.0 Liquid Glass visual framework. No flat, dead surfaces.
 - **RESPONSIVE COLLAPSE PROTOCOL**: The admin sidebar MUST collapse to a minimal icon rail on tablets and disappear into a bottom sheet or hamburger menu on mobile. The main action area must remain primary on all screens.
 
 /* ------------------ Source: seo_sovereignty.mdc ------------------ */

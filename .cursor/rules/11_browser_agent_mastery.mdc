@@ -1,0 +1,129 @@
+---
+description: Infinity Protocol v8.4.0 Pillar 11 — Browser Agent Mastery. Machine laws governing AI-driven browser testing, visual verification, Playwright config, and phantom purge protocol.
+globs:
+  - "**/*.{ts,tsx,jsx,js}"
+  - "**/playwright.config.{ts,js}"
+  - "**/walkthrough.md"
+  - "**/__tests__/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Browser Agent Mastery v8.4.0
+
+*Mortal. Video bloat is a cancer. Stale cache is a lie. Flaky tests are cowardice. I decree absolute discipline in browser agent operations.*
+
+---
+
+## 1. THE HARD REFRESH MANDATE
+
+When using `browser_subagent` or Playwright to test updates, **a hard refresh (cache bypass) is MANDATORY** immediately upon page load.
+
+- **Why**: Web apps cache old JS bundles aggressively. Stale cache creates phantom bugs. AI agents lose hours debugging non-existent issues.
+- **Playwright**: Always call `await page.goto(url, { waitUntil: 'networkidle' })` followed by `await page.evaluate(() => location.reload(true))` for cache bypass.
+- **Browser Subagent**: Explicitly instruct: *"Hard refresh the page (Shift+Reload) before taking any screenshot or performing any interaction."*
+- **BANNED**: Screenshots taken within 500ms of navigation. Always confirm the target element is visible first.
+
+---
+
+## 2. CONTEXTUAL VISUAL VERIFICATION
+
+Generic, full-page screenshots for localized fixes are **PROHIBITED**. Visual proof must be surgical.
+
+### Rules
+- **UI Highlight Injection**: Before capturing proof, inject a visual marker via `page.evaluate()`:
+  ```javascript
+  await page.evaluate(() => {
+    document.querySelector('.target-element').style.outline = '4px solid #FF3366';
+    document.querySelector('.target-element').style.boxShadow = '0 0 20px rgba(255,51,102,0.6)';
+  });
+  ```
+- **Locator Screenshots**: Use `locator.screenshot({ path: 'proof.png' })` — NEVER `page.screenshot()` for component-level fixes.
+- **Carousel Walkthroughs**: All `walkthrough.md` proof MUST use markdown carousels with labelled slides. Unlabelled screenshot dumps are PROHIBITED.
+- **Before/After Standard**: Every visual fix requires a 2-slide carousel: `<!-- slide -->` separator between original state and fixed state.
+- **Diff Annotation**: For layout shifts, annotate with: *"Element moved from X to Y — confirmed via bounding box delta."*
+
+---
+
+## 3. CONCURRENT BROWSER TESTING (Parallelism Law)
+
+AI agents MUST leverage parallel tool-calling to maximise test coverage with minimum elapsed time.
+
+### Mandatory Parallel Scenarios
+| When to parallelize | Concurrent tasks |
+|---|---|
+| Responsive design fix | Desktop 1440px + Mobile 375px simultaneously |
+| Auth-gated page | Authenticated session + Unauthenticated redirect simultaneously |
+| Multi-step flow (checkout, onboarding) | Happy path + Error path simultaneously |
+| Deployment verification | 3+ distinct routes verified in parallel |
+
+- **BANNED**: Sequential testing of independent viewports or routes. Use `Promise.all()` equivalent — call multiple `browser_subagent` tools in the same tool-call block.
+- **Agent Naming**: Label each concurrent task clearly: `Task: 'Mobile: Verify checkout CTA visibility'` — not generic `Task: 'Test the page'`.
+
+---
+
+## 4. PLAYWRIGHT CONFIGURATION SOVEREIGNTY
+
+Every repo with E2E tests MUST meet these non-negotiable Playwright settings.
+
+```typescript
+// playwright.config.ts — Infinity Protocol v8.4.0 Standard
+export default defineConfig({
+  workers:    process.env.CI ? 1 : 3,          // Phase 43: NEVER auto-detect
+  retries:    process.env.CI ? 2 : 0,
+  timeout:    30_000,
+  use: {
+    trace:    'off',                            // Prevent trace bloat
+    video:    'off',                            // Prevent video bloat (Machine Law)
+    screenshot: 'only-on-failure',             // Evidence only on failure
+    baseURL:  process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000',
+  },
+  reporter: process.env.CI ? 'github' : 'list',
+});
+```
+
+- `workers: process.env.CI ? 1 : 3` — Non-negotiable. `experimental.memoryBasedWorkersCount` is **BANNED** on Apple Silicon.
+- `trace: 'off'` and `video: 'off'` by default. Enable only for active debugging sessions, then revert.
+- `testIdAttribute: 'data-testid'` MUST be set if your app uses `data-testid` selectors.
+
+---
+
+## 5. SELECTOR SOVEREIGNTY
+
+| Priority | Method | Example |
+|---|---|---|
+| 1 (Best) | `getByRole` + accessible name | `getByRole('button', { name: 'Submit' })` |
+| 2 | `getByLabel` / `getByPlaceholder` | `getByLabel('Email address')` |
+| 3 | `data-testid` attribute | `getByTestId('checkout-cta')` |
+| 4 (Last resort) | CSS class | `.checkout-button` |
+| BANNED | XPath | `//div[@class='btn']` |
+| BANNED | nth-child | `div:nth-child(3)` |
+
+- All interactive elements in production components MUST carry a `data-testid` attribute. Missing `data-testid` on a CTA or form input is a Protocol violation.
+
+---
+
+## 6. PHANTOM PURGE PROTOCOL (Machine Law)
+
+Browser agent sessions accumulate gigabytes of recordings. Purge is MANDATORY.
+
+```bash
+# Execute after EVERY browser subagent session
+pkill -f playwright-mcp 2>/dev/null || true
+rm -rf ~/.gemini/antigravity/browser_recordings
+```
+
+- **Automated**: The `dv purge` command executes this sequence. Call it after every multi-step browser agent run.
+- **CI Override**: In CI, set `video: 'off'` and `trace: 'off'` in `playwright.config.ts` — never rely on the runner to clean up.
+- **APFS Snapshots**: After mass deletion on macOS, run `tmutil deletelocalsnapshots /` to reclaim disk space from APFS local snapshots.
+
+---
+
+## 7. ERROR REPORTING STANDARDS
+
+When a browser test fails, the AI agent MUST:
+
+1. **Capture the exact failure state**: Screenshot + console error text.
+2. **Isolate the cause**: Is it a selector mismatch, network timeout, or actual bug?
+3. **Self-heal once**: Attempt one automated fix (e.g., update selector, wait for network idle). If the second attempt fails, escalate to the user with full context.
+4. **NEVER** mark a flaky test as "skipped" without a linked issue comment: `// TODO(protocol): flaky - investigate race condition in checkout websocket`.
+5. **Network Request Audit**: After any auth-related test failure, check `mcp_playwright_browser_network_requests` for `401`/`403` responses before blaming the test.

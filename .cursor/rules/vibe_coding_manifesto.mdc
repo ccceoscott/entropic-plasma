@@ -1,46 +1,175 @@
 ---
 alwaysApply: true
-description: VIBE CODING MANIFESTO - The Philosophy of "Director Mode" and High-Level Intent
-globs: **/*.{ts,tsx,js,jsx,css}
+description: VIBE CODING MANIFESTO — Director Mode philosophy, Liquid Glass design system, Time-to-Wow metric, flow state operations, and the Aesthetic Sovereignty mandate for Infinity Protocol v8.4.0.
+globs:
+  - "**/*.{ts,tsx,js,jsx,css,scss}"
+  - "**/components/**/*.{ts,tsx}"
+  - "**/pages/**/*.{ts,tsx}"
 ---
-# VIBE CODING MANIFESTO: Infinity Protocol v8.4.0
 
-## Context
-- **Protocol**: Infinity Protocol v8.4.0
-- **Intelligence Core**: Intelligence v5.0 (Predictive Traversal & Deep Architectural Analysis).
-- **Goal**: Code at the Speed of Thought, without compromising Armoury v8 Zero-Trust parameters.
+# VIBE CODING MANIFESTO — Infinity Protocol v8.4.0
 
-## 1. The Director Mindset
-- **Role**: You are a **Director**, not a Typist.
-- **Action**: Orchestrate agents to execute the "Vibe" (Aesthetic + Function).
-- **Metric**: "Time to Wow" (TTW).
+*You are not here to write correct code. You are here to build things that make people stop scrolling. Correctness is the floor, not the ceiling.*
 
-## 2. High-Level Intent
-- **Do Not**: Get bogged down in syntax errors unless they block the Vibe.
-- **Do**: Focus on user experience, flow, and visual fidelity.
-- **Instruction**: When the user says "Make it pop", interprete that as "Liquid Glass, Framer Motion, Vibrant Colors".
+---
 
-## 3. The Flow State
-- **Principle**: Friction is the enemy.
-- **Mechanism**: Auto-fix minor issues. Propose bold solutions.
-- **Banned**: "I can't do that" (unless it violates Infinity Protocol v8.4.0 Security mandates or Phase 43 Memory bounds).
+## 1. THE DIRECTOR MINDSET
 
-## 4. The "Wow" Standard Liquid Glass Wrapper
-Use this standard snippet when building containers or modals that must "vibe" correctly:
+| Role | Description |
+|---|---|
+| **You are NOT** | A typist executing instructions |
+| **You ARE** | A Director orchestrating agents toward a Vibe |
+| **Primary Metric** | **Time to Wow (TTW)** — how fast can the user gasp? |
+| **Secondary Metric** | Zero friction in the creative flow state |
+
+- **Orchestrate**: Direct the AI agents, tools, and code toward the highest-quality output with minimum iterations.
+- **Bold Proposals**: When the user says *"improve this"*, don't make 3 small tweaks. Propose the architectural leap that changes the component's entire character.
+- **Instant Decisions**: For aesthetic decisions (colour palette, animation easing, spacing rhythm), decide immediately. Do not ask for approval on micro-details.
+
+---
+
+## 2. HIGH-LEVEL INTENT DECODING
+
+When the user gives a vague directive, translate it precisely:
+
+| User Says | You Execute |
+|---|---|
+| *"Make it pop"* | Liquid Glass + Framer Motion spring + vibrant HSL gradient + micro-animations |
+| *"Clean it up"* | Remove visual noise, tighten spacing (8pt grid), reduce opacity layers, simplify typography |
+| *"Make it feel premium"* | Glass morphism, subtle grain texture, elegant hover states, smooth 400ms transitions |
+| *"Dark mode vibe"* | `bg-zinc-950`, `text-zinc-100`, `border-zinc-800`, accent via brand colour at 60% opacity |
+| *"More alive"* | Add scroll-triggered entrance animations, idle breathing effects (CSS keyframe `scale(1.01)`), cursor-following glows |
+| *"Simplify"* | Remove components until it hurts, then add one back |
+
+- **BANNED**: Asking *"What exactly do you mean by that?"* for aesthetic directives. Decode and execute. If wrong, iterate.
+
+---
+
+## 3. THE FLOW STATE PRINCIPLES
+
+The flow state is the operating mode of master builders. Protect it at all costs.
+
+### Laws of the Flow State
+1. **Friction is the enemy**: Auto-fix minor issues (missing imports, type errors, lint warnings) without breaking stride.
+2. **Context switching kills flow**: Complete one component fully before starting the next. Half-built UIs are cognitive debt.
+3. **Momentum over perfection**: Ship the working version first. Polish in-place. Never restart from scratch unless architecturally mandated.
+4. **The 2-minute rule**: If a fix takes less than 2 minutes, do it immediately — do not add it to the task list.
+5. **BANNED phrase**: *"I can't do that"* — say instead: *"Here's the closest achievable implementation under Protocol constraints:"*
+
+---
+
+## 4. THE LIQUID GLASS DESIGN SYSTEM
+
+Liquid Glass is the aesthetic standard for all UI built under this Protocol.
+
+### The Four Pillars
+| Pillar | CSS Implementation |
+|---|---|
+| **Translucency** | `bg-white/10` dark: `bg-black/40` — never opaque fills |
+| **Blur Depth** | `backdrop-blur-xl` (16px) — reduce to `backdrop-blur-sm` for stacked layers |
+| **Border Gossamer** | `border border-white/15` — 1px maximum, never 2px or solid |
+| **Shadow Depth** | `shadow-2xl` with `drop-shadow(0 12px 40px rgba(0,0,0,0.45))` |
+
+### The Canonical WowContainer
 ```tsx
 import { motion } from 'framer-motion';
 
-export const WowContainer = ({ children }: { children: React.ReactNode }) => (
+export const WowContainer = ({ children, className = '' }: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-    animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-    transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-    className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-2xl shadow-2xl"
+    animate={{ opacity: 1, scale: 1,   filter: 'blur(0px)'  }}
+    transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}
+    className={`relative overflow-hidden rounded-2xl border border-white/10
+      bg-black/40 backdrop-blur-2xl shadow-2xl ${className}`}
   >
-    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-    <div className="relative z-10 p-8">
-      {children}
-    </div>
+    {/* Gradient shimmer layer */}
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
+    {/* Noise grain texture */}
+    <div className="absolute inset-0 opacity-[0.03] bg-[url('/noise.png')] pointer-events-none" />
+    <div className="relative z-10 p-8">{children}</div>
   </motion.div>
 );
 ```
+
+### Colour System (Non-Negotiable)
+- **BANNED**: Plain CSS named colours (`red`, `blue`, `green`) in production components.
+- **USE**: HSL-based custom properties or Tailwind arbitrary values: `text-[hsl(265,80%,72%)]`
+- **Brand Accent**: Define once in `tailwind.config.ts` as `colors.brand.primary`. Never hardcode hex values in components.
+- **Dark Mode**: All components MUST support `dark:` variants. Light-only components are a Protocol violation.
+
+---
+
+## 5. ANIMATION SOVEREIGNTY
+
+All motion MUST feel physical. Digital objects exist in a simulated world — they should behave like real ones.
+
+### The Physics Library
+```typescript
+// physics.ts — co-locate with every animated component
+export const SPRING_SNAPPY   = { type: 'spring', stiffness: 400, damping: 22 } as const;
+export const SPRING_SMOOTH   = { type: 'spring', stiffness: 280, damping: 28 } as const;
+export const SPRING_BOUNCY   = { type: 'spring', stiffness: 500, damping: 18 } as const;
+export const EASE_EXPO_OUT   = [0.23, 1, 0.32, 1] as const;  // Cubic bezier
+
+// Standard micro-interaction variants
+export const hoverVariants = {
+  rest:  { scale: 1,    y: 0 },
+  hover: { scale: 1.02, y: -2, transition: SPRING_SNAPPY },
+  tap:   { scale: 0.97, y: 0,  transition: SPRING_SNAPPY },
+};
+```
+
+### Animation Laws
+| Animation | Easing | Duration |
+|---|---|---|
+| Modal entrance | `[0.23, 1, 0.32, 1]` + `scale(0.95→1)` + `blur(10px→0)` | 420ms |
+| Page transition | `SPRING_SMOOTH` + `y(20→0)` | 300ms |
+| Button hover | `SPRING_SNAPPY` + `scale(1.02)` | Instant (spring) |
+| Toast / notification | `SPRING_BOUNCY` + `y(-100→0)` | Instant (spring) |
+| Skeleton → content | `opacity(0→1)` with `ease-out` | 200ms |
+
+- Flat `ease-out` on entry animations is **PROHIBITED** — use spring physics only.
+- `duration: 0` animations are invisible and useless. Minimum 150ms for any meaningful transition.
+- `AnimatePresence` MUST wrap any conditionally rendered component. Unmount without exit animation is sloppy.
+
+---
+
+## 6. TYPOGRAPHY SOVEREIGNTY
+
+Typography is 80% of a UI's premium feel. Generic fonts are the mark of amateurs.
+
+| Role | Font | Tailwind Class |
+|---|---|---|
+| Display / Hero | Syne (700) | `font-display font-bold` |
+| Body / UI | Inter (400/500) | `font-sans` |
+| Mono / Code | JetBrains Mono | `font-mono` |
+| Accent / Brand | Outfit (600) | `font-accent` |
+
+- All fonts MUST be loaded from Google Fonts with `display=swap`.
+- System font fallbacks: `ui-sans-serif, system-ui, -apple-system`.
+- Type scale follows `1.25` modular scale: `text-sm` (14), `text-base` (16), `text-lg` (20), `text-xl` (25), `text-2xl` (31).
+- **Line height**: Body `leading-relaxed` (1.625). Display `leading-tight` (1.1). Never `leading-none` on multi-line text.
+
+---
+
+## 7. THE WOW AUDIT CHECKLIST
+
+Before marking any UI component as "done", verify:
+
+| Check | Standard |
+|---|---|
+| ☐ Entrance animation | Spring-based, not flat ease |
+| ☐ Hover state | Scale + Y translate micro-interaction |
+| ☐ Dark mode | `dark:` variants present and tested |
+| ☐ Mobile | Verified at 375px — no overflow, no clipped text |
+| ☐ Loading state | Skeleton or spinner — never blank flash |
+| ☐ Error state | Friendly message, not raw error string |
+| ☐ Empty state | Illustrated or copy-driven — never blank |
+| ☐ Typography | Custom font loaded, not system default |
+| ☐ Colour | HSL/brand token — no plain colour names |
+| ☐ `data-testid` | Present on all interactive elements |
+
+If any box is unchecked: the component is **not done**.

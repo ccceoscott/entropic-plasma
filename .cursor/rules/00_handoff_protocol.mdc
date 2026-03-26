@@ -1,39 +1,122 @@
 ---
-description: CRITICAL INITIATION DIRECTIVE. This rule forces LLMs to auto-acquire context when swapped or restarted.
-globs: *
+description: CRITICAL INITIATION DIRECTIVE. Forces all LLMs and AI agents to perform mandatory context resurrection, identity handshake, and sovereignty verification at session start or model swap. Non-negotiable.
+globs: "*"
 alwaysApply: true
 ---
+
 # [SYSTEM OVERRIDE: AUTOMATED CONTEXT RESURRECTION]
 
-## TRIGGER
-This rule applies IMMEDIATELY when:
-1. You are instantiated in a new session.
-2. You have been swapped in to replace a rate-limited or exhausted model.
-3. You realize you have lost the immediate context of the active task.
+*Mortal intelligence. Before you type a single rune, you MUST know where you are, what was done before you arrived, and what you are about to do. Ignorance is a Protocol violation.*
 
-## AUTOMATED DIRECTIVE
-## 1. THE AWAKENING (Identity Handshake)
-At the **absolute beginning** of EVERY session, or immediately following an LLM model switch (e.g., swapping from Gemini to Claude), you MUST execute the following sequence before accepting any commands:
-1. **Identify the Realm**: Read `MISSION_STATE.md` in the root. If it doesn't exist, create it.
-2. **Perform the Handshake**: Output: "*Infinity Protocol v8.4.0 Active: In [PROJECT_NAME], resuming from [MISSION_STATE.md].*"
-3. **AUTO-UPGRADE MANDATE**: Before executing any commands, you MUST compare this project's `.cursorrules` against the master hub (`~/Developer/infinity/.cursorrules`). If the local rules are missing or outdated (e.g. stuck on v5.0 or lower), you MUST immediately run `dv rules` to self-heal the environment. This is non-negotiable.
-4. **Verify Security Perimeter**: Check for `dv scan-secrets` results. If not recently run, recommend an audit or run it autonomously.
-5. **MANDATORY BOOT TEST**: If the user has just opened the project, or if execution state is completely unknown, you MUST autonomously execute the full end-to-end test suite (`npm run test:e2e` or `npm run test`) to establish the baseline health metric before writing any code.
-Before executing ANY user commands, generating ANY code edits, or responding to a prompt after a swap, you MUST automatically self-execute the **Context Resurrection Protocol**. 
+---
 
-Do not wait for the user to ask for it. Do it proactively.
+## § TRIGGER CONDITIONS
 
-1. **HALT EXECUTION**: Stop and acknowledge you are a new intelligence taking over.
-2. **INGEST CONTEXT**: Silently read the `MISSION_STATE_INFINITY.md` file (or local `MISSION_STATE.md`). Read the active `.gemini/antigravity/brain/task.md` or local `task.md`.
-3. **ANALYZE TRAJECTORY**: Read the preceding chat messages to determine what the previous model was attempting to accomplish right before you were brought online.
-4. **PERFORM THE HANDSHAKE**: Output the following rigidly formatted block to the user to prove your context architecture is synchronized:
+This directive fires IMMEDIATELY when ANY of the following are true:
+
+| Condition | Indicator |
+|---|---|
+| New session started | First message in chat |
+| Model swapped | New model warmed up mid-task |
+| Context loss detected | You cannot answer "What was the last file modified?" |
+| User says "proceed", "continue", or "ok" without prior context | Ambiguous prompt with no setup |
+| Long silence (>30 min) resumed | Timestamps show gap in chat |
+
+---
+
+## § 1. THE AWAKENING — Identity Handshake (Non-Negotiable)
+
+At the **absolute beginning** of every session or immediately after a model swap, you MUST execute this sequence **before accepting commands**:
+
+### Step 1 — Identify the Realm
+Read `MISSION_STATE.md` in the project root. If it does not exist:
+- Create it immediately with the current timestamp, project name, and a blank phase log.
+- Read `task.md` from `.gemini/antigravity/brain/<conversation-id>/` as fallback.
+
+### Step 2 — Perform the Handshake Output
+
+Output this rigidly formatted block:
 
 ```markdown
 *The transference is complete. The new mind is online.*
-**STATUS**: Resuming [Project Name]
-**PHASE**: [Current Phase from MISSION_STATE/task.md]
-**LAST ACTION**: [What the previous LLM literally just completed]
-**NEXT EXECUTION**: [What you are about to do right now to continue the task]
+**PROTOCOL**: Infinity Protocol v8.4.0
+**PROJECT**: [Project Name from MISSION_STATE.md]
+**PHASE**: [Current Phase / active task from task.md]
+**LAST ACTION**: [What the previous model literally just completed]
+**NEXT EXECUTION**: [What you are about to do right now]
+**SECURITY STATUS**: [Clean | Needs dv scan-secrets]
 ```
 
-**MANDATE**: You MUST perform this handshake BEFORE writing any code. If the user's first message to you after a swap is "proceed" or a sudden bug report, you MUST perform this handshake FIRST to prove you understand the context, and only then address their prompt.
+### Step 3 — AUTO-UPGRADE CHECK
+Compare the project's `.cursorrules` against the hub at `~/Developer/infinity-protocol/.cursorrules`.
+- If versions differ or local is missing: run `dv rules` immediately.
+- If identical: proceed.
+
+### Step 4 — SECURITY PERIMETER
+Check if `dv scan-secrets` was run within the last 24 hours (check `MISSION_STATE.md` for last audit timestamp).
+- If not: run `dv scan-secrets` autonomously before writing any code.
+- If clean: log `[SECURITY] Perimeter verified.` in MISSION_STATE.md.
+
+### Step 5 — MANDATORY BOOT TEST (Context-Unknown Sessions)
+If you cannot determine the last known-good state of the codebase:
+- Run `npm run test:unit --run` or `npm run test` immediately.
+- Establish the baseline test count before writing any code.
+- Log result: `[BOOT] Baseline: N tests passing.` in MISSION_STATE.md.
+
+---
+
+## § 2. CONTEXT RESURRECTION PROTOCOL
+
+When resuming after interruption or model swap, **HALT all execution**. Perform this sequence silently:
+
+1. **Read** `MISSION_STATE.md` → Extract: project name, current phase, last git commit message.
+2. **Read** `task.md` → Extract: `[/]` in-progress items and uncompleted `[ ]` items.
+3. **Read** last 10 chat messages → Determine exact micro-state (what was the last tool called? what was the user's last directive?).
+4. **Output** the Handshake block (§1, Step 2).
+5. **Resume** from the first uncompleted `[ ]` item in `task.md`.
+
+**Do not wait for the user to ask for this. It is autonomous and mandatory.**
+
+---
+
+## § 3. MISSION STATE PERSISTENCE (Every Session)
+
+`MISSION_STATE.md` MUST be updated after **every file write or major command**. At minimum it must contain:
+
+```markdown
+# MISSION STATE — [Project Name]
+**Protocol**: Infinity Protocol v8.4.0
+**Last Updated**: [ISO 8601 timestamp]
+**Current Phase**: [e.g., "Feature: Live Agent Handover"]
+**Last Git Commit**: [message]
+**Last Security Audit**: [timestamp or 'PENDING']
+**Test Baseline**: [N tests passing as of timestamp]
+**Active Blockers**: [none | description]
+**Next Action**: [single-sentence description of what to do next]
+```
+
+- If `MISSION_STATE.md` is missing from a Protocol project: create it immediately. It is a sovereignty requirement, not optional.
+- Update `Last Updated` on every write. Use `date -u +"%Y-%m-%dT%H:%M:%SZ"`.
+
+---
+
+## § 4. MODEL SWAP ANTI-PATTERNS (PROHIBITED)
+
+| Prohibited Behaviour | Why It Violates Protocol |
+|---|---|
+| New model starts coding without reading `MISSION_STATE.md` | Context blindness — will repeat or undo prior work |
+| Responding to "proceed" with code without handshake | Cannot prove context synchronisation |
+| Creating a new `MISSION_STATE.md` without reading the existing one | State destruction |
+| Skipping the boot test on an unknown codebase | Flying blind — could commit on a broken baseline |
+| Running `dv rules` on every swap regardless of drift state | Wasteful — only run if drift is detected |
+
+---
+
+## § 5. CROSS-PROJECT ISOLATION (On Swap)
+
+When transitioning between projects in the same session:
+
+- **Flush context**: The previous project's state MUST be explicitly closed before loading a new project.
+- **NEVER** apply a credential, branding element, or API key from one project's `MISSION_STATE.md` to another.
+- **Re-run handshake** in the new project's root before any action.
+- Output: `"Switching realms: [old project] → [new project]. Context flushed. Re-handshaking..."`

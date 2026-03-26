@@ -1078,7 +1078,7 @@ Before merging any new spec file, verify:
 | `ecommerce.mdc §14` Auth | `[ ]` Firebase Auth, no mock auth in prod |
 | `ecommerce.mdc §17` Embedding | `[ ]` gemini-embedding-001, taskType always set |
 | `gemini.mdc G.2` Role Assignments | `[ ]` All model refs via GEMINI_MODELS.* |
-| `constitution.mdc §2` Poison Check | `[ ]` No CareKey/SARAH/Vast strings |
+| `constitution.mdc §2` Poison Check | `[ ]` No [REDACTED]/SARAH/Vast strings |
 | `Phase 43` Memory Sovereignty | `[ ]` NODE_OPTIONS=4096 in all npm scripts |
 | `testing.mdc §12` Memory Cap | `[ ]` workers=3 local / workers=1 CI |
 
@@ -1199,3 +1199,42 @@ git add TEST_MANIFEST.json
 git commit -m "chore(test-registry): raise floor to <NEW_FLOOR>"
 ```
 Never lower `globalFloor` manually. It can only go up.
+
+---
+
+## 11. Test Registry Sovereignty (v8.4.0 Machine Law)
+
+> Added 2026-03-22 — mandatory in all Infinity Protocol projects.
+
+### TEST_MANIFEST.json (Required at project root)
+
+Every protocol project MUST contain a `TEST_MANIFEST.json` file defining:
+- `globalFloor` — minimum total test count before CI blocks
+- `warningThreshold` — alert level before floor is breached  
+- Per-file `minTests` floors for each critical test suite
+
+```json
+{
+  "version": "8.4.0",
+  "globalFloor": 165,
+  "warningThreshold": 175,
+  "files": [
+    { "path": "src/lib/protocolInvariants.test.ts", "minTests": 40 },
+    { "path": "src/lib/fleetSovereignty.test.ts", "minTests": 18 }
+  ]
+}
+```
+
+### Pre-Commit Gate 11 — Version String Sovereignty
+
+Every project git repo MUST have the 11-gate `pre-commit-enforce.sh` installed:
+- Deployed automatically via: `dv rules`, `dv fix-drift`, `dv ignite`, `mcp_watchdog.sh`
+- Blocks commits introducing stale version strings (v6.x, v8.4.0–v8.4.0)
+- Manual install: `cp $HUB/scripts/pre-commit-enforce.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit`
+
+### Session-Start Test Registry Protocol
+
+At the start of every AI session touching a protocol project:
+1. Run `dv test-manifest:show` to verify floor
+2. If `globalFloor` < 85% of actual test count, run `dv test-manifest:update`
+3. Never commit with `VIOLATIONS > 0` from the pre-commit hook output

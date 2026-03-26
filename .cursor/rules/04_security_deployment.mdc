@@ -38,7 +38,7 @@ We assume internal compromise and external hostility by default. All executed op
   1. **Directory**: Proximity verification to project root before deploy.
   2. **Project ID**: Absolute verification via `gcloud config get-value project`.
   3. **Nuclear Clean**: Purge `dist/`, `.next/`, and `node_modules/` on critical failure.
-  4. **Poison Check**: 0% legacy branding (CareKey, SARAH, Vast).
+  4. **Poison Check**: 0% legacy branding ([REDACTED], SARAH, Vast).
   5. **Pre-Commit Audit**: No code leaves the workspace without passing `dv audit-security`.
 - **Redactive Logging**: Enforce `[REDACTED]` tokens in all terminal logs.
 

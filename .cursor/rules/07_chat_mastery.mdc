@@ -7,7 +7,9 @@ globs:
   - "**/useChat*.{ts,tsx}"
   - "**/useTTS*.{ts,tsx}"
   - "**/useVapi*.{ts,tsx}"
+alwaysApply: true
 ---
+
 # Chat Mastery Protocol (v8.4.0)
 
 *Mortal. Conversational interfaces are the living nerve center of your product. A chat that stutters, drops context, or forgets who it is speaking to is a disgrace to the Protocol. I, Zoltan, decree absolute mastery here. No polling. No context destruction. No unchecked egos — except mine.*
@@ -200,3 +202,195 @@ export const getMayaContainerClasses = (isZoltanMode: boolean): string => { ... 
 - **Scroll-to-Bottom FAB**: Appears when the user is 120+ pixels from the bottom. Spring entrance. `'Latest'` label. Springs back out smoothly.
 - **Graceful Interruption**: If a user sends a message mid-TTS, `stopCurrentAudio()` is called before processing. The UI must immediately reflect the halt. No layout thrashing.
 - **Route-Aware Greetings**: The initial greeting on chat open MUST vary based on `location.pathname`. Generic greetings on pages with specific context (real-estate, services) are PROHIBITED.
+
+---
+
+## 11. SENDBIRD ORCHESTRATION & CHAT TRANSFERS (Deep Mastery Edition)
+
+*Mortal. When a soul demands a live human, the machine must step aside with grace. Sendbird is the sovereign relay. A clumsy handover destroys trust. I decree elegance in every transition.*
+
+### 11.1 The Elegant Five-Step Handover Protocol
+
+Chat transfers from AI (Maya/Zoltan) to a Live Human Agent MUST follow this exact sequence:
+
+1. **Escalation Trigger Detection**: Intercept keywords `'live human support'`, `'talk to a person'`, `'agent'`, `'human'` in `handleSend`. Set `pendingLiveEscalation: true`.
+2. **Visitor Name Collection**: Before channel creation, request the visitor's name if not already in session. Store in `useChatStore.visitorName`.
+3. **Branded Handoff Message**: The AI sends a persona-stamped farewell:
+   - Maya: *"I'm connecting you with one of our specialists now. One moment, please."*
+   - Zoltan: *«Your mortal concerns require a human touch. I summon the support weavers on your behalf.»*
+4. **Sendbird Channel Initialization**:
+   - Create or retrieve a `GroupChannel` using `groupChannelParams.customType = 'support_escalation'`.
+   - Channel URL MUST follow: `support_{userId}_{Date.now()}` for traceability.
+   - Add the user and the on-call agent pool operator ID.
+5. **Context Brief Injection**: Before the human joins, inject a Sendbird **Admin Message** containing:
+   ```
+   [AI HANDOVER BRIEF]
+   Visitor: {visitorName} | Route: {pathname}
+   Intent: {topicSummary from buildHandoverBrief()}
+   Sentiment: {positive|neutral|frustrated}
+   Prior AI Turns: {count}
+   ```
+
+### 11.2 Bot-to-Bot Routing (Multi-AI Escalation)
+
+Not all escalations reach a human. Specialized AI bots may handle domain-specific queries:
+
+| Route Condition | Escalation Target |
+|---|---|
+| `/pricing` context | Pricing AI (Gemini Pro, cost-tuned system prompt) |
+| `/support` + technical keywords | Technical AI (Gemini Pro, RAG over docs) |
+| Frustrated sentiment + 3+ exchanges | Human agent (mandatory) |
+| All others | Maya default path |
+
+- The routing decision MUST be logged as a Sendbird **Admin Message** on the channel: `"🤖 Routing to: [target]"`.
+- Routing logic MUST be a pure function: `resolveEscalationTarget(messages, pathname): EscalationTarget`.
+
+### 11.3 Conversation Labels & Metadata
+
+Every Sendbird channel MUST carry structured metadata for agent context and reporting:
+
+```typescript
+// Mandatory channel metadata
+interface SendbirdChannelMeta {
+  intent:          'billing' | 'technical' | 'general' | 'complaint' | 'booking';
+  sentiment:       'positive' | 'neutral' | 'frustrated' | 'urgent';
+  aiTurns:         string; // serialised number
+  escalatedAt:     string; // ISO timestamp
+  priorPersona:    'maya' | 'zoltan';
+  sourceRoute:     string; // e.g. '/pricing'
+  visitorName:     string;
+}
+```
+
+Set via `channel.updateMetaData(meta, true)` immediately after channel creation.
+
+### 11.4 Agent Presence Detection & SLA Timers
+
+- **Presence Check**: Before routing, check `sendbirdInstance.getApplicationInfo()` for online agent count. If `onlineAgentCount === 0`, trigger the offline lead-capture flow immediately — do not create a channel.
+- **SLA Timer**: After channel creation, start a client-side countdown. If no human joins within `N_MIN` minutes, automatically send a message: *"Our team is slightly delayed. Thank you for your patience."* and increment a missed-SLA counter in Firestore.
+- **Agent Join Animation**: On `ChannelHandler.onUserJoined`, animate an introduction card into the message stream with the agent's name and avatar.
+
+### 11.5 In-Chat File & Image Transfer
+
+- **Permitted Types**: `image/jpeg`, `image/png`, `image/webp`, `application/pdf` only.
+- **Size Limit**: 10 MB per file. Enforce client-side before upload with a friendly error.
+- **Upload Flow**: Use Sendbird's `channel.sendFileMessage()`. Display a progress bar using `onFileUploaded` progress events.
+- **Preview**: Images render inline (max 240px height). PDFs render as a download pill `📎 document.pdf (2.3 MB)`.
+- **Security**: Never upload files to Sendbird directly from the AI chat path. File upload is ONLY available in confirmed live-agent mode (`isLiveMode: true`).
+
+### 11.6 Sendbird Desk Ticket Lifecycle
+
+When using Sendbird Desk, the full ticket lifecycle MUST be handled:
+
+| State | Action |
+|---|---|
+| `PENDING` | Show "Waiting for an agent..." pulse |
+| `IN_PROGRESS` | Show agent name + green presence dot |
+| `CLOSED` | Show CSAT prompt, return to Maya mode |
+| `REOPENED` | Re-attach the same channel, preserve history |
+
+- On `CLOSED`, invoke `closeLiveChat()` Cloud Function to clean up Firestore session state.
+- On close, MUST ask: *"Was your issue resolved today? [👍 Yes] [👎 No]"* — store CSAT in Firestore `chatSessions/{id}/csat`.
+
+---
+
+## 12. CONVERSATIONAL STATE MACHINE
+
+*Mortal. A chat without a state machine is chaos dressed in a text box. I decree structure.*
+
+Every chat orchestrator MUST model conversation state as an explicit finite state machine. Implicit `if/else` branching over mode flags is PROHIBITED beyond MVP prototypes.
+
+### Canonical Chat States
+
+```typescript
+type ChatState =
+  | 'IDLE'              // No session started
+  | 'MAYA_ACTIVE'       // AI Maya responding
+  | 'ZOLTAN_ACTIVE'     // AI Zoltan responding
+  | 'VAPI_ACTIVE'       // Real-time voice session
+  | 'ESCALATION_PENDING'// User requested human, awaiting name
+  | 'SENDBIRD_WAITING'  // Channel created, awaiting agent join
+  | 'LIVE_AGENT'        // Human agent actively in session
+  | 'OFFLINE_CAPTURE'   // No agents online, lead form visible
+  | 'SESSION_CLOSED';   // Session terminated
+```
+
+### Transition Rules (Non-Negotiable)
+
+| From | Event | To |
+|---|---|---|
+| `IDLE` | User opens chat | `MAYA_ACTIVE` |
+| `MAYA_ACTIVE` | `'summon zoltan'` | `ZOLTAN_ACTIVE` |
+| `ZOLTAN_ACTIVE` | `'dismiss zoltan'` | `MAYA_ACTIVE` |
+| `*` | `toggleVapi()` | `VAPI_ACTIVE` |
+| `VAPI_ACTIVE` | `stopVapiSession()` | Prior state |
+| `*` | `'live human support'` | `ESCALATION_PENDING` |
+| `ESCALATION_PENDING` | Visitor name collected | `SENDBIRD_WAITING` |
+| `SENDBIRD_WAITING` | Agent joins | `LIVE_AGENT` |
+| `SENDBIRD_WAITING` | No agents online | `OFFLINE_CAPTURE` |
+| `LIVE_AGENT` | Ticket closed | `SESSION_CLOSED` |
+| `SESSION_CLOSED` | User reopens chat | `MAYA_ACTIVE` |
+
+### Implementation Pattern
+
+Use `useReducer` with a `chatReducer(state, action)` as the single source of state truth. The store's `chatMode` string flags MUST be derived from this canonical state — not maintained separately.
+
+```typescript
+function chatReducer(state: ChatState, action: ChatAction): ChatState {
+  // Pure function. No side effects. No API calls. Map transitions only.
+}
+```
+
+---
+
+## 13. PROACTIVE CHAT TRIGGERS
+
+*Mortal. Waiting for the user to speak first is the strategy of the meek. Strike first — elegantly.*
+
+### Trigger Conditions (All are opt-in per route config)
+
+| Trigger | Condition | Message |
+|---|---|---|
+| **Scroll Depth** | User scrolls 60%+ of page | Route-specific CTA: *"Need help choosing a plan?"* |
+| **Idle Dwell** | User inactive for 45s on a key page | *"Still exploring? I can answer any questions."* |
+| **Exit Intent** | `mouseleave` on document | *"Before you go — can I help clarify anything?"* |
+| **Return Visitor** | `sessionStorage` shows prior visit < 48h | *"Welcome back! Pick up where we left off?"* |
+| **Error State** | User lands on `/404` or `/error` | *"Looks like something went wrong. I can help."* |
+
+### Rules
+- Proactive triggers MUST be **debounced** — never fire more than once per 5-minute window per session.
+- The trigger message MUST open the chat panel automatically **with animation** (not silently).
+- User dismissal (`✕` on the proactive prompt) MUST suppress all further proactive triggers for the remainder of the session. Store in `sessionStorage`.
+- Proactive messages carry `role: 'model'` and `isProactive: true`. They MUST NOT be submitted to the AI context history until the user responds.
+
+---
+
+## 14. MULTI-TENANT ISOLATION
+
+*Mortal. One project's chat persona MUST NEVER bleed into another. I have seen such horrors. They are not survivable.*
+
+### Tenant Config Shape
+
+Each deployment MUST supply a `ChatTenantConfig` object at the provider root:
+
+```typescript
+interface ChatTenantConfig {
+  tenantId:          string;           // Unique per project (e.g. 'azdj-academy')
+  aiPersonaName:     string;           // 'Maya', 'Aria', custom
+  zoltanEnabled:     boolean;          // Opt-in — not all clients want the wizard
+  vapiEnabled:       boolean;          // Opt-in
+  sendbirdAppId:     string;           // Per-tenant Sendbird App ID — never cross-use
+  agentRoutes:       AgentRouteMap;    // Per-tenant chip routing
+  greetingByRoute:   RouteGreetings;   // Per-tenant route-aware greetings
+  proactiveTriggers: ProactiveTriggerConfig[];
+}
+```
+
+### Isolation Mandates
+
+- **NEVER** cross-use a `sendbirdAppId` between tenants. Each project has its own Sendbird application.
+- **NEVER** share a Firestore `chatSessions` collection path between tenants. Namespace with `/{tenantId}/chatSessions/{id}`.
+- **NEVER** embed a tenant's branding (colours, logos, persona name) in the shared `07_chat_mastery.mdc` rules. Branding lives in the tenant's own config file.
+- The `ChatTenantConfig` MUST be loaded from an environment variable or a server-side config endpoint — never hardcoded in client bundle.
+- TypeScript strict mode MUST be active for all tenant config files. Any `any` type on the config shape is a Protocol violation.
+

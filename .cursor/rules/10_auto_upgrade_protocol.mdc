@@ -88,7 +88,7 @@ The following states are protocol violations and MUST trigger an immediate upgra
 
 ```
 ❌ package.json version: "6.7.0"    → VIOLATION: run dv upgrade
-❌ .cursorrules: "INFINITY PROTOCOL v6.7.0"  → VIOLATION: run dv rules
+❌ .cursorrules: "Infinity Protocol v8.4.0"  → VIOLATION: run dv rules
 ❌ .cursorrules: "INFINITY PROTOCOL v8.4.0"  → VIOLATION: run dv rules
 ❌ git log shows any commit not prefixed "feat(protocol): v8.4.0" as HEAD → VIOLATION: pull
 ❌ ~/Developer/dv header ≠ v8.4.0   → VIOLATION: cp scripts/dv ~/Developer/dv
@@ -149,3 +149,115 @@ You can also run `dv version-scan` at any time to audit without making changes.
 3. `git push origin master --no-verify`
 4. `dv rules` — broadcasts + runs nuke-versions automatically
 5. On all other machines: `git pull --rebase origin master && dv nuke-versions`
+
+## 8. SESSION-START TEST REGISTRY PROTOCOL
+
+At the start of every Infinity Protocol session, run:
+
+```bash
+dv test-manifest:show    # Verify globalFloor and per-file floors
+dv version-scan          # Confirm fleet has no stale version strings
+```
+
+If `globalFloor` is more than 15% below the actual test count shown by `npm run test:unit`:
+```bash
+dv test-manifest:update  # Recalculates floor from live test run, auto-commits
+```
+
+**Machine Law**: Every session touching a protocol project MUST run `dv test-manifest:show` before making changes. A floor below 85% of actual tests is a protocol breach.
+
+---
+
+## § 9. CANARY DEPLOYMENT VERIFICATION
+
+After any protocol upgrade, verify the new rules are active before marking the upgrade complete:
+
+```bash
+# Verify the upgraded rule is active in a canary project
+TARGET_PROJECT="azdj-academy"
+EXPECTED="v8.4.0"
+ACTUAL=$(grep -m1 "Infinity Protocol" "$HOME/Developer/$TARGET_PROJECT/.cursorrules" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
+if [ "$ACTUAL" = "$EXPECTED" ]; then
+  echo "✓ Canary PASS: $TARGET_PROJECT on $ACTUAL"
+else
+  echo "✗ Canary FAIL: $TARGET_PROJECT shows $ACTUAL — run dv rules"
+  exit 1
+fi
+```
+
+Run this check against a minimum of 3 projects after every `dv rules` broadcast. If any canary fails: halt deployment, investigate, re-broadcast.
+
+---
+
+## § 10. PROTOCOL GOVERNANCE CALENDAR
+
+The Protocol MUST follow a structured release cadence to prevent drift accumulation:
+
+| Cadence | Action |
+|---|---|
+| **Daily** | `mcp_watchdog.sh` auto-sync (passive) |
+| **Per session** | `dv test-manifest:show` + `dv version-scan` |
+| **Per PR** | 11-gate pre-commit hook enforcement |
+| **Weekly** | `dv sync-all` full fleet sweep |
+| **Monthly** | `dv sovereign-scan [project]` deep audit per project |
+| **Per version bump** | Full `§6 Version Bump Procedure` |
+| **Per new project** | `dv fix-drift` during onboarding |
+
+**Non-negotiable**: The `mcp_watchdog.sh` cron MUST be active. Verify with: `crontab -l | grep mcp_watchdog`
+
+---
+
+## § 11. CROSS-MACHINE SOVEREIGNTY CHECKLIST
+
+When setting up a new machine or restoring a machine that's been offline:
+
+```bash
+# §11 Recovery Sequence — Run in order
+# 1. Verify identity
+git -C ~/Developer/infinity-protocol remote get-url origin
+
+# 2. Hard reset to master
+cd ~/Developer/infinity-protocol
+git fetch origin
+git reset --hard origin/master
+
+# 3. Install dv binary
+cp scripts/dv ~/Developer/dv
+chmod +x ~/Developer/dv
+
+# 4. Broadcast rules to all projects
+bash scripts/dv rules
+
+# 5. Install pre-commit hooks fleet-wide
+bash scripts/dv fix-drift
+
+# 6. Verify test registry
+bash scripts/dv test-manifest:show
+
+# 7. Confirm fleet version scan
+bash scripts/dv version-scan
+```
+
+After this sequence, output:
+```
+✓ Machine sovereignty restored.
+  Protocol: v8.4.0
+  Fleet: N projects aligned
+  Test Floor: 274
+  Pre-commit hooks: Active
+```
+
+---
+
+## § 12. DRIFT DETECTION MATRIX (Quick Reference)
+
+| Symptom | Root Cause | Cure |
+|---|---|---|
+| `.cursorrules` shows wrong version | `dv rules` not run after bump | `dv rules` |
+| Pre-commit hook missing | New repo not onboarded | `dv fix-drift` |
+| `dv` binary outdated | Machine not synced | `cp scripts/dv ~/Developer/dv` |
+| Test count below floor | Tests deleted without floor update | `npm run test:unit -- --run` then investigate |
+| `TEST_MANIFEST.json` missing | New project not initialized | `dv test-manifest:update` |
+| Poison strings in `.mdc` files | `auto_fix_rules.js` not run | `node scripts/auto_fix_rules.js` |
+| Fleet has stale version strings | Version bump without `nuke-versions` | `dv nuke-versions` |
+| `MISSION_STATE.md` missing | New project / model swap | Create immediately per `§3` template |
