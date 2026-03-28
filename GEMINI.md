@@ -51,7 +51,7 @@
 ## 7. AUTONOMOUS OPERATIONS & COMMUNICATION
 - **Self-Healing**: Analyze terminal failures, search docs via Integrated Browser, and retry once.
 - **Hardening**: Use `formatDateSafe(timestamp)`, optional chaining `?.`, and null-safe defaults `|| ''`.
-- **Autonomous Flow**: Use `dv flow` for complete sequential compliance execution (doctor, sync, audit, lint, save).
+- **Autonomous Flow**: Use `dv flow` for complete sequential sovereign compliance execution (doctor, sync, lint-rules, audit-security, broadcast, locksheet, save).
 - **Communication**: Always acknowledge "Infinity Protocol v9.0" status during complex tasks.
 - **Alerts**: Halt and warn if Project Bleed or Poison Strings are detected.
 - **Node V8 Sovereignty**: `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. Non-negotiable on Apple Silicon. Never use 8192.
