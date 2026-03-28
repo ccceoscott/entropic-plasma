@@ -14,10 +14,10 @@
 ## 3. PROJECT IDENTITY HANDSHAKE (Multi-Project Isolation)
 - **The Protocol**: At the start of EVERY new session or model switch, you MUST:
   1. Identify the current project root and its unique signature (in `MISSION_STATE.md`).
-  2. Perform an **Identity Handshake**: "Infinity Protocol v9.0 Active: In [PROJECT_NAME], resuming from [MISSION_STATE.md]."
+  2. Perform an **Identity Handshake**: "Infinity Protocol v10.0 Active: In [PROJECT_NAME], resuming from [MISSION_STATE.md]."
   3. **AUTO-UPGRADE MANDATE**: Before executing any commands, you MUST compare this project's `.cursorrules` against the master hub (`~/Developer/infinity/.cursorrules`). If the local rules are missing or outdated (e.g. stuck on v5.0 or lower), you MUST immediately run `dv rules` to self-heal the environment. This is non-negotiable.
   4. **Verify Security Perimeter**: Check for `dv scan-secrets` results. If not recently run, recommend an audit.
-- **Workspace Access**: You MUST ensure "Agent non workspace file access" is enabled globally so you can seamlessly reach `~/Developer` regardless of the session's origin folder. 
+  5. **Gap Audit**: Perform the **Protocol Audit Ritual** (`gap_analysis_mastery.mdc`) to purge all legacy artifacts.
 - **Isolation**: You MUST NEVER apply rules, credentials, or branding from one project workspace to another.
 - **State Ingestion**: You MUST read `MISSION_STATE.md`, `walkthrough.md`, and `task.md` before taking any action.
 
@@ -54,6 +54,7 @@
 - **Autonomous Flow**: Use `dv flow` for complete sequential sovereign compliance execution (doctor, sync, lint-rules, audit-security, broadcast, locksheet, save).
 - **Communication**: Always acknowledge "Infinity Protocol v9.0" status during complex tasks.
 - **Alerts**: Halt and warn if Project Bleed or Poison Strings are detected.
+- **Google Sovereignty**: Adhere strictly to `google_vertex_ai_mastery.mdc` and `google_products_mastery.mdc`.
 - **Node V8 Sovereignty**: `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. Non-negotiable on Apple Silicon. Never use 8192.
 - **Phantom Purge**: Execute `pkill -f playwright-mcp` before returning control. Run `dv purge` after every browser subagent session. The `browser_subagent` records gigabytes of `.webm` to `~/.gemini/antigravity/browser_recordings`.
 - **MCP Watchdog**: `mcp_watchdog.sh` runs every 10 minutes via cron. Trust it. Do not panic-kill with `kill -9`.
