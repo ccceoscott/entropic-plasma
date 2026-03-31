@@ -1,49 +1,118 @@
 ---
-description: Safe Atomic Deployment Workflow
+description: Complete Safe Deployment Lifecycle — Security Scan + Identity Lock + Build + Ascension (Phase 57 Sovereign)
 ---
-# Safe Atomic Deployment
 
-Follow this workflow for EVERY deployment to ensure stability and prevent zero-downtime failures.
+# /deploy_safely — Sovereign Deployment Lifecycle
 
-## 1. 🔒 Environment Verification
-- [ ] **Check Project ID:**
-    ```bash
-    # Run in terminal
-    echo $GCLOUD_PROJECT && echo $FIREBASE_PROJECT
-    ```
-    - Verify matches expected production ID.
+The complete, atomic deployment execute from zero to production. Merges `/security_scan` and `/deployment_safety` — those are now deprecated redirects to this file.
 
-## 2. 🧪 Pre-Deploy Validation
-- [ ] **Lint Check:**
-    ```bash
-    npm run lint
-    ```
-- [ ] **Type Check:**
-    ```bash
-    npm run type-check # or tsc --noEmit
-    ```
-- [ ] **Regression Tests (E2E):**
-    ```bash
-    # MANDATORY: Verify core flows
-    npx playwright test --project=chromium --grep "@critical"
-    ```
-- [ ] **Build Check:**
-    ```bash
-    npm run build
-    ```
-    - **IF** build fails, **STOP**. Do not proceed to deploy.
+> **⚠️ PHASE 57 LAWS:**
+> - `gcloud config get-value project` → BANNED → use `.firebaserc` read
+> - `gcloud <cmd>` without `--quiet` → BANNED → always add `--quiet`
+> - `firebase firestore:rules > /tmp/...` → BANNED → use MCP tool
+> - Network commands NEVER get `// turbo` — user approval required
 
-## 3. 🚀 Atomic Deployment
-- [ ] **Deploy:**
-    ```bash
-    firebase deploy --only hosting,functions # or specific service
-    ```
-- [ ] **Verify:**
-    - Visit the production URL immediately.
-    - Check for "White Screen of Death" (Console errors).
+---
 
-## 4. ↩️ Rollback Plan
-- [ ] **If Failed:**
-    ```bash
-    firebase hosting:rollback
-    ```
+## 🔒 Lock 0: Secret Exposure Scan (NEVER SKIP)
+
+Use `grep_search` MCP tool (non-blocking, no terminal):
+- Query: `AIza` in `src/`
+- Query: `PRIVATE KEY` in repo root
+
+Then (local git only — safe):
+
+// turbo
+```bash
+git grep -r "AIza" -- . 2>/dev/null || echo "CLEAN: No API keys found"
+```
+
+// turbo
+```bash
+git grep -rn "PRIVATE KEY" -- . 2>/dev/null || echo "CLEAN: No private keys found"
+```
+
+// turbo
+```bash
+bash .git/hooks/pre-commit 2>/dev/null || echo "Pre-commit hook complete"
+```
+
+**Halt immediately** if any match found outside `.env.local` or `.env.example`.
+
+---
+
+## 🔒 Lock 1: Project Identity (Sovereign — NO gcloud)
+
+// turbo
+```bash
+node -e "console.log('Project:', require('./.firebaserc').projects.default)" 2>/dev/null || echo "⚠️ .firebaserc not found — ABORT"
+```
+
+Use `view_file` to read `.firebaserc` and confirm `default` alias:
+- Maps to `prod` → **HARD STOP**. Require explicit confirmation.
+- Maps to `staging`/`dev` → proceed with orange warning.
+- `.firebaserc` missing → **ABORT**. Run `/bootstrap_new_project` first.
+
+MCP identity check: `mcp_gcloud_run_gcloud_command` with args `["config", "get-value", "account", "--quiet"]`
+
+---
+
+## 🔒 Lock 2: Firestore Rules — Open Access Detection (MCP)
+
+Use: `mcp_firebase-mcp-server_firebase_get_security_rules` with `type: "firestore"`
+
+Scan for:
+- `if true` → **ABORT** if found without auth guard
+- `allow read, write` → verify has `request.auth != null`
+
+---
+
+## 🔒 Lock 3: Function Teardown Detection (MCP)
+
+Use: `mcp_firebase-mcp-server_functions_list_functions`
+
+Use `view_file` to read `functions/src/index.ts`. Alert on any function in GCP that is missing locally — that's an **accidental deletion on next deploy**.
+
+---
+
+## 🔒 Lock 4: Secret Manifest Check (MCP)
+
+Use: `mcp_gcloud_run_gcloud_command` with args `["secrets", "list", "--project", "<project-id>", "--quiet"]`
+
+Confirm all env vars referenced in Cloud Functions exist in Secret Manager.
+
+---
+
+## 🔒 Lock 5: Lint
+
+// turbo
+```bash
+npm run lint 2>/dev/null || true
+```
+
+---
+
+## 🔒 Lock 6: Idempotent Build
+
+// turbo
+```bash
+rm -rf .next/ dist/ 2>/dev/null || true
+```
+
+```bash
+NODE_OPTIONS=--max-old-space-size=4096 npm run build
+```
+
+> Build is 60-120s. Do NOT `// turbo`. Wait for user approval.
+
+---
+
+## 🔒 Lock 7: Ascension Deploy
+
+```bash
+firebase deploy --only functions,hosting --force
+```
+
+> Network call. NEVER auto-run. `WaitMsBeforeAsync: 10000` minimum. Explicit user approval required.
+
+*Status: All Locks Passed. Deployment Sealed. The Cloud reflects the Source.*

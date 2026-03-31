@@ -1,57 +1,122 @@
 ---
-description: Mandatory protocol for initializing ANY new project in the ecosystem.
+description: Mandatory Protocol for initializing ANY new project — Next.js scaffold + Firebase Ascension + Governance Injection (Phase 57 Sovereign)
 ---
 
-# New Project Bootstrap Protocol (God Mode)
+# /bootstrap_new_project — The Ascension Ritual
 
-> [!IMPORTANT]
-> **Constraint:** All new projects MUST inherit the Global Governance layer from `Infinity-Protocol` before any code is written.
+Every new project begins here. Merges both `/bootstrap_new_project` and `/new_project_bootstrap` — Phase 57 consolidated standard.
 
-## 1. Initialization
-1.  **Create Directory/Repo**:
-    ```bash
-    mkdir my-new-project && cd my-new-project
-    git init
-    ```
-2.  **Establish Governance Structure**:
-    ```bash
-    mkdir -p governance
-    mkdir -p .agent/workflows
-    ```
+> **⚠️ PHASE 57 LAWS:**
+> - `// turbo-all` REMOVED — only local-only steps get `// turbo`
+> - `sed` for package.json edits → BANNED → use `multi_replace_file_content` MCP tool
+> - Network installs (`npm i -g`, `firebase init`, `gcloud`) require user approval
+> - `.firebaserc` must be written via `write_to_file` MCP tool — not `cat`/`touch`
 
-## 2. Governance Injection (The "God Seed")
-Run the following to copy the master standards from `Infinity-Protocol`:
+---
 
+## §1. Scaffold & Memory Clamp
+
+// turbo
 ```bash
-# Define source
-JUNO_ROOT="$HOME/Infinity-Protocol"
-
-# Copy Constitution & Identity
-cp "$JUNO_ROOT/governance/global_rules.md" governance/
-cp "$JUNO_ROOT/governance/user_identity.md" governance/
-
-# Copy Core Workflows
-cp "$JUNO_ROOT/.agent/workflows/god_mode_protocols.md" .agent/workflows/
-cp "$JUNO_ROOT/.agent/workflows/deploy_safely.md" .agent/workflows/
-cp "$JUNO_ROOT/.agent/workflows/verify_environment.md" .agent/workflows/
+mkdir <project-name> && cd <project-name>
 ```
 
-## 3. Configuration
-1.  **Create `mcp_config.json`** (if project-specific overrides are needed, otherwise use global).
-2.  **Set Environment Variables**:
-    - Ensure `FIREBASE_PROJECT` and `GCLOUD_PROJECT` are defined in `.env` or context.
+// turbo
+```bash
+git init
+```
 
-## 4. Verification
-1.  Run the Environment Verification workflow:
-    ```bash
-    # trigger verify_environment.md
-    ```
-2.  Commit the governance layer:
-    ```bash
-    git add governance .agent
-    git commit -m "chore: Initialize God Mode governance"
-    ```
+// turbo
+```bash
+export NEXT_TELEMETRY_DISABLED=1 && export ASTRO_TELEMETRY_DISABLED=1
+```
 
-## 5. Agency Logic
--   **Neural Link**: Agent MUST read `governance/user_identity.md` to load Scott's context.
--   **Rule Enforcement**: Agent MUST read `governance/global_rules.md` to load the Constitution.
+**Machine Laws → `package.json`:** Use `multi_replace_file_content` MCP — NOT `sed`:
+- `"next dev"` → `"NODE_OPTIONS=--max-old-space-size=4096 next dev"`
+- `"next build"` → `"NODE_OPTIONS=--max-old-space-size=4096 next build"`
+- `"next start"` → `"NODE_OPTIONS=--max-old-space-size=4096 next start"`
+
+```bash
+npm i -g npm@latest
+```
+
+> `npm i -g` = network call — requires user approval.
+
+---
+
+## §2. Firebase Ascension
+
+**Write `.firebaserc` via `write_to_file` MCP (NOT touch/cat/echo):**
+```json
+{ "projects": { "default": "<project-id>" } }
+```
+
+User-approved network calls (one at a time):
+
+```bash
+npx -y firebase-tools projects:addfirebase <project-id>
+```
+
+```bash
+gcloud beta billing projects link <project-id> --billing-account=0196B1-6B8DAD-19F74C --quiet
+```
+
+> `gcloud config set project` mutates global state — user must explicitly confirm.
+
+---
+
+## §3. Governance Injection
+
+Copy security rules from master templates via `write_to_file` MCP tool directly — or:
+
+// turbo
+```bash
+cp ~/Developer/infinity-protocol-1/templates/firestore_master.rules ./firestore.rules 2>/dev/null || echo "⚠️ Create firestore.rules manually"
+```
+
+// turbo
+```bash
+cp ~/Developer/infinity-protocol-1/templates/firestore.indexes.json ./firestore.indexes.json 2>/dev/null || true
+```
+
+Deploy security gates FIRST (user approves):
+```bash
+firebase deploy --only firestore:rules,firestore:indexes
+```
+
+Install pre-commit hook:
+// turbo
+```bash
+mkdir -p .husky/ && cp ~/Developer/infinity-protocol-1/templates/.pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit 2>/dev/null || echo "⚠️ Install pre-commit hook manually"
+```
+
+---
+
+## §4. Secret Vault Initialization
+
+Use `mcp_gcloud_run_gcloud_command` with args:
+`["secrets", "create", "GEMINI_API_KEY", "--data-file=-", "--project", "<project-id>", "--quiet"]`
+
+Use `write_to_file` to create:
+- `.env.local` (empty placeholder)
+- `.env.example` (with all required keys, no values)
+
+Add `.env.local` to `.gitignore`.
+
+---
+
+## §5. Bootstrap Verification
+
+// turbo
+```bash
+node -e "console.log('Project:', require('./.firebaserc').projects.default)"
+```
+
+// turbo
+```bash
+npm run lint 2>/dev/null || true
+```
+
+MCP verification: `mcp_firebase-mcp-server_firebase_list_projects`
+
+*Status: Project Initialized. Sovereign by Default. Cleared for Development.*

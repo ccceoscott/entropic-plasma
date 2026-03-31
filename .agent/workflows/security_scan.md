@@ -1,13 +1,10 @@
 ---
-description: Automated workflow to scan Firestore security rules for vulnerabilities and drift.
+description: DEPRECATED — See /deploy_safely (Lock 0)
 ---
 
-# Security Vulnerability Scan
+# ⚠️ Deprecated
 
-Used to identify "Rule Drift" or overly permissive configurations.
+This workflow has been consolidated. Use `/deploy_safely` instead.
 
-1. **Retrieve current security rules**: `gcloud firestore rules list --project <project-id>`
-2. **Audit for Vulnerabilities**:
-   - Check for "Open Access": `grep -n "if true" firestore.rules.current`
-   - Verify "Default Deny": Check for `{document=**} { allow read, write: if false; }`
-3. **Compare** against `templates/firestore_master.rules` for divergence.
+Security scan content lives at **Lock 0** in:
+`/Users/teknojunkeee/Developer/infinity-protocol-1/.agent/workflows/deploy_safely.md`
