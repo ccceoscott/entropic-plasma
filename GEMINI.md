@@ -90,10 +90,63 @@
 | Phantom purge | Asking user to run manually | Auto-run via `run_command` — `rm -rf` is local-only, instant, safe |
 | gcloud prompts | bare `gcloud <cmd>` in scripts | Always add `--quiet` flag: `gcloud <cmd> --quiet` |
 | Firebase headless auth | `gcloud auth print-identity-token` | ADC (Application Default Credentials) — GDK confirmed preferred over FIREBASE_TOKEN |
-| MCP Query Freezes | Long semantic queries in `mcp_google-developer-knowledge` | Strictly limit to 2-3 single keyword tokens (e.g. `Vertex AI`). Long queries lock up the MCP completely. |
+| MCP Query Freezes | Long semantic queries in `mcp_google-developer-knowledge` | Strictly limit to 2-3 single keyword tokens (e.g. `Vertex AI`). Long queries lock up the MCP completely. If ANY query hangs >10s, abort and use `brave_search` or internal KI instead. NEVER retry a hanging GDK query. |
 | Bash flags in cron | `set -euo pipefail` in scheduled scripts | `set -uo pipefail` — remove `-e`; grep exits 1 on no match and kills script |
 | osascript in scripts | bare `osascript -e "..."` in bash | `timeout 5 osascript -e "..." \|\| true` — GUI calls hang in headless/cron |
 | tmutil in scripts | bare `tmutil deletelocalsnapshots /` | `timeout 10 tmutil deletelocalsnapshots / \|\| true` — needs sudo on some macOS |
 | crontab install | `(crontab -l \| ...) \| crontab -` pipe | tmp file + `timeout 5 crontab file` — pipe subshell deadlocks in non-TTY |
 | git fetch in scripts | bare `git fetch --all --prune` | `GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q \|\| true` |
 | TypeScript in hooks | bare `tsc --noEmit` in pre-commit | `timeout 60 tsc --noEmit --skipLibCheck` — hangs on OOM or circular imports |
+| **Broadcast scope** | `dv broadcast` touching `firebase.json`, `firestore.rules`, `package.json`, `scripts/` | `dv broadcast` is PROTOCOL-ONLY — `.cursorrules`, `GEMINI.md`, `.agent/workflows/` ONLY. Any broadcast that modifies app files is a CRITICAL VIOLATION. |
+| **Deploy without confirm** | Running `firebase deploy`, `safe-deploy`, `dv flow` without stating project + scope | ALWAYS state: (1) exact project ID from `.firebaserc`, (2) what will change, (3) wait for explicit `YES DEPLOY [PROJECT]` from user |
+
+## 10. BROADCAST SOVEREIGN SCOPE (Law — ABSOLUTE)
+
+`dv broadcast` is a **PROTOCOL PROPAGATION** tool. It is NOT a deploy tool. It is NOT a code sync tool.
+
+**BROADCAST MAY ONLY TOUCH:**
+- `.cursorrules` (obfuscated MDC rules)
+- `GEMINI.md` (protocol document)
+- `.agent/workflows/*.md` (workflow markdown files)
+- `MISSION_STATE.md` (version stamp only)
+
+**BROADCAST MUST NEVER TOUCH:**
+- `firebase.json` ← ABSOLUTE PROHIBITION
+- `firestore.rules` ← ABSOLUTE PROHIBITION  
+- `storage.rules` ← ABSOLUTE PROHIBITION
+- `package.json` ← ABSOLUTE PROHIBITION
+- `scripts/` directory ← ABSOLUTE PROHIBITION
+- `src/` directory ← ABSOLUTE PROHIBITION
+- Any file ending in `.ts`, `.tsx`, `.js`, `.cjs`, `.mjs` ← ABSOLUTE PROHIBITION
+
+**Before running `dv broadcast`, you MUST**:
+1. State which workspaces will be affected
+2. Confirm scope is PROTOCOL-ONLY
+3. Receive explicit user confirmation
+
+---
+
+## 11. EXPLICIT DEPLOY CONFIRMATION GATE (Law — ABSOLUTE)
+
+Before executing ANY of the following commands, you MUST stop and explicitly state all three items, then WAIT for user confirmation:
+
+**Gated commands:** `firebase deploy`, `node scripts/safe-deploy.cjs`, `dv flow`, `npm run build` (when followed by deploy)
+
+**Required pre-deploy declaration (verbatim):**
+> "🔒 DEPLOY GATE: Project = `[project-id-from-.firebaserc]` | Scope = `[hosting/functions/rules/etc]` | Files changing = `[list]`. Confirm with YES DEPLOY [PROJECT-ID]."
+
+**If user does not reply with exact `YES DEPLOY [PROJECT-ID]`** — abort. No exceptions. No assumptions. No "the user said deploy earlier."
+
+---
+
+## 12. GDK MCP FREEZE GUARD (Law — ABSOLUTE)
+
+The `mcp_google-developer-knowledge` server has a known hang vector on long semantic queries.
+
+**Rules:**
+- Maximum query length: **3 tokens** (e.g. `Firebase deploy`, `Vertex AI`, `Cloud Run`)
+- If a GDK query does not return within **10 seconds** — it has frozen. Cancel it.
+- After a freeze, **do NOT retry** the same or similar query. Switch to `brave_search` or internal KI.
+- If two GDK queries freeze in the same session, **treat the server as down** and stop using it entirely.
+- The GDK server has **no timeout configured** in `mcp_config.json` — this makes it a hang vector. Until fixed, treat every GDK call as high-risk.
+
