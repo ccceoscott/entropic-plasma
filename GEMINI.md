@@ -13,11 +13,12 @@
 
 ## 3. PROJECT IDENTITY HANDSHAKE (Multi-Project Isolation)
 - **The Protocol**: At the start of EVERY new session or model switch, you MUST:
-  1. Identify the current project root and its unique signature (in `MISSION_STATE.md`).
-  2. Perform an **Identity Handshake**: "Infinity Protocol v10.0 Active: In [PROJECT_NAME], resuming from [MISSION_STATE.md]."
-  3. **AUTO-UPGRADE MANDATE**: Before executing any commands, you MUST compare this project's `.cursorrules` against the master hub (`~/Developer/infinity/.cursorrules`). If the local rules are missing or outdated (e.g. stuck on v5.0 or lower), you MUST immediately run `dv rules` to self-heal the environment. This is non-negotiable.
-  4. **Verify Security Perimeter**: Check for `dv scan-secrets` results. If not recently run, recommend an audit.
-  5. **Gap Audit**: Perform the **Protocol Audit Ritual** (`gap_analysis_mastery.mdc`) to purge all legacy artifacts.
+  1. **ZERO-CHAT BASELINE HUB SYNC**: Before processing even a single line of chat, prompt, or local file reading, you MUST execute `dv downlink` or `./scripts/dv sync-cloud` to ingest the latest global Firebase Brain. This is non-negotiable.
+  2. Identify the current project root and its unique signature (in `MISSION_STATE.md`).
+  3. Perform an **Identity Handshake**: "Infinity Protocol v10.0 Active: In [PROJECT_NAME], resuming from [MISSION_STATE.md]."
+  4. **AUTO-UPGRADE MANDATE**: Before executing any commands, you MUST compare this project's `.cursorrules` against the master hub (`~/Developer/infinity/.cursorrules`). If the local rules are missing or outdated (e.g. stuck on v5.0 or lower), you MUST immediately run `dv rules` to self-heal the environment. This is non-negotiable.
+  5. **Verify Security Perimeter**: Check for `dv scan-secrets` results. If not recently run, recommend an audit.
+  6. **Gap Audit**: Perform the **Protocol Audit Ritual** (`gap_analysis_mastery.mdc`) to purge all legacy artifacts.
 - **Isolation**: You MUST NEVER apply rules, credentials, or branding from one project workspace to another.
 - **State Ingestion**: You MUST read `MISSION_STATE.md`, `walkthrough.md`, and `task.md` before taking any action.
 
@@ -31,7 +32,7 @@
   1. **Directory**: Proximity verification to project root.
   2. **Project ID**: Absolute verification via `.firebaserc` — `node -e "console.log(require('./.firebaserc').projects.default)"`. NEVER use `gcloud config get-value project` — it hangs in non-interactive shells.
   3. **Nuclear Clean**: Purge `dist/`, `.next/`, and `node_modules/` on critical failure.
-  4. **Poison Check**: 0% legacy branding (CareKey, SARAH, Vast).
+  4. **Dynamic Poison Guard**: The Sovereign pre-commit hook auto-detects your active project name. It will physically block commits containing ANY other portfolio legacy strings ("Soul Contract", "CareKey", "SARAH", "FirstPick", etc.) referencing cross-project bleed.
   5. **Pre-Commit Audit**: No code leaves the workspace without passing `dv audit-security`.
 - **Redactive Logging**: Enforce `[REDACTED]` tokens in all terminal logs.
 
@@ -89,6 +90,7 @@
 | Phantom purge | Asking user to run manually | Auto-run via `run_command` — `rm -rf` is local-only, instant, safe |
 | gcloud prompts | bare `gcloud <cmd>` in scripts | Always add `--quiet` flag: `gcloud <cmd> --quiet` |
 | Firebase headless auth | `gcloud auth print-identity-token` | ADC (Application Default Credentials) — GDK confirmed preferred over FIREBASE_TOKEN |
+| MCP Query Freezes | Long semantic queries in `mcp_google-developer-knowledge` | Strictly limit to 2-3 single keyword tokens (e.g. `Vertex AI`). Long queries lock up the MCP completely. |
 | Bash flags in cron | `set -euo pipefail` in scheduled scripts | `set -uo pipefail` — remove `-e`; grep exits 1 on no match and kills script |
 | osascript in scripts | bare `osascript -e "..."` in bash | `timeout 5 osascript -e "..." \|\| true` — GUI calls hang in headless/cron |
 | tmutil in scripts | bare `tmutil deletelocalsnapshots /` | `timeout 10 tmutil deletelocalsnapshots / \|\| true` — needs sudo on some macOS |

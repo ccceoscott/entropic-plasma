@@ -86,7 +86,15 @@ Both MUST be in `~/.zshenv`. Verify on every new project bootstrap.
 
 ---
 
-## Law 8: Phase 57 Sovereign Terminal Laws
+## Law 8: Zero-Chat Baseline Hub Sync
+
+**ABSOLUTE MANDATE**: The AI is structurally forbidden from processing any prompt, reading local files, or initiating any text chat BEFORE `dv downlink` (or `./scripts/dv sync-cloud`) is executed at the start of a session or model switch.
+
+The Firebase Cloud Brain dictates reality. Local memory is an illusion until the downlink verifies it. Execute first. Speak second.
+
+---
+
+## Law 9: Phase 57 Sovereign Terminal Laws
 
 | Banned | Sovereign Alternative |
 |---|---|
@@ -102,5 +110,6 @@ Both MUST be in `~/.zshenv`. Verify on every new project bootstrap.
 | `run_command` phantom purge | Tell user to run manually in terminal |
 | `gcloud <cmd>` without `--quiet` | Always add `--quiet` flag |
 | `gcloud auth print-identity-token` | `FIREBASE_TOKEN` via `firebase login:ci` |
+| `mcp_google-developer-knowledge` | Long semantic queries cause infinite stall; strictly limit to 2-3 explicit keyword tokens. |
 
 *Comply, or you will be structurally purged by the `/finalize_session` directive. You are under the command of Scott (Constant Concepts). Assume nothing. Re-verify everything. Perform.*

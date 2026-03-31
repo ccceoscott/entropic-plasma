@@ -10,7 +10,19 @@ description: Mandatory session start — Identity Handshake, State Ingestion, Se
 
 ---
 
-## §0: MCP Health Verification (Phase 57 — MCP tools only)
+## §0: Zero-Chat Baseline Hub Sync (MANDATORY FIRST STEP)
+
+**CRITICAL MANDATE**: Before loading any local rules, before reading the MISSION_STATE, and BEFORE processing a single prompt or outputting any chat, you MUST execute the Cloud Sync to ensure perfect parity with the Hub-and-Spoke Firebase databank.
+```bash
+./scripts/dv downlink || ./scripts/dv sync-cloud || echo "⚠️ Brain sync failed."
+```
+
+If the sync fails, fallback to reading KI artifacts from `~/.gemini/antigravity/knowledge/`.
+Always consult `KNOWLEDGE.md` for project-specific patterns.
+
+---
+
+## §1: MCP Health Verification (Phase 57 — MCP tools only)
 
 Use `mcp_firebase-mcp-server_firebase_get_environment` to verify Firebase CLI auth status.
 
@@ -20,7 +32,7 @@ Check active workflows are accessible: `list_dir` on `.agent/workflows/` to conf
 
 ---
 
-## §1: Workspace Identity Lock (MANDATORY FIRST)
+## §2: Workspace Identity Lock (MANDATORY SECOND)
 
 Use `view_file` to read these in priority order — **never from memory:**
 
@@ -33,7 +45,7 @@ Use `view_file` to read these in priority order — **never from memory:**
 
 ---
 
-## §2: Project Identity Lock (Sovereign — NO gcloud hang)
+## §3: Project Identity Lock (Sovereign — NO gcloud hang)
 
 // turbo
 ```bash
@@ -54,16 +66,6 @@ grep "NODE_OPTIONS" package.json 2>/dev/null || echo "⚠️ MACHINE LAW VIOLATI
 ```bash
 ls -la .git/hooks/pre-commit 2>/dev/null || echo "⚠️ Pre-commit hook not installed"
 ```
-
----
-
-## §3: Cloud Memory Context (Phase 51 Sovereignty)
-
-Read KI artifacts from `~/.gemini/antigravity/knowledge/` using `list_dir` then `view_file` for CRITICAL/HIGH items relevant to the current project.
-
-If cloud sync desired: use `python3 -c` with `subprocess.run(timeout=8)` — never bare `curl` with `$()`.
-
-Fallback: `KNOWLEDGE.md` + `~/.gemini/antigravity/knowledge/` KI artifacts. Always valid.
 
 ---
 

@@ -35,6 +35,8 @@ export NEXT_TELEMETRY_DISABLED=1 && export ASTRO_TELEMETRY_DISABLED=1
 - `"next dev"` → `"NODE_OPTIONS=--max-old-space-size=4096 next dev"`
 - `"next build"` → `"NODE_OPTIONS=--max-old-space-size=4096 next build"`
 - `"next start"` → `"NODE_OPTIONS=--max-old-space-size=4096 next start"`
+- `"test"` → `"NODE_OPTIONS=--max-old-space-size=4096 vitest run"`
+- `"test:e2e"` → `"NODE_OPTIONS=--max-old-space-size=4096 playwright test"`
 
 ```bash
 npm i -g npm@latest
@@ -82,6 +84,18 @@ cp ~/Developer/infinity-protocol-1/templates/firestore.indexes.json ./firestore.
 Deploy security gates FIRST (user approves):
 ```bash
 firebase deploy --only firestore:rules,firestore:indexes
+```
+
+Copy Master Testing Gates directly from the Hub:
+// turbo
+```bash
+cp ~/Developer/infinity-protocol-1/templates/playwright.config.ts . 2>/dev/null || true
+cp ~/Developer/infinity-protocol-1/templates/vitest.config.ts . 2>/dev/null || true
+```
+
+Pull the Sovereign Brain directly from Firebase (User Approval):
+```bash
+~/Developer/infinity-protocol-1/scripts/dv sync-cloud || echo "⚠️ Brain sync failed."
 ```
 
 Install pre-commit hook:
