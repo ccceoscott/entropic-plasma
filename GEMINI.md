@@ -81,12 +81,12 @@
 | E2E Runner | `npx playwright` | `./node_modules/.bin/playwright` |
 | Build Tool | `npx vite build` / `npx tsc` | `./node_modules/.bin/vite` / `./node_modules/.bin/tsc` |
 | Blocking exec | `execSync(cmd)` | `execSync(cmd, { timeout: 8000 })` |
-| Finalize/Session | `run_command` for bash steps | `write_to_file` / `grep_search` MCP tools |
+| Finalize/Session | `run_command` for network/blocking ops | MCP file tools preferred; safe local `rm`/`curl --max-time` ALLOWED |
 | Secret scan | `run_command` grep | `grep_search` MCP tool |
 | Firestore rules | `firebase firestore:rules > /tmp/...` | `mcp_firebase-mcp-server_firebase_get_security_rules` |
 | Fleet audit | bare `gcloud` in `run_command` | `mcp_gcloud_run_gcloud_command` MCP tool |
 | `// turbo-all` | on any workflow with network calls | Remove annotation; use per-step `// turbo` only for local-only ops |
-| Phantom purge | `run_command` rm | Tell user to run manually in their terminal |
+| Phantom purge | Asking user to run manually | Auto-run via `run_command` — `rm -rf` is local-only, instant, safe |
 | gcloud prompts | bare `gcloud <cmd>` in scripts | Always add `--quiet` flag: `gcloud <cmd> --quiet` |
 | Firebase headless auth | `gcloud auth print-identity-token` | ADC (Application Default Credentials) — GDK confirmed preferred over FIREBASE_TOKEN |
 | Bash flags in cron | `set -euo pipefail` in scheduled scripts | `set -uo pipefail` — remove `-e`; grep exits 1 on no match and kills script |
