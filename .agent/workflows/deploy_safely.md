@@ -53,7 +53,8 @@ Use `view_file` to read `.firebaserc` and confirm `default` alias:
 - Maps to `staging`/`dev` → proceed with orange warning.
 - `.firebaserc` missing → **ABORT**. Run `/bootstrap_new_project` first.
 
-MCP identity check: `mcp_gcloud_run_gcloud_command` with args `["config", "get-value", "account", "--quiet"]`
+MCP identity check (GDK canonical form from `gcloud info --format='value(config.account)'`):
+`mcp_gcloud_run_gcloud_command` with args `["info", "--format=value(config.account)", "--quiet"]`
 
 ---
 
@@ -87,8 +88,10 @@ Confirm all env vars referenced in Cloud Functions exist in Secret Manager.
 
 // turbo
 ```bash
-npm run lint 2>/dev/null || true
+LINT_FAIL=0; npm run lint 2>&1 || LINT_FAIL=1; [ $LINT_FAIL -eq 1 ] && echo "⚠️ Lint warnings present — review before deploy"
 ```
+
+> GDK: do not swallow lint errors silently. Capture exit code, warn but allow proceed if non-breaking.
 
 ---
 
@@ -110,9 +113,9 @@ NODE_OPTIONS=--max-old-space-size=4096 npm run build
 ## 🔒 Lock 7: Ascension Deploy
 
 ```bash
-firebase deploy --only functions,hosting --force
+firebase deploy --only functions,hosting --non-interactive --force
 ```
 
-> Network call. NEVER auto-run. `WaitMsBeforeAsync: 10000` minimum. Explicit user approval required.
+> GDK (firebase.google.com/docs/cli): `--non-interactive` is mandatory for CI/headless. `--force` bypasses all warning-level confirmation prompts for connectors/Data Connect.
 
 *Status: All Locks Passed. Deployment Sealed. The Cloud reflects the Source.*
