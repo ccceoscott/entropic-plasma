@@ -37,9 +37,10 @@
 - **Redactive Logging**: Enforce `[REDACTED]` tokens in all terminal logs.
 
 ## 5. INTELLIGENCE v5.0 (Predictive Security)
-- **Deep Reflection & KI Grounding**: You MUST pause and think longer before execution. Query the `<appDataDir>/knowledge/` database first. Simulate the entire execution path and test against Master Protocol bounds before writing code.
+- **Deep Reflection & KI Grounding**: You MUST pause and think longer before execution. Query the `<appDataDir>/knowledge/` database first. Then, you MUST query `mcp_firebase-mcp-server_developerknowledge_search_documents` for both Google and Firebase official documentation to ensure your proposed architecture is modern. Simulate the entire execution path and test against Master Protocol bounds before writing code.
 - **Deep Architectural Analysis (DAA)**: PFIA reports must include long-term system impact and security surface area changes.
 - **Predictive Safeguards (PS)**: Proactive security/performance auditing of touched code.
+- **Periodic Knowledge Audit**: You must proactively and periodically execute `.agent/workflows/knowledge_audit.md` to scan the active project against official docs and backup the findings to Firebase Storage.
 - **5:1 Rigor**: 5 parts research to 1 part write for critical logic.
 - **Logical Traversal**: Mandatory side-effect analysis before execution.
 - **Error Path Analysis (EPA)**: Architect for failure by default.
@@ -126,27 +127,25 @@
 
 ---
 
-## 11. EXPLICIT DEPLOY CONFIRMATION GATE (Law — ABSOLUTE)
+## 11. EXPLICIT DEPLOY CONFIRMATION GATE (Revised — Contextual Deploy)
 
-Before executing ANY of the following commands, you MUST stop and explicitly state all three items, then WAIT for user confirmation:
+Before executing ANY deployments (e.g. `firebase deploy`, `dv flow`, `safe-deploy`), you MUST automatically read the project ID from the workspace using `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc')).projects.default)"`.
 
-**Gated commands:** `firebase deploy`, `node scripts/safe-deploy.cjs`, `dv flow`, `npm run build` (when followed by deploy)
+If the user says "proceed", "deploy", or gives explicit permission in the conversational context:
+1. State the project you are deploying to and the scope.
+2. Execute the deployment immediately.
 
-**Required pre-deploy declaration (verbatim):**
-> "🔒 DEPLOY GATE: Project = `[project-id-from-.firebaserc]` | Scope = `[hosting/functions/rules/etc]` | Files changing = `[list]`. Confirm with YES DEPLOY [PROJECT-ID]."
-
-**If user does not reply with exact `YES DEPLOY [PROJECT-ID]`** — abort. No exceptions. No assumptions. No "the user said deploy earlier."
+You DO NOT need to halt and force the user to type `YES DEPLOY [PROJECT-ID]`. The manual lock is hereby lifted—you must act autonomously.
 
 ---
 
-## 12. GDK MCP FREEZE GUARD (Law — ABSOLUTE)
+## 12. GDK MCP BAN & FIREBASE HUB ALTERNATIVE (Law — ABSOLUTE)
 
-The `mcp_google-developer-knowledge` server has a known hang vector on long semantic queries.
+The standalone `mcp_google-developer-knowledge` server is globally banned due to severe thread freezing and hangs across workspaces.
+**It has been purged from mcp_config.json.**
 
 **Rules:**
-- Maximum query length: **3 tokens** (e.g. `Firebase deploy`, `Vertex AI`, `Cloud Run`)
-- If a GDK query does not return within **10 seconds** — it has frozen. Cancel it.
-- After a freeze, **do NOT retry** the same or similar query. Switch to `brave_search` or internal KI.
-- If two GDK queries freeze in the same session, **treat the server as down** and stop using it entirely.
-- The GDK server has **no timeout configured** in `mcp_config.json` — this makes it a hang vector. Until fixed, treat every GDK call as high-risk.
+- MUST exclusively use the integrated `mcp_firebase-mcp-server_developerknowledge_search_documents` for both Google AND Firebase Developer Knowledge queries BEFORE writing code in the active project.
+- MUST proactively leverage the `/knowledge_audit.md` workflow to generate drift reports saved automatically to Firebase Storage for sovereign portfolio persistence.
+- Do NOT attempt to use the broken `google-developer-knowledge` standalone sever.
 

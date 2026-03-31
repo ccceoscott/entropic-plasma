@@ -128,7 +128,9 @@ curl -s --connect-timeout 5 --max-time 8 \
 
 // turbo
 ```bash
-rm -rf ~/.gemini/antigravity/browser_recordings/ ~/.npm/_npx/ /tmp/ableton_* /tmp/vault_* 2>/dev/null; echo "[PURGE] Done"
+rm -rf ~/Developer/infinity-*/.next/cache ~/Developer/infinity-*/node_modules/.vite 2>/dev/null
+rm -rf ~/.gemini/antigravity/browser_recordings/ ~/.npm/_npx/ /tmp/ableton_* /tmp/vault_* 2>/dev/null
+echo "[PURGE] Phantom bloat eradicated."
 ```
 
 > Safe to auto-run. No network, no stdin, no hang risk. Duration: <100ms.
