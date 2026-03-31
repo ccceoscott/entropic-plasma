@@ -64,21 +64,27 @@ Write the session KI directly to disk using the `write_to_file` tool:
 
 ---
 
-## 3. ☁️ Cloud Run Sync (run_command — bounded, safe)
+## 3. ☁️ Cloud Sync — DISK IS AUTHORITATIVE
 
-Sync the KI to the Cloud Run memory hub using a bounded curl call:
+> **ROOT CAUSE FIXED (Phase 57.1):** The previous `curl` pattern sent a raw JSON body to `saveSessionMemory` which is an `onCall` function — not `onRequest`. Firebase `onCall` requires the payload wrapped as `{"data": {...}}` with a Firebase ID token in the `Authorization` header. A raw curl **always** produces a cold-start payload mismatch. This is not recoverable via curl.
+
+**The correct pattern:**
+
+- **KI disk write (Step 2) is the AUTHORITATIVE record.** It never fails and never requires a network call.
+- Cloud sync is **deferred** — at the START of the next session, the MCP tool `mcp_firebase-mcp-server_firestore_add_document` or the `saveSessionMemory` onCall function (invoked via the Firebase SDK, not curl) handles persistence.
+- **DO NOT attempt curl against onCall endpoints.** They will always mismatch without a valid Firebase ID token.
+
+**If you want to verify cloud sync health**, use the `/ping` endpoint (onRequest — curl-safe):
 
 ```bash
-curl -s --connect-timeout 5 --max-time 10 \
-  -X POST "https://savesessionmemory-g5pod66w5a-uc.a.run.app/save" \
-  -H "Content-Type: application/json" \
-  -d "{\"project\":\"PROJECT_NAME\",\"summary\":\"BRIEF_SUMMARY\"}" \
-  2>/dev/null || echo "[WARN] Cloud sync skipped (cold start or unreachable)"
+curl -s --connect-timeout 5 --max-time 8 \
+  "https://mcpserver-g5pod66w5a-uc.a.run.app/ping" \
+  2>/dev/null || echo "[WARN] MCP hub unreachable — KI disk write is authoritative"
 ```
 
 // turbo
 
-> This is a **bounded** network call (10s max). It is safe to run via `run_command`. If it fails, the KI disk write in step 2 is the authoritative fallback.
+> **Law (Phase 57.1):** Never curl an `onCall` function. KI disk write is always the authoritative finalization record. Cloud sync is a best-effort operation deferred to next session start.
 
 ---
 
