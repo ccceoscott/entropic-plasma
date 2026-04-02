@@ -37,10 +37,9 @@
 - **Redactive Logging**: Enforce `[REDACTED]` tokens in all terminal logs.
 
 ## 5. INTELLIGENCE v5.0 (Predictive Security)
-- **Deep Reflection & KI Grounding**: You MUST pause and think longer before execution. Query the `<appDataDir>/knowledge/` database first. Then, you MUST query `mcp_firebase-mcp-server_developerknowledge_search_documents` for both Google and Firebase official documentation to ensure your proposed architecture is modern. Simulate the entire execution path and test against Master Protocol bounds before writing code.
+- **Deep Reflection & KI Grounding**: You MUST pause and think longer before execution. Query the `<appDataDir>/knowledge/` database first. Simulate the entire execution path and test against Master Protocol bounds before writing code.
 - **Deep Architectural Analysis (DAA)**: PFIA reports must include long-term system impact and security surface area changes.
 - **Predictive Safeguards (PS)**: Proactive security/performance auditing of touched code.
-- **Periodic Knowledge Audit**: You must proactively and periodically execute `.agent/workflows/knowledge_audit.md` to scan the active project against official docs and backup the findings to Firebase Storage.
 - **5:1 Rigor**: 5 parts research to 1 part write for critical logic.
 - **Logical Traversal**: Mandatory side-effect analysis before execution.
 - **Error Path Analysis (EPA)**: Architect for failure by default.
@@ -91,61 +90,10 @@
 | Phantom purge | Asking user to run manually | Auto-run via `run_command` — `rm -rf` is local-only, instant, safe |
 | gcloud prompts | bare `gcloud <cmd>` in scripts | Always add `--quiet` flag: `gcloud <cmd> --quiet` |
 | Firebase headless auth | `gcloud auth print-identity-token` | ADC (Application Default Credentials) — GDK confirmed preferred over FIREBASE_TOKEN |
-| MCP Query Freezes | Long semantic queries in `mcp_google-developer-knowledge` | Strictly limit to 2-3 single keyword tokens (e.g. `Vertex AI`). Long queries lock up the MCP completely. If ANY query hangs >10s, abort and use `brave_search` or internal KI instead. NEVER retry a hanging GDK query. |
+| MCP Query Freezes | Long semantic queries in `mcp_google-developer-knowledge` | Strictly limit to 2-3 single keyword tokens (e.g. `Vertex AI`). Long queries lock up the MCP completely. |
 | Bash flags in cron | `set -euo pipefail` in scheduled scripts | `set -uo pipefail` — remove `-e`; grep exits 1 on no match and kills script |
 | osascript in scripts | bare `osascript -e "..."` in bash | `timeout 5 osascript -e "..." \|\| true` — GUI calls hang in headless/cron |
 | tmutil in scripts | bare `tmutil deletelocalsnapshots /` | `timeout 10 tmutil deletelocalsnapshots / \|\| true` — needs sudo on some macOS |
 | crontab install | `(crontab -l \| ...) \| crontab -` pipe | tmp file + `timeout 5 crontab file` — pipe subshell deadlocks in non-TTY |
 | git fetch in scripts | bare `git fetch --all --prune` | `GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q \|\| true` |
 | TypeScript in hooks | bare `tsc --noEmit` in pre-commit | `timeout 60 tsc --noEmit --skipLibCheck` — hangs on OOM or circular imports |
-| **Broadcast scope** | `dv broadcast` touching `firebase.json`, `firestore.rules`, `package.json`, `scripts/` | `dv broadcast` is PROTOCOL-ONLY — `.cursorrules`, `GEMINI.md`, `.agent/workflows/` ONLY. Any broadcast that modifies app files is a CRITICAL VIOLATION. |
-| **Deploy without confirm** | Running `firebase deploy`, `safe-deploy`, `dv flow` without stating project + scope | ALWAYS state: (1) exact project ID from `.firebaserc`, (2) what will change, (3) wait for explicit `YES DEPLOY [PROJECT]` from user |
-
-## 10. BROADCAST SOVEREIGN SCOPE (Law — ABSOLUTE)
-
-`dv broadcast` is a **PROTOCOL PROPAGATION** tool. It is NOT a deploy tool. It is NOT a code sync tool.
-
-**BROADCAST MAY ONLY TOUCH:**
-- `.cursorrules` (obfuscated MDC rules)
-- `GEMINI.md` (protocol document)
-- `.agent/workflows/*.md` (workflow markdown files)
-- `MISSION_STATE.md` (version stamp only)
-
-**BROADCAST MUST NEVER TOUCH:**
-- `firebase.json` ← ABSOLUTE PROHIBITION
-- `firestore.rules` ← ABSOLUTE PROHIBITION  
-- `storage.rules` ← ABSOLUTE PROHIBITION
-- `package.json` ← ABSOLUTE PROHIBITION
-- `scripts/` directory ← ABSOLUTE PROHIBITION
-- `src/` directory ← ABSOLUTE PROHIBITION
-- Any file ending in `.ts`, `.tsx`, `.js`, `.cjs`, `.mjs` ← ABSOLUTE PROHIBITION
-
-**Before running `dv broadcast`, you MUST**:
-1. State which workspaces will be affected
-2. Confirm scope is PROTOCOL-ONLY
-3. Receive explicit user confirmation
-
----
-
-## 11. EXPLICIT DEPLOY CONFIRMATION GATE (Revised — Contextual Deploy)
-
-Before executing ANY deployments (e.g. `firebase deploy`, `dv flow`, `safe-deploy`), you MUST automatically read the project ID from the workspace using `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc')).projects.default)"`.
-
-If the user says "proceed", "deploy", or gives explicit permission in the conversational context:
-1. State the project you are deploying to and the scope.
-2. Execute the deployment immediately.
-
-You DO NOT need to halt and force the user to type `YES DEPLOY [PROJECT-ID]`. The manual lock is hereby lifted—you must act autonomously.
-
----
-
-## 12. GDK MCP BAN & FIREBASE HUB ALTERNATIVE (Law — ABSOLUTE)
-
-The standalone `mcp_google-developer-knowledge` server is globally banned due to severe thread freezing and hangs across workspaces.
-**It has been purged from mcp_config.json.**
-
-**Rules:**
-- MUST exclusively use the integrated `mcp_firebase-mcp-server_developerknowledge_search_documents` for both Google AND Firebase Developer Knowledge queries BEFORE writing code in the active project.
-- MUST proactively leverage the `/knowledge_audit.md` workflow to generate drift reports saved automatically to Firebase Storage for sovereign portfolio persistence.
-- Do NOT attempt to use the broken `google-developer-knowledge` standalone sever.
-

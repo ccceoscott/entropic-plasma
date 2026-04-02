@@ -13,6 +13,7 @@ description: Mandatory session start — Identity Handshake, State Ingestion, Se
 ## §0: Zero-Chat Baseline Hub Sync (MANDATORY FIRST STEP)
 
 **CRITICAL MANDATE**: Before loading any local rules, before reading the MISSION_STATE, and BEFORE processing a single prompt or outputting any chat, you MUST execute the Cloud Sync to ensure perfect parity with the Hub-and-Spoke Firebase databank.
+// turbo-all
 ```bash
 ./scripts/dv downlink || ./scripts/dv sync-cloud || echo "⚠️ Brain sync failed."
 ```
