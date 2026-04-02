@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Antigravity Active Tiered Episodic Memory Schema",
+  "type": "object",
+  "properties": {
+    "system_phase": {
+      "type": "string",
+      "description": "The current development phase of the project (e.g., 'Phase 4 - API Hardening')."
+    },
+    "active_blockers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Specific blockers preventing progress."
+    },
+    "current_focus": {
+      "type": "string",
+      "description": "The direct, immediate objective of the current working session."
+    },
+    "domain_tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Relevance tags mapping the episodic memory format for Semantic Extraction."
+    },
+    "completed_today": {
+      "type": "integer",
+      "description": "Total tasks completed in this sprint before compression runs."
+    },
+    "previous_session_reference": {
+      "type": "string",
+      "description": "Temporal chain pointer pointing to the most recently generated Session Summary Knowledge Item."
+    }
+  },
+  "required": [
+    "system_phase",
+    "active_blockers",
+    "current_focus",
+    "domain_tags",
+    "completed_today",
+    "previous_session_reference"
+  ]
+}
