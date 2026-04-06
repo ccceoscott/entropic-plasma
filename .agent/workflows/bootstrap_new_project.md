@@ -1,10 +1,10 @@
 ---
-description: Mandatory Protocol for initializing ANY new project — Next.js scaffold + Firebase Ascension + Governance Injection (Phase 57 Sovereign)
+description: Mandatory Protocol for initializing ANY new project — Next.js scaffold + Firebase Ascension + Governance Injection (Phase 160 Sovereign)
 ---
 
 # /bootstrap_new_project — The Ascension Ritual
 
-Every new project begins here. Merges both `/bootstrap_new_project` and `/new_project_bootstrap` — Phase 57 consolidated standard.
+Every new project begins here. Merges both `/bootstrap_new_project` and `/new_project_bootstrap` — Phase 160 consolidated standard.
 
 > **⚠️ PHASE 57 LAWS:**
 > - `// turbo-all` REMOVED — only local-only steps get `// turbo`

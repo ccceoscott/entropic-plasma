@@ -1,108 +1,36 @@
 ---
-description: Mandatory session start — Identity Handshake, State Ingestion, Security Perimeter, Stack Verification (Phase 57 Sovereign)
+description: "DEPRECATED — USE /turnover INSTEAD. /session_start has been fully absorbed into /turnover (SESSION START PROTOCOL v5.0). This file is preserved for historical reference only. (Phase 117 Sovereign)"
 ---
 
-# /session_start — Identity Handshake & Environment Verification
+# /session_start — ⚠️ DEPRECATED — Use `/turnover` Instead
 
-**Runs at the start of EVERY session and after ANY model switch.** This is the sovereign anchor that prevents hallucination, context bleed, and protocol drift. Merges `/jack-roberts` (deprecated) and `/verify_environment` (deprecated).
+> **STATUS**: DEPRECATED as of Phase 117. All functionality from this workflow has been fully absorbed into `/turnover` — SESSION START PROTOCOL v5.0 (20-stage Sovereign Omniscience Engine).
 
-> Per `init.mdc §5`: **After any model switch, all in-memory state is UNVERIFIED. Re-read from disk before acting.**
+## The Sovereign Session Lifecycle
 
----
-
-## §0: Zero-Chat Baseline Hub Sync (MANDATORY FIRST STEP)
-
-**CRITICAL MANDATE**: Before loading any local rules, before reading the MISSION_STATE, and BEFORE processing a single prompt or outputting any chat, you MUST execute the Cloud Sync to ensure perfect parity with the Hub-and-Spoke Firebase databank.
-// turbo-all
-```bash
-./scripts/dv downlink || ./scripts/dv sync-cloud || echo "⚠️ Brain sync failed."
+```
+SESSION START  →  /turnover          (20-stage Omniscience Engine — run at session begin)
+   ↓ work happens ↓
+SESSION END    →  /finalize_session  (24-stage Close-of-Session Engine — run at session end)
 ```
 
-If the sync fails, fallback to reading KI artifacts from `~/.gemini/antigravity/knowledge/`.
-Always consult `KNOWLEDGE.md` for project-specific patterns.
+## Absorption Map
 
----
+The following sections from this file now live in `/turnover`:
 
-## §1: MCP Health Verification (Phase 57 — MCP tools only)
+| Old Section | New Location in `/turnover` |
+|---|---|
+| §0 Zero-Chat Baseline Hub Sync | Stage 0 — Dead Reckoning + Stage 1 — Identity Lock |
+| §1 MCP Health Verification | Stage 11 — Live System Health Probes (MCP server inventory) |
+| §2 Workspace Identity Lock | Stage 2 — Full Artifact Pipeline Ingest |
+| §3 Project Identity Lock | Stage 1 — 4-Point Identity Lock (.firebaserc verification) |
+| §4 Anti-Hallucination Gate | Stage 2 — Artifact Ingest (KI vs. Disk principle) |
+| §5 Secret Perimeter Check | Stage 4 — Full-Spectrum Security Sweep |
+| §6 Stack & Aesthetic Standard | Stage 13 — Aesthetic Compliance Scan |
+| §7 Emit Handshake | Stage 1 — Handshake emission (required output) |
 
-Use `mcp_firebase-mcp-server_firebase_get_environment` to verify Firebase CLI auth status.
+## Why This Was Deprecated
 
-Use `mcp_gcloud_run_gcloud_command` with args `["auth", "list", "--quiet"]` to confirm active GCP account.
+`/session_start` was a 7-section, 109-line lightweight handshake that competed with `/turnover`'s 20-stage, 925-line omniscience engine for the same session-start slot. Having two workflows that both claimed to be "the session start" created confusion, duplication, and inconsistent behavior across model switches. Resolution: `/turnover` wins as the canonical start protocol. `/session_start` is retired.
 
-Check active workflows are accessible: `list_dir` on `.agent/workflows/` to confirm 6 canonical files present.
-
----
-
-## §2: Workspace Identity Lock (MANDATORY SECOND)
-
-Use `view_file` to read these in priority order — **never from memory:**
-
-1. `MISSION_STATE.md` — current version, completed goals, active blockers
-2. `task.md` — any `[/]` in-progress items take priority over new requests
-3. `walkthrough.md` — what was last verified; don't redo it
-4. `KNOWLEDGE.md` — project-specific known patterns
-
-> **NEVER use `run_command` to `cat` these files.** Use `view_file` MCP tool only.
-
----
-
-## §3: Project Identity Lock (Sovereign — NO gcloud hang)
-
-// turbo
-```bash
-node -e "console.log('Project:', require('./.firebaserc').projects.default)" 2>/dev/null || echo "⚠️ .firebaserc not found — run /bootstrap_new_project"
-```
-
-// turbo
-```bash
-node --version && npm --version
-```
-
-// turbo
-```bash
-grep "NODE_OPTIONS" package.json 2>/dev/null || echo "⚠️ MACHINE LAW VIOLATION: NODE_OPTIONS missing from package.json"
-```
-
-// turbo
-```bash
-ls -la .git/hooks/pre-commit 2>/dev/null || echo "⚠️ Pre-commit hook not installed"
-```
-
----
-
-## §4: Source-First Anti-Hallucination Gate
-
-Before writing ANY code:
-- [ ] `view_file` the actual source — NEVER code from memory
-- [ ] Verify imports exist in `package.json` via `view_file` or `grep_search`
-- [ ] Source field/collection names from `MISSION_STATE.md` — never assume
-- [ ] If uncertain: state it explicitly — **never guess confidently**
-
----
-
-## §5: Secret Perimeter Check
-
-Use `grep_search` MCP tool (non-blocking):
-- Query `AIza` in `src/`
-- Query `PRIVATE KEY` in repo root
-
-All secrets → Google Cloud Secret Manager via `defineSecret()`. `.env.local` local-only. Never committed.
-
----
-
-## §6: Stack & Aesthetic Standard
-
-- **Stack**: Next.js App Router + TypeScript + Tailwind CSS + Framer Motion
-- **Aesthetic**: Liquid Glass v10.0 — translucent borders, fluid typography, GPU-accelerated keyframes
-- **UI**: Radix primitives, curated HSL dark mode, Framer micro-animations
-- **Forbidden**: `style={{}}` inline styles, generic colors, grey placeholder boxes
-
----
-
-## §7: Emit Handshake
-
-After completing all sections above, emit verbatim:
-
-> **"Infinity Protocol v10.0 Active: In [PROJECT_NAME], resuming from MISSION_STATE.md. Phase [N]. All state verified."**
-
-*Failure to perform this ritual after a model switch is a Protocol violation. There is no excuse for skipping it.*
+> *The machine that ran two competing start protocols was a machine at war with itself. Now it speaks with one voice.*

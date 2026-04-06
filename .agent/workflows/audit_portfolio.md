@@ -1,5 +1,5 @@
 ---
-description: Automated workflow to audit the status of all Firebase projects in the portfolio. (Phase 57 Sovereign Standard)
+description: Automated workflow to audit the status of all Firebase projects in the portfolio. (Phase 160 Sovereign)
 ---
 
 # /audit_portfolio — Sovereign Fleet Inspection

@@ -1,5 +1,5 @@
 ---
-description: Complete Safe Deployment Lifecycle — Security Scan + Identity Lock + Build + Ascension (Phase 57 Sovereign)
+description: Complete Safe Deployment Lifecycle — Security Scan + Identity Lock + Build + Ascension (Phase 160 Sovereign)
 ---
 
 # /deploy_safely — Sovereign Deployment Lifecycle
@@ -38,6 +38,15 @@ bash .git/hooks/pre-commit 2>/dev/null || echo "Pre-commit hook complete"
 ```
 
 **Halt immediately** if any match found outside `.env.local` or `.env.example`.
+
+---
+
+## 🔒 Lock 0.5: Protocol Auto-Update (Sovereign Sync)
+
+// turbo
+```bash
+bash "$HOME/Developer/infinity-protocol-1/scripts/dv" fix-drift "$PWD" >/dev/null 2>&1 || true
+```
 
 ---
 

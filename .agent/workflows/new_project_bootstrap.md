@@ -1,5 +1,5 @@
 ---
-description: Standard Protocol for initializing a NEW Firebase project with Governance Standards. (Phase 57 Sovereign Standard)
+description: Standard Protocol for initializing a NEW Firebase project with Governance Standards. (Phase 160 Sovereign)
 ---
 
 # ⚠️ Deprecated

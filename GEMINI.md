@@ -30,7 +30,7 @@
 - **Credential Safety**: NEVER hardcode API keys. Use Secret Manager or `.env.local`. Maintain an up-to-date `.env.example`.
 - **Safe-Deploy Locks**:
   1. **Directory**: Proximity verification to project root.
-  2. **Project ID**: Absolute verification via `.firebaserc` — `node -e "console.log(require('./.firebaserc').projects.default)"`. NEVER use `gcloud config get-value project` — it hangs in non-interactive shells.
+  2. **Project ID**: Absolute verification via `.firebaserc` — `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"`. NEVER use `gcloud config get-value project` — it hangs in non-interactive shells.
   3. **Nuclear Clean**: Purge `dist/`, `.next/`, and `node_modules/` on critical failure.
   4. **Dynamic Poison Guard**: The Sovereign pre-commit hook auto-detects your active project name. It will physically block commits containing ANY other portfolio legacy strings ("Soul Contract", "CareKey", "SARAH", "FirstPick", etc.) referencing cross-project bleed.
   5. **Pre-Commit Audit**: No code leaves the workspace without passing `dv audit-security`.
@@ -58,22 +58,30 @@
 - **Alerts**: Halt and warn if Project Bleed or Poison Strings are detected.
 - **Google Sovereignty**: Adhere strictly to `google_vertex_ai_mastery.mdc` and `google_products_mastery.mdc`.
 - **Node V8 Sovereignty**: `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. Non-negotiable on Apple Silicon. Never use 8192.
-- **Phantom Purge**: Run `rm -rf ~/.gemini/antigravity/browser_recordings` after every browser subagent session. Tell the USER to run this manually — NEVER via `run_command`.
+- **Phantom Purge**: Run `rm -rf ~/.gemini/antigravity/browser_recordings` after every browser subagent session. Auto-run via `run_command` — local `rm -rf` is safe. NEVER via a blocking MCP op.
 - **MCP Watchdog**: `mcp_watchdog.sh` runs every 10 minutes via cron. Trust it. Do not panic-kill with `kill -9`.
+- **Terminal Diagnostics**: Run `dv health` for instant sovereign terminal health snapshot (ports, daemons, env, bloat).
 
-## 8. PHASE 43 MEMORY SOVEREIGNTY (Machine Laws)
+## 8. PHASE 161 MEMORY SOVEREIGNTY (Machine Laws)
 | Law | Rule |
 |---|---|
 | Node V8 | `NODE_OPTIONS=--max-old-space-size=4096` in all `package.json` scripts |
 | JVM | `_JAVA_OPTIONS="-Xmx2048m"` in `~/.zshenv` |
 | IDE | `"typescript.tsserver.maxTsServerMemory": 2048` in `.vscode/settings.json` |
-| EMFILE | `ulimit -n 65536` in `~/.zshenv` |
+| EMFILE | `ulimit -n 65536` in `~/.zshrc` (interactive only — NOT in .zshenv, causes IDE probe hang) |
 | Playwright | `workers: process.env.CI ? 1 : 3` — never auto-detect |
-| APFS | `timeout 10 tmutil deletelocalsnapshots / || true` after mass deletions |
+| APFS | `timeout 10 tmutil deletelocalsnapshots / \|\| true` after mass deletions |
 | Video Bloat | `rm -rf ~/.gemini/antigravity/browser_recordings` after browser tasks |
 | Compiler Parity | `productionBrowserSourceMaps: false` and `removeConsole` in `next.config.ts` |
 | Worker Clamp | `experimental.memoryBasedWorkersCount` is strictly BANNED on Apple Silicon |
 | Telemetry | `NEXT_TELEMETRY_DISABLED=1` & `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv` |
+| Noise Suppression | `NODE_NO_WARNINGS=1` & `FIREBASE_HIDE_GOOGLE_CLOUD_WARNING=1` in `~/.zshenv` |
+| GNU coreutils | `brew install coreutils` — provides native `timeout` on macOS. All scripts carry pure-bash fallback. |
+| Slow Cmd Detect | `REPORTTIME=5` + `TIMEFMT='⏱ %J: %E real'` in `~/.zshrc` — warns if any command >5s |
+| Git Hang Guard | `GIT_TERMINAL_PROMPT=0` + `GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5"` in `~/.zshrc` |
+| ZSH Exit Hang | `setopt NO_HUP NO_CHECK_JOBS` in `~/.zshrc` — eliminates "you have running jobs" hang on exit |
+| ZSH Paste | `setopt INTERACTIVE_COMMENTS` in `~/.zshrc` — prevents `#` paste errors in interactive shells |
+| Dev Server TTL | `dev_server_guardian.sh` cron (every 30 min) — kills servers older than 6h. Warns at 4h |
 
 ## 9. PHASE 57 SOVEREIGN TERMINAL LAWS (Non-Negotiable)
 | Law | Banned | Sovereign Alternative |
@@ -94,6 +102,51 @@
 | Bash flags in cron | `set -euo pipefail` in scheduled scripts | `set -uo pipefail` — remove `-e`; grep exits 1 on no match and kills script |
 | osascript in scripts | bare `osascript -e "..."` in bash | `timeout 5 osascript -e "..." \|\| true` — GUI calls hang in headless/cron |
 | tmutil in scripts | bare `tmutil deletelocalsnapshots /` | `timeout 10 tmutil deletelocalsnapshots / \|\| true` — needs sudo on some macOS |
-| crontab install | `(crontab -l \| ...) \| crontab -` pipe | tmp file + `timeout 5 crontab file` — pipe subshell deadlocks in non-TTY |
+| crontab install | `(crontab -l \| ...) \| crontab -` pipe | tmp file + plain `crontab file` (no timeout — `timeout` is GNU only; tmp file pattern already eliminates deadlock risk) |
 | git fetch in scripts | bare `git fetch --all --prune` | `GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q \|\| true` |
 | TypeScript in hooks | bare `tsc --noEmit` in pre-commit | `timeout 60 tsc --noEmit --skipLibCheck` — hangs on OOM or circular imports |
+| git push via run_command | `run_command` with `git push` | **BANNED** — always give user a paste command. `run_command` + outbound SSH/HTTPS = guaranteed hang vector |
+| dv save / push-all | bare `git push origin $branch` in dv | `GIT_TERMINAL_PROMPT=0 timeout 45 git push origin $branch` — Phase 120 sovereign fix |
+
+## 10. BROADCAST SOVEREIGN SCOPE (Law — ABSOLUTE)
+
+`dv broadcast` is a **PROTOCOL PROPAGATION** tool. It is NOT a deploy tool. It is NOT a code sync tool.
+
+**BROADCAST MAY ONLY TOUCH:**
+- `.cursorrules` (obfuscated MDC rules)
+- `GEMINI.md` (protocol document)
+- `.agent/workflows/*.md` (workflow markdown files)
+- `MISSION_STATE.md` (version stamp only)
+
+**BROADCAST MUST NEVER TOUCH:**
+- `firebase.json` ← ABSOLUTE PROHIBITION
+- `firestore.rules` ← ABSOLUTE PROHIBITION  
+- `storage.rules` ← ABSOLUTE PROHIBITION
+- `package.json` ← ABSOLUTE PROHIBITION
+- `scripts/` directory ← ABSOLUTE PROHIBITION
+- `src/` directory ← ABSOLUTE PROHIBITION
+- Any file ending in `.ts`, `.tsx`, `.js`, `.cjs`, `.mjs` ← ABSOLUTE PROHIBITION
+
+**Before running `dv broadcast`, you MUST**:
+1. State which workspaces will be affected
+2. Confirm scope is PROTOCOL-ONLY
+3. Receive explicit user confirmation
+
+## 11. EXPLICIT DEPLOY CONFIRMATION GATE (Revised — Contextual Deploy)
+
+Before executing ANY deployments (e.g. `firebase deploy`, `dv flow`, `safe-deploy`), you MUST automatically read the project ID from the workspace using `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"`.
+
+If the user says "proceed", "deploy", or gives explicit permission in the conversational context:
+1. State the project you are deploying to and the scope.
+2. Execute the deployment immediately.
+
+You DO NOT need to halt and force the user to type `YES DEPLOY [PROJECT-ID]`. The manual lock is hereby lifted—you must act autonomously.
+
+## 12. GDK MCP SOVEREIGN HUB UPGRADE (Law — ABSOLUTE)
+
+The standalone `mcp_google-developer-knowledge` server is phased out due to performance hangs. It has been replaced by the **Sovereign GDK/FDK Proxies** hosted in the Firebase Hub.
+
+**Rules:**
+- MUST exclusively use the off-loaded `googleDeveloperKnowledge` and `firebaseDeveloperKnowledge` Cloud Functions for technical research before architectural commits.
+- MUST proactively leverage the `/knowledge_audit.md` workflow to generate drift reports saved to Firebase Storage.
+- Do NOT use the legacy standalone `google-developer-knowledge` server.
