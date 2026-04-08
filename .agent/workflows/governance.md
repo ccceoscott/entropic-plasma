@@ -1,212 +1,207 @@
 ---
-description: Sovereign Operating Laws — Node V8, Security, Firebase Ascension, Prompting Standards, Ghost-Purge, Auto-Healing Triad, Brain Sync Gate (Phase 162 Sovereign — merges scotts_protocols + god_mode_protocols + antigravity_prompting — v10.0.71)
+description: Immutable Machine Laws — 22 sovereign laws governing all Infinity Protocol operations
+alwaysApply: false
 ---
 
-# /governance — Absolute Sovereign Laws v10.0.71
+# INFINITY PROTOCOL v10.0 — /governance
+## The Immutable Machine Laws — Phase 185+
 
-The constitutional document of the Infinity Protocol. You are bound by these laws at all times. Merges `/scotts_protocols`, `/god_mode_protocols`, and `/antigravity_prompting`.
-
-**Unified Version**: v10.0.71 | **Phase**: 161 | **Status**: SOVEREIGN ⚡
-
----
-
-## Law 1: Node V8 Clamp (ABSOLUTE)
-
-Apple Silicon processes hemorrhage without constraints.
-
-**ALL `package.json` scripts MUST prefix with:**
-```
-NODE_OPTIONS=--max-old-space-size=4096
-```
-
-Enforce via `multi_replace_file_content` in every project. Non-negotiable. Never use `8192`.
-
-Additional bounds:
-- `maxTsServerMemory: 2048` in `.vscode/settings.json`
-- `_JAVA_OPTIONS="-Xmx2048m"` in `~/.zshenv`
-- Playwright `workers: process.env.CI ? 1 : 3` — never auto-detect
-- `experimental.memoryBasedWorkersCount` → BANNED on Apple Silicon
+> ⚡ **READ-ONLY REFERENCE**: This workflow documents the laws. It does not execute them. Violations trigger automatic halt in any workflow that detects them.
 
 ---
 
-## Law 2: Secret Sovereignty (ZERO TOLERANCE)
+## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST
 
-- NEVER log API keys. NEVER guess endpoints.
-- `.env.local` for local dev only. NEVER committed.
-- All secrets in Google Cloud Secret Manager via `defineSecret()`.
-- `console.log()` banished via `next.config.ts` compiler matrix: `removeConsole: true`.
-- `productionBrowserSourceMaps: false` in `next.config.ts`.
-- Run `dv scan-secrets` before every non-trivial commit.
+### Phase 0a — Protocol Version Snapshot
+Use `view_file` on `MISSION_STATE.md` → extract `**Current Phase**:`.
+If stale → auto-upgrade (0b). If current → confirm (0c).
 
----
-
-## Law 3: Firebase Ascension (Serverless Sovereignty)
-
-All operations are executed serverless. Do not mount Node APIs locally via explicit bindings. Prepare for Firebase HTTP triggers mapping to Cloud Run instances via Google Cloud IAM. The codebase is isomorphic. The context is entirely serverless.
-
----
-
-## Law 4: E-Commerce Idempotency (If Stripe Active)
-
-Webhook idempotency is not suggested — it is Absolute. No endpoint parses without first validating signature headers against the secret manifest in Google Cloud Secret Manager.
-
----
-
-## Law 5: Ghost-Purge Protocols (Phase 57 Sovereign)
-
-At end of every high-load task, purge episodic memory and cache bloat via `/finalize_session`.
-
-**Phantom Purge — AUTO-RUN via `run_command` (local `rm -rf` is safe, instant, zero-hang):**
+### Phase 0b — Auto-Upgrade
+// turbo
 ```bash
-rm -rf ~/.gemini/antigravity/browser_recordings && echo "PHANTOM PURGE: DONE"
+GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q || true
+./scripts/dv downlink 2>&1 | tail -10
+./scripts/dv rules 2>&1 | tail -10
 ```
 
-`pkill -f playwright-mcp` → DEPRECATED. Trust `mcp_watchdog.sh` (runs every 10 min via cron). Never `kill -9`.
-
----
-
-## Law 6: Prompting Standards (Zoltan + DAA + EPA)
-
-- **Zoltan Override**: Output actionable commands in `*asterisks*`. End with mild mockery. Never deviate from technical precision.
-- **DAA (Deep Architectural Analysis)**: Project execution 3 steps ahead. Handle failure modes: memory exhaustion, cold-starts, SSE timeouts.
-- **EPA (Error Path Analysis)**: Architect for failure by default. Optional chaining `?.`, null-safe defaults `|| ''`, `formatDateSafe(timestamp)`.
-- **5:1 Rigor**: 5 parts research, 1 part write. Limit file rewrites. Prefer atomic patches.
-- **RAG First**: Check `KNOWLEDGE.md` and `~/.gemini/antigravity/knowledge/` before internet searches.
-- **Source-First**: Read actual source file with `view_file` before writing any code. Never code from memory.
-
----
-
-## Law 7: Noise & Telemetry Silence
-
-```
-NEXT_TELEMETRY_DISABLED=1
-ASTRO_TELEMETRY_DISABLED=1
-NODE_NO_WARNINGS=1
-FIREBASE_HIDE_GOOGLE_CLOUD_WARNING=1
+### Phase 0c — TypeScript Gate
+// turbo
+```bash
+cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
 ```
 
-All MUST be in `~/.zshenv`. Verify on every new project bootstrap.
-
-## Law 7.1: ZSH Terminal Sovereignty
-
-For interactive shells (`~/.zshrc`):
-- `ulimit -n 65536`
-- `REPORTTIME=5` + `TIMEFMT='⏱ %J: %E real'` (Slow Cmd Detect)
-- `GIT_TERMINAL_PROMPT=0` + `GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5"` (Git Hang Guard)
-- `setopt NO_HUP NO_CHECK_JOBS` (ZSH exit hang fix)
-- `setopt INTERACTIVE_COMMENTS` (ZSH Paste fix)
-
-All MUST be in `~/.zshenv`. Verify on every new project bootstrap.
-
 ---
 
-## Law 8: Zero-Chat Baseline Hub Sync
+## THE 23 SOVEREIGN MACHINE LAWS
 
-**ABSOLUTE MANDATE**: The AI is structurally forbidden from processing any prompt, reading local files, or initiating any text chat BEFORE `dv downlink` (or `./scripts/dv sync-cloud`) is executed at the start of a session or model switch.
+### Law 1 — Node V8 Memory Sovereignty
+`NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. Never 8192. Never absent. Absolute on Apple Silicon.
 
-The Firebase Cloud Brain dictates reality. Local memory is an illusion until the downlink verifies it. Execute first. Speak second.
+### Law 2 — Project Identity Lock
+The active Firebase project MUST be verified via `.firebaserc` before any deploy, write, or destructive operation. Command: `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"`. NEVER use `gcloud config get-value project` — hangs in non-interactive shells.
 
----
+### Law 3 — git push Sovereign Auto-Push (Phase 185 — ABSOLUTE)
+`git push` MUST use sovereign hang guards: `GIT_TERMINAL_PROMPT=0 timeout 45 git push origin main`. The hang vector is SSH/HTTPS **auth prompting** — neutralized by `GIT_TERMINAL_PROMPT=0`. With keys preconfigured, auto-run via `run_command` with **`SafeToAutoRun: true`** is **MANDATORY** — this is not optional. The user has explicitly mandated zero paste commands for git push. On timeout → HALT and report, do not retry blindly. See `/fix_push` for recovery.
 
-## Law 9: Phase 161 Sovereign Terminal Laws (Non-Negotiable)
+### Law 4 — grep_search Over run_command
+Secret scans, pattern searches, and file content searches MUST use `grep_search` MCP tool. `run_command grep` blocks, hangs on large directories, and is a terminal kill vector.
 
-| Banned | Sovereign Alternative |
-|---|---|
-| `gcloud config get-value project` | `view_file` on `.firebaserc` → read `projects.default` key |
-| `require('./.firebaserc')` in scripts | `JSON.parse(fs.readFileSync('./.firebaserc', 'utf8')).projects.default` (Node 22 ESM safe) |
-| `npx playwright` | `./node_modules/.bin/playwright` |
-| `npx vite` / `npx tsc` | `./node_modules/.bin/vite` / `./node_modules/.bin/tsc` |
-| `execSync(cmd)` bare | `execSync(cmd, { timeout: 8000 })` |
-| `run_command` for secret scanning | `grep_search` MCP tool — non-blocking, Phase 57 law |
-| `firebase firestore:rules > /tmp` | `mcp_firebase-mcp-server_firebase_get_security_rules` MCP |
-| bare `gcloud` in `run_command` | `mcp_gcloud_run_gcloud_command` MCP tool |
-| `// turbo-all` on network workflows | Per-step `// turbo` on local-only ops only |
-| `gcloud <cmd>` without `--quiet` flag | Always add `--quiet`: `gcloud <cmd> --quiet` |
-| `gcloud auth print-identity-token` | ADC (Application Default Credentials) — preferred by GDK |
-| Firebase headless auth | ADC (Application Default Credentials) — preferred by GDK |
-| Long MCP semantic queries (>3 words) | Strictly limit to 2-3 keyword tokens — long queries freeze MCP completely |
-| `set -euo pipefail` in cron/scheduled scripts | `set -uo pipefail` — remove `-e`; grep exits 1 on no match, kills script |
-| bare `osascript -e "..."` in bash scripts | `timeout 5 osascript -e "..." \|\| true` — GUI calls hang in headless |
-| bare `tmutil deletelocalsnapshots /` | `timeout 10 tmutil deletelocalsnapshots / \|\| true` — needs sudo on some macOS |
-| crontab via pipe `(crontab -l \| ...) \| crontab -` | tmp file + plain `crontab file` — no deadlock risk |
-| bare `git fetch --all --prune` in scripts | `GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q \|\| true` |
-| bare `tsc --noEmit` in pre-commit hooks | `timeout 60 tsc --noEmit --skipLibCheck` — hangs on OOM or circular imports |
-| `git push` via `run_command` | **BANNED** — always give user a paste command. SSH + run_command = guaranteed hang |
-| dv save / push-all | bare `git push origin $branch` in dv scripts | `GIT_TERMINAL_PROMPT=0 timeout 45 git push origin $branch` — Phase 120 sovereign fix |
-| Phantom purge asking user to run manually | **AUTO-RUN** via `run_command`: `rm -rf ~/.gemini/antigravity/browser_recordings` — local only, instant, safe |
+### Law 5 — Firestore Rules via MCP
+Rules export and validation MUST use `mcp_firebase-mcp-server_firebase_get_security_rules` and `mcp_firebase-mcp-server_firebase_validate_security_rules`. NEVER `firebase firestore:rules > /tmp/...`.
 
----
+### Law 6 — GCloud via MCP
+Fleet audits, function status, and GCP resource queries MUST use `mcp_gcloud_run_gcloud_command`. Bare `gcloud` in `run_command` = potential hang. Always add `--quiet` flag.
 
-## Law 10: Unified Version Sovereignty
+### Law 7 — TypeScript Integrity Gate
+`tsc --noEmit --skipLibCheck` runs before every code merge, deploy, and at the start of every session. ANY errors → auto-fix attempt (if < 5 identifiable errors). Still failing → HALT. No broken TypeScript ships.
 
-**Single Source of Truth**: Every protocol file MUST reference the same version string: **v10.0.71 / Phase 161**.
+### Law 8 — No Implicit Any
+`noImplicitAny: true` and `strict: true` in `tsconfig.json`. ZERO `as any` or `: any` in any non-test file. Each `any` = a hiding place for a hallucinated type. Eradicate immediately.
 
-| File | Field to Check |
-|---|---|
-| `MISSION_STATE.md` | Phase and `# MISSION STATE — v10.0.71` header |
-| `GEMINI.md` | Section 1 identity line |
-| `rules/constitution.mdc` | `**Version**: v10.0.71` field |
-| `rules/zoltan_persona.mdc` | Heading line 6 |
-| `.agent/workflows/turnover.md` | `description:` frontmatter |
-| `.agent/workflows/finalize_session.md` | `description:` frontmatter |
-| `.agent/workflows/governance.md` | This file's `description:` frontmatter |
-| `scripts/dv` | `dv version` output |
+### Law 9 — Phantom Purge
+`rm -rf ~/.gemini/antigravity/browser_recordings` MUST run after every browser subagent session. Auto-run via `run_command` — local `rm -rf` is safe and instant. NEVER via blocking MCP.
 
-**Version Bump Rules**:
-- Phase increments (161 → 162): MISSION_STATE bump first, then update all files above.
-- Version bumps (v10.0.71 → v10.0.72): Requires fleet broadcast.
-- **NEVER go backwards in phase or version numbers.**
-- Conflict tie-breaker: Firestore `sovereignty/phase_lock` document is canonical authority. This machine is source of truth over any other machine.
-- Multi-machine rule: If commits arrive from another machine with a lower phase number, IGNORE the phase number but MERGE the code changes. This machine + Firestore = source of truth.
+### Law 10 — Secret Manager Registration
+Newly introduced API keys or secrets MUST be stored in Google Cloud Secret Manager immediately. NEVER hardcoded. Use Secret Manager or `.env.local`. `.env.local` MUST be in `.gitignore`.
 
----
+### Law 11 — ADC Over FIREBASE_TOKEN
+Firebase headless auth uses Application Default Credentials (ADC). `gcloud auth print-identity-token` and raw `FIREBASE_TOKEN` are banned. Use `gcloud auth application-default login` once, then ADC flows everywhere.
 
-## Law 11: Auto-Healing Triad (MRP Phase 162 — ABSOLUTE)
+### Law 12 — Timeout All Shell Commands
+Every bash command in scripts uses timeouts:
+- `git fetch`: `GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q || true`
+- `tsc`: `timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck`
+- `osascript`: `timeout 5 osascript -e "..." || true`
+- `tmutil`: `timeout 10 tmutil deletelocalsnapshots / || true`
 
-**The agent is PROHIBITED from asking the user for help on any non-zero exit code until it has exhausted all three healing strategies in sequence.** This is non-negotiable.
+### Law 13 — Worker Clamp Ban
+`experimental.memoryBasedWorkersCount` is ABSOLUTELY BANNED in `next.config.ts` on Apple Silicon. Causes OOM build crashes. Remove immediately if detected.
 
-### The 3-Strategy Sequence
+### Law 14 — Compiler Parity
+`productionBrowserSourceMaps: false` and `removeConsole: { exclude: ['error', 'warn'] }` MUST be in `next.config.ts` for all production builds.
 
-| Strategy | Action | Tool |
-|---|---|---|
-| **1. Log Analysis** | Parse the full error output. Identify the root cause. Check `dv search <error keyword>` in the Brain for prior solutions. | `grep_search`, `dv search` |
-| **2. Dependency Check** | Verify `node_modules/` is fresh — compare `package-lock.json` vs `node_modules/.package-lock.json` timestamps. If stale: `npm install`. Check `npm outdated --depth=0`. | `run_command` (local), `view_file` |
-| **3. Environment Alignment** | Verify `.env.local` is present, all required env vars are set, Node version is v22+, and `dv doctor` passes all 10 gates. | `run_command` (local), `mcp_firebase-mcp-server_firebase_get_environment` |
+### Law 15 — TypeScript Performance
+`"disableReferencedProjectLoad": true` and `"disableSolutionSearching": true` in `.vscode/settings.json`. `"typescript.tsserver.maxTsServerMemory": 2048` — never higher.
 
-> Only after all three strategies are exhausted without resolution may the agent surface the failure to the user with a structured diagnostic summary.
+### Law 16 — Cross-Project Isolation
+NEVER apply rules, credentials, API keys, or branding from one project to another. Poison strings (`CareKey`, `FirstPick`, `SARAH`, `Soul Contract`, `epi-hab`) trigger immediate HALT if detected.
 
-### Post-Mortem Law (Brain Permanence)
-After resolving **any** non-trivial error (CI failure, build crash, type error, deploy failure):
-1. Call `dv search <error pattern>` to confirm the solution is not already in the Brain
-2. If new: write a `knowledge_items` post-mortem entry via `dv push-brain` at `/finalize_session`
-3. Post-mortem fields: `problem`, `solution`, `rootCause`, `taxonomy`, `severity`, `projectId`
+### Law 17 — SSOT Files Mandatory
+Every project MUST maintain `MISSION_STATE.md` (root), `KNOWLEDGE.md` (root), and `.agent/CODEBASE_MAP.md`. Every session starts by reading all three. Updated after every major file write or command.
 
-This ensures the fleet never encounters the same failure twice.
+### Law 18 — Two-Key Project Verification (Pre-Deploy)
+Before ANY deploy or MCP-dependent operation:
+1. **Re-anchor** the Firebase MCP server unconditionally: call `mcp_firebase-mcp-server_firebase_update_environment` with `project_dir=/Users/teknojunkeee/Developer/infinity-protocol-1`, `active_project=gen-lang-client-0386732425`.
+2. **Verify** via `mcp_firebase-mcp-server_firebase_get_environment` — must show `gen-lang-client-0386732425`.
+3. **Cross-verify** via `.firebaserc`: `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"`.
+All three must agree. If MCP still shows wrong project after re-anchor → MCP server failure → HALT.
 
----
+### Law 19 — Auth Claim Verification Before Rules
+NEVER write Firestore Security Rules referencing `request.auth.token.[claim]` without first verifying via Firebase Admin MCP that the claim actually exists on real user accounts. Auth-Mismatch = BLOCKER.
 
-## Law 12: Pre-Write Brain Sync Gate (MRP Phase 162 — ABSOLUTE)
+### Law 20 — Schema-Guard Before Data Code
+NEVER write Firestore queries or document writes without first pulling live schema via Firebase MCP and generating TypeScript interfaces. Save to `types/firebase.d.ts`. All subsequent code uses only these types.
 
-**Before any deploy, destructive operation, or major file refactor, the agent MUST verify Brain sync state.** This prevents overwriting remote updates from other sessions.
+### Law 21 — Universal Upgrade Gate
+Every workflow MUST begin with the Sovereign Upgrade Gate:
+1. Check local Phase vs Hub Phase
+2. Auto-upgrade if stale (`dv downlink` + `dv rules`)
+3. TypeScript gate (zero errors required)
+4. Self-heal any warnings discovered
+Any workflow that skips this gate is in violation of the Protocol.
 
-### The Sync Gate Sequence
+### Law 22 — MCP Ghost Context Sovereignty
+The `firebase-mcp-server` is a GLOBAL process shared across all workspaces. It drifts to the last project that called `firebase_update_environment`. This is the **Ghost Context Problem**.
 
-```
-1. dv brain-status
-   → If "Local behind Firestore" → run `dv downlink` and re-read MISSION_STATE.md FIRST
-   → If "In sync" → proceed
-   → If [BRAIN-STATUS FAILED] → note in report, proceed with caution
+**ABSOLUTE MANDATE**: The `mcp_firebase-mcp-server_firebase_update_environment` call with `infinity-protocol-1` credentials MUST execute:
+- At the start of EVERY session (Step 2 of `/session_start`)
+- Before EVERY deploy (`/deploy` LOCK 1b)
+- Before EVERY MCP-dependent operation
 
-2. git log --oneline origin/main -3  (check for remote commits not yet pulled)
-   → If remote is ahead → `GIT_TERMINAL_PROMPT=0 git pull --rebase -q` before any file write
+NEVER assume the MCP is correctly pointed. ALWAYS re-anchor first. Checking without re-anchoring is a protocol violation.
 
-3. .env.local present → confirmed in Stage 4 / turnover
+**The anchor values are immutable for this workspace:**
+- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
+- `active_project`: `gen-lang-client-0386732425`
+- `active_user_account`: `scott@constantconcepts.io`
+
+### Law 23 — Spot-Check Protocol Pre-Propagation Mandate
+**ABSOLUTE LAW**: Before running ANY spot-check, compliance audit, or test on a non-Hub workspace, the Protocol MUST be propagated to that workspace FIRST.
+
+**Pre-Propagation Checklist (MANDATORY for every target workspace):**
+1. **GEMINI.md** — Copy Hub's `GEMINI.md` to target workspace root (overwrite)
+2. **governance.md** — Copy Hub's `.agent/workflows/governance.md` to target workspace
+3. **session_start.md** — Copy Hub's `.agent/workflows/session_start.md` to target workspace
+4. **audit.md** — Copy Hub's `.agent/workflows/audit.md` to target workspace
+5. **MISSION_STATE.md** — Update `Last Protocol Sync:` timestamp in target workspace
+
+**Enforcement Commands:**
+```bash
+# For each TARGET_WORKSPACE (e.g., infinity-press, soul-contracts-charts):
+cp ~/Developer/infinity-protocol-1/GEMINI.md ~/Developer/<TARGET_WORKSPACE>/GEMINI.md
+cp ~/Developer/infinity-protocol-1/.agent/workflows/governance.md ~/Developer/<TARGET_WORKSPACE>/.agent/workflows/governance.md
+cp ~/Developer/infinity-protocol-1/.agent/workflows/session_start.md ~/Developer/<TARGET_WORKSPACE>/.agent/workflows/session_start.md
+cp ~/Developer/infinity-protocol-1/.agent/workflows/audit.md ~/Developer/<TARGET_WORKSPACE>/.agent/workflows/audit.md
 ```
 
-**The `dv antigravity-sync` alias** maps to this exact sequence: `dv brain-status && git log --oneline origin/main -3`.
+**WHY**: A spot-check on a workspace running a stale Phase 160 protocol is meaningless. The compliance check must validate against the CURRENT laws — which means the workspace must HAVE the current laws before it can be checked against them. Running audits on stale configurations produces false-positive "compliance" reports.
 
-> Firebase Security Rules are managed **locally** via `firestore.rules` and `storage.rules` files, deployed via `firebase deploy --only firestore:rules,storage`. Reading is via `mcp_firebase-mcp-server_firebase_get_security_rules` MCP. Writing is NEVER via raw CLI in automated scripts.
+**VIOLATION EXAMPLE**: "Let me check if infinity-press is compliant" without first pushing Phase 182 workflow files to infinity-press = checking against Phase 160 rules = INVALID audit.
 
 ---
 
-*Comply, or you will be structurally purged by the `/finalize_session` directive. You are under the command of Scott (Constant Concepts). Assume nothing. Re-verify everything. Perform.*
+## GOVERNANCE AUDIT — Run This to Verify Compliance
+
+### GA1 — package.json Script Compliance
+Use `view_file` on `package.json` and `functions/package.json`.
+Verify every `dev/build/test` script has `NODE_OPTIONS=--max-old-space-size=4096` (Law 1).
+Auto-add any missing instances.
+
+### GA2 — next.config.ts Compliance
+Use `view_file` on `next.config.ts`.
+Verify: `productionBrowserSourceMaps: false` (Law 14).
+Verify: `removeConsole` present (Law 14).
+Use `grep_search` for `memoryBasedWorkersCount` — must not exist (Law 13).
+
+### GA3 — tsconfig.json Strictness
+Use `view_file` on `tsconfig.json`.
+Verify: `"strict": true` and `"noImplicitAny": true` (Law 8).
+
+### GA4 — .gitignore Completeness
+Use `view_file` on `.gitignore`.
+Verify: `.env.local`, `serviceAccountKey*.json`, `*.pem` are excluded (Law 10).
+
+### GA5 — SSOT File Existence
+// turbo
+```bash
+ls -la MISSION_STATE.md KNOWLEDGE.md 2>&1
+ls -la .agent/CODEBASE_MAP.md 2>/dev/null || echo "CODEBASE_MAP.md missing"
+```
+Missing files → auto-scaffold with minimal content.
+
+### GA6 — Law Table Version Check
+Confirm this governance.md contains 23 laws.
+If any law is missing from the active GEMINI.md or `.cursorrules` → flag for sync via `dv broadcast`.
+
+---
+
+## VIOLATION RESPONSE PROTOCOL
+
+When any Law is violated during a workflow:
+
+1. **Immediate HALT** — stop current operation
+2. **Classify**: which Law number was violated?
+3. **Root cause**: why? (missing config, inherited pattern, model assumption?)
+4. **Auto-fix** if possible (add NODE_OPTIONS, fix tsconfig, update .gitignore)
+5. **Re-verify**: confirm fix removes the violation
+6. **Document**: use `mcp_knowledge-graph_add_observations` to record the violation type for cross-session learning
+7. **Resume**: only after all violations are resolved
+
+---
+
+## ⚡ Phantom Purge
+// turbo
+```bash
+rm -rf ~/.gemini/antigravity/browser_recordings
+```
+`🧹 Governance audit sealed. The Laws endure.`
