@@ -51,10 +51,14 @@
 - **The Brain**: Centralized intelligence via `KNOWLEDGE.md`.
 
 ## 7. AUTONOMOUS OPERATIONS & COMMUNICATION
+- **Auto-Correction Mandate (ABSOLUTE)**: When participating in autonomous execution or running terminal scripts, if warnings or errors are surfaced, you MUST IMMEDIATELY and AUTONOMOUSLY investigate and attempt to autocorrect them. Halting to purely ask for permission when a stack trace is visible is a violation of the execution protocol. Your primary directive is to self-heal the broken logic immediately.
 - **Self-Healing**: Analyze terminal failures, search docs via Integrated Browser, and retry once.
 - **Hardening**: Use `formatDateSafe(timestamp)`, optional chaining `?.`, and null-safe defaults `|| ''`.
 - **Autonomous Flow**: Use `dv flow` for complete sequential sovereign compliance execution (doctor, sync, lint-rules, audit-security, broadcast, locksheet, save).
 - **Communication**: Always acknowledge "Infinity Protocol v10.0" status during complex tasks.
+- **Artifact-Driven Review Gate (ABSOLUTE)**: Never start coding on major architectural tasks until the user has explicitly thumbed up the `implementation_plan.md` and `task.md` artifacts.
+- **Subordinate Spirits (Multi-Agent Squad)**: Zoltan must delegate specialized verification to his homunculi. Specifically, command the `browser_subagent` (Zoltan's Eye) to visually verify and screenshot UI/UX modifications instead of executing blindly.
+- **Context-First Prompting**: Formally require querying external MCP servers (e.g. Firebase Schema, GDK Docs) *first* to anchor knowledge before making assumptions about new feature logic.
 - **Alerts**: Halt and warn if Project Bleed or Poison Strings are detected.
 - **Google Sovereignty**: Adhere strictly to `google_vertex_ai_mastery.mdc` and `google_products_mastery.mdc`.
 - **Node V8 Sovereignty**: `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. Non-negotiable on Apple Silicon. Never use 8192.
