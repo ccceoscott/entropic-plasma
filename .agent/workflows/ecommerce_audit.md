@@ -169,7 +169,92 @@ Spawn browser subagent to:
 
 ---
 
-## SECTOR 8 — Audit Report Generation
+## SECTOR 8 — Multi-Item Cart & Persistence Audit
+
+### 8a — Cart Storage Key Verification
+Use `grep_search` for `epihab-cart-storage` in `src/` to confirm the canonical storage key.
+
+### 8b — Multi-Item Subtotal Math Check
+Verify that the cart subtotal computation is:
+```
+subtotal = sum(item.price for item in cart.items)
+```
+NOT `sum(item.price * item.quantity)` unless `item.price` is already the line total.
+Use `grep_search` for `reduce` + `cart` in `src/store/` or `src/hooks/`.
+
+### 8c — Cart Persistence Test
+Confirm `persist: true` or equivalent is set on the Zustand cart store.
+Use `grep_search` for `persist` in cart store files.
+
+### 8d — Empty Cart Guard
+Use `grep_search` for `items.length` combined with `/checkout` navigation to confirm the empty-cart redirect guard is implemented.
+
+---
+
+## SECTOR 9 — Promo / Coupon Code Pipeline Audit
+
+### 9a — Backend Promo Function Check
+Use `mcp_firebase-mcp-server_functions_list_functions` to identify any `applyPromo`, `validateCoupon`, or `redeemCode` functions.
+
+### 9b — Promo Code Collection Audit
+Use `mcp_firebase-mcp-server_firestore_list_collections` to identify `promoCodes`, `coupons`, or `discountCodes` collections.
+If present: pull 2-3 sample documents via `firestore_list_documents`.
+
+### 9c — PaymentIntent Discount Propagation
+Use `grep_search` for `discount` or `coupon` in `functions/src/` to confirm promo codes are applied server-side before `createPaymentIntent`.
+
+### 9d — Promo Error Handling Check
+Use `grep_search` for `invalid.*promo\|promo.*invalid\|coupon.*not found` in `src/` to confirm UI-level error handling.
+
+---
+
+## SECTOR 10 — Tax Jurisdiction Verification
+
+### 10a — TaxJar / Stripe Tax Integration Check
+Use `grep_search` for `taxjar\|stripe.*tax\|automatic_tax\|tax_code` in `functions/src/`.
+Confirm the `createPaymentIntent` call passes `automatic_tax: { enabled: true }` OR a TaxJar lookup is performed.
+
+### 10b — Jurisdiction Baseline Verification
+Pull 3 recent orders from the `orders` collection.
+Check `taxAmount` field — confirm it is a number (not undefined/NaN).
+
+### 10c — Tax NaN Guard
+Use `grep_search` for `taxAmount` in `src/` to confirm all display paths handle `taxAmount ?? 0` (null-safe default).
+
+---
+
+## SECTOR 11 — Declined Payment & Error Recovery Audit
+
+### 11a — Stripe Error Handler Coverage
+Use `grep_search` for `card_declined\|payment_failed\|stripe.*error` in `src/` and `functions/src/`.
+Confirm there is a catch path that surfaces a human-readable error message (NOT throws to console).
+
+### 11b — createPaymentIntent Failure Mode
+Use `grep_search` for `catch` blocks adjacent to `createPaymentIntent` in Cloud Functions.
+Confirm function returns a structured error response (status 4xx with `{ error: string }`) rather than throwing 500.
+
+### 11c — Frontend Error State UI
+Use `grep_search` for `paymentError\|stripeError\|cardDeclined` in `src/` to confirm a React state variable drives the error display.
+
+---
+
+## SECTOR 12 — Seller Dashboard & Order Receipt Audit
+
+### 12a — Seller Route Guard
+Use `grep_search` for `seller\|admin` route definitions in `src/router\|src/App.tsx\|src/routes/`.
+Confirm seller routes are protected by an `isAdmin\|isSeller\|role` check.
+
+### 12b — Order Receipt Financial Fields
+Use `grep_search` for `subtotal\|grandTotal\|orderTotal` in seller/portal order components.
+Confirm all 4 financial fields render: `subtotal`, `shipping`, `tax`, `total`.
+
+### 12c — Order Status Enum Audit
+Pull sample documents from the `orders` collection.
+Confirm `status` field uses canonical enum values: `pending`, `processing`, `shipped`, `delivered`, `cancelled`.
+
+---
+
+## SECTOR 13 — Audit Report Generation
 
 Create audit summary:
 | Area | Status | Issues Found | Auto-Fixed | Blockers |
@@ -181,17 +266,26 @@ Create audit summary:
 | Inventory Control | ✅/⚠️/❌ | | | |
 | Security Rules | ✅/⚠️/❌ | | | |
 | E2E Browser Witness | ✅/⚠️/❌ | | | |
+| Multi-Cart Math | ✅/⚠️/❌ | | | |
+| Cart Persistence | ✅/⚠️/❌ | | | |
+| Promo/Coupon Pipeline | ✅/⚠️/❌ | | | |
+| Tax Jurisdiction | ✅/⚠️/❌ | | | |
+| Decline Recovery | ✅/⚠️/❌ | | | |
+| Seller Dashboard | ✅/⚠️/❌ | | | |
 
 **ALL GREEN** → `✅ E-commerce audit complete. Platform is financially sovereign.`
 **ANY BLOCKER** → `❌ AUDIT BLOCKED: [list]. Do not go live until resolved.`
 
 ---
 
-## SECTOR 9 — Knowledge Graph Persistence (MCP)
+## SECTOR 14 — Knowledge Graph Persistence (MCP)
 Use `mcp_knowledge-graph_add_observations` to record:
 - E-commerce schema snapshot (live field types)
 - Idempotency patterns applied
 - Any financial risk gaps found and resolved
+- Promo/coupon configuration status
+- Tax jurisdiction integration status
+- Declined payment error recovery patterns
 - Checkout flow E2E result
 
 ---

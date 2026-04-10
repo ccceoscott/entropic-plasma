@@ -26,6 +26,24 @@ Expected: 8 hooks installed, `Done!` message. If it fails → abort and investig
 
 ---
 
+## PHASE 0 — COGNITIVE TRAJECTORY SYNTHESIS (Sovereign Planning)
+
+> Before any planning or spec-writing, you MUST synthesize the trajectory from the Remote Brain. This ensures the current sprint does not violate global architectural patterns.
+
+### Step 0a — Trajectory Analysis:
+Call `mcp_brain-mcp_search_knowledge` with:
+- `query`: [Primary Goal from MISSION_STATE.md]
+- `projectId`: [active project id]
+- `mode`: `"hybrid"`
+- `limit`: 10
+
+### Step 0b — Synthesis Validation:
+1.  **Directives**: Absorb the `synthesis` block. These are your "Unbreakable Laws" for this sprint.
+2.  **Contradiction Check**: Scan the `contradictions` array. If any recent architectural decisions conflict with the Brain's memory → **STOP** and resolve with the user.
+3.  **Meta-Context Alignment**: Verify that the proposed work aligns with the `metaContext` (architectural principle).
+
+---
+
 ## PHASE 1 — GSD PROJECT INITIALIZATION
 
 > Run ONCE per project. Skip if `~/.gsd/projects/[project-id].json` already exists.
@@ -67,8 +85,8 @@ GSD creates:
 
 ## PHASE 2 — SPRINT PLANNING (Spec-Driven)
 
-### Step 2a — Load Brain Context
-Before planning, pull Remote Brain KIs as sprint anchors:
+### Step 2a — Load Brain Context & Synthesis
+Before planning, pull Remote Brain Synthesis as the sprint's analytical anchor:
 
 Use `mcp_brain-mcp_search_knowledge` with:
 - `query`: [primary goal from MISSION_STATE.md]
@@ -77,7 +95,7 @@ Use `mcp_brain-mcp_search_knowledge` with:
 - `globalSearch`: true
 - `limit`: 10
 
-Log all returned KIs. These are the **spec anchors** — known patterns, failure modes, resolved bugs. They MUST inform the spec.
+Log the returned `synthesis`, `metaContext`, and any `contradictions`. These MUST inform the spec and be explicitly referenced in the "Context" section.
 
 ### Step 2b — Write the Sprint Spec
 
@@ -127,14 +145,16 @@ Display the spec as an artifact. Wait for: "proceed", "looks good", "execute", o
 
 ### For Each Task in `.gsd/sprint-spec.md`:
 
-#### Step 3a — Pre-Task Context Pull
+#### Step 3a — Pre-Task Context & Trajectory Pull
 Call `mcp_brain-mcp_search_knowledge` with:
 - `query`: [this specific task description]
 - `projectId`: [project ID]
-- `mode`: `"keyword"`
-- `limit`: 3
+- `mode`: `"hybrid"`
+- `limit`: 5
 
-Check KIs for any known failure modes related to this task. If found: apply the fix pattern BEFORE writing new code.
+**Execution Requirement**:
+- Absorb the `synthesis` and `metaContext` from this result to guide the implementation.
+- If `contradictions` are found for this specific task → **HEAL** the task description in `.gsd/sprint-spec.md` before coding.
 
 #### Step 3b — Implement (5:1 Research/Write rule)
 Research first:

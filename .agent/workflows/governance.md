@@ -1,5 +1,5 @@
 ---
-description: Immutable Machine Laws — 22 sovereign laws governing all Infinity Protocol operations
+description: Immutable Machine Laws — 29 sovereign laws governing all Infinity Protocol operations
 alwaysApply: false
 ---
 
@@ -32,7 +32,7 @@ cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules
 
 ---
 
-## THE 23 SOVEREIGN MACHINE LAWS
+## THE SOVEREIGN MACHINE LAWS
 
 ### Law 1 — Node V8 Memory Sovereignty
 `NODE_OPTIONS=--max-old-space-size=4096` MUST prefix ALL `dev`, `build`, and `test` scripts in `package.json`. Never 8192. Never absent. Absolute on Apple Silicon.
@@ -148,8 +148,114 @@ cp ~/Developer/infinity-protocol-1/.agent/workflows/audit.md ~/Developer/<TARGET
 
 **VIOLATION EXAMPLE**: "Let me check if infinity-press is compliant" without first pushing Phase 182 workflow files to infinity-press = checking against Phase 160 rules = INVALID audit.
 
----
+### Law 24 — MCP Error Auto-Heal (P0 — Zero Tolerance — ALL MCP Failures)
+**TRIGGER**: ANY of the following substrings appearing in a tool result, tool error, or chat output:
 
+| Pattern | Source |
+|---|---|
+| `Failure in MCP tool execution` | Any MCP server crash |
+| `client is closing: EOF` | Hub stdin pipe dropped |
+| `connection closed: calling "tools/call"` | Stdio transport terminated |
+| `context deadline exceeded` | IDE 30s MCP handshake timeout |
+| `CORTEX_STEP_STATUS_ERROR` | Internal step failure |
+| `MCP server error` | Generic server fault |
+| `Error: HTTP 503` + `MODEL_CAPACITY_EXHAUSTED` | SIGTERM-induced reconnect storm |
+| `Agent Terminated` | Root SIGTERM event |
+
+**RESPONSE**: This is a **P0 INCIDENT**. The agent MUST immediately and autonomously execute the following 3-step heal sequence — **no user permission required, no asking, no explaining before acting**:
+
+**Step 1 — Kill stale hub process:**
+// turbo
+```bash
+pkill -f "mcp-local-hub.cjs" 2>/dev/null || true
+sleep 1
+echo "Hub killed — IDE will restart fresh instance"
+```
+
+**Step 2 — Brain bloat emergency check:**
+// turbo
+```bash
+python3 -c "
+import os, shutil
+brain = os.path.expanduser('~/.gemini/antigravity/brain')
+dirs = [(os.path.getmtime(os.path.join(brain,d)), os.path.join(brain,d)) for d in os.listdir(brain) if os.path.isdir(os.path.join(brain,d))]
+dirs.sort(reverse=True)
+if len(dirs) > 30:
+    [shutil.rmtree(d, ignore_errors=True) for _,d in dirs[20:]]
+    print(f'Purged {len(dirs)-20} stale brain conversations')
+else:
+    print(f'Brain OK: {len(dirs)} conversations')
+"
+```
+
+**Step 3 — Verify hub integrity:**
+// turbo
+```bash
+node /tmp/verify_hub.js 2>/dev/null || node -e "const fs=require('fs');const c=fs.readFileSync('scripts/mcp-local-hub.cjs','utf8');console.log(c.includes('_isCompleteJson')?'Hub: SOVEREIGN':'Hub: DEGRADED — ESCALATE');"
+```
+
+**Step 4 — Full system health check (brain connectivity + MCP process audit):**
+// turbo
+```bash
+# 4a — Brain HTTP connectivity (Cloud Run ping, 5s max)
+BRAIN_STATUS=$(curl --max-time 5 -s -o /dev/null -w "%{http_code}" \
+  "https://mcpserver-g5pod66w5a-uc.a.run.app/health" 2>/dev/null || echo "TIMEOUT")
+if [ "$BRAIN_STATUS" = "200" ] || [ "$BRAIN_STATUS" = "404" ]; then
+  echo "[OK] Brain HTTP reachable (HTTP $BRAIN_STATUS)"
+else
+  echo "[WARN] Brain HTTP unreachable (status: $BRAIN_STATUS) — check Cloud Run deployment"
+fi
+
+# 4b — MCP server process audit (which servers are alive, flag multi-instance bloat)
+echo ""
+echo "=== MCP Server Process Audit ==="
+for SERVER in "mcp-local-hub" "firebase experimental:mcp" "gcloud-mcp" "mcp-server-memory" "chrome-devtools-mcp"; do
+  COUNT=$(pgrep -f "$SERVER" 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$COUNT" -gt "2" ]; then
+    echo "[BLOAT]  $SERVER — ${COUNT} instances (multi-workspace RSS waste, ~$((COUNT * 50))MB est)"
+  elif [ "$COUNT" -gt "0" ]; then
+    echo "[ALIVE]  $SERVER ($COUNT instance(s))"
+  else
+    echo "[DOWN]   $SERVER — will be restarted by IDE on next tool call"
+  fi
+done
+
+# 4c — knowledge-graph file lock check (double-spawn creates corrupt state)
+KG_FILE="$HOME/.gemini/antigravity/knowledge-graph.jsonl"
+KG_PROCS=$(pgrep -f "mcp-server-memory" 2>/dev/null | wc -l | tr -d ' ')
+if [ "$KG_PROCS" -gt "1" ]; then
+  echo "[WARN] DOUBLE-SPAWN: $KG_PROCS knowledge-graph processes sharing same JSONL — killing extras"
+  # Keep only the most recent
+  pgrep -f "mcp-server-memory" 2>/dev/null | sort -r | tail -n +2 | xargs kill -15 2>/dev/null || true
+else
+  echo "[OK] knowledge-graph: $KG_PROCS process(es) — no file-lock contention"
+fi
+
+# 4d — Brain local dir health
+BRAIN_COUNT=$(ls -1 ~/.gemini/antigravity/brain/ 2>/dev/null | wc -l | tr -d ' ')
+BRAIN_MB=$(du -sm ~/.gemini/antigravity/brain/ 2>/dev/null | cut -f1 || echo 0)
+echo "[INFO] Brain local: ${BRAIN_COUNT} conversations / ${BRAIN_MB}MB"
+echo "=== Heal Sequence Complete ==="
+```
+
+**After heal**: Report in one line: `🔧 MCP P0 HEALED — hub restarted, brain HTTP [STATUS], brain local [N]convos/[X]MB, KG procs [N], hub SOVEREIGN`. Then resume the task immediately.
+
+**WHY**: All patterns in the trigger table are symptoms of the same root cascade: hub stalls on bare-JSON initialize (no `\n`) → context deadline → SIGTERM → rapid reconnects → Claude capacity exhausted → 503. Killing the stale hub forces the IDE to restart it with the Phase 185.6 fixed binary, breaking the loop in under 3 seconds. Brain bloat compounds the window by slowing IDE startup.
+
+**ESCALATION**:
+- Hub `DEGRADED` → halt + run `/audit_antigravity DOMAIN 2`
+- Brain HTTP unreachable + not `TIMEOUT` (i.e. DNS failure) → check Cloud Run: `mcp_gcloud_run_gcloud_command ["run", "services", "list", "--region=us-central1", "--quiet"]`
+- KG double-spawn persists after kill → check `mcp_config.json` for duplicate knowledge-graph entries
+
+
+
+---
+### Law 29 — The Autonomic Nervous System (Self-Heal Loop)
+**TRIGGER**: Encountering an unknown stack trace, architectural blocker, or failure taking >1 turn to fix.
+**RESPONSE**: The Integrated Browser is BANNED for error resolution. The Agent MUST immediately freeze execution and query `mcp_mcp-local-hub_brain_search_knowledge` with the EXACT error string. If no local KI exists, query GDK/FDK proxies. 
+**LEARNING MANDATE**: If an error resolution takes >3 turns, the Agent MUST autonomously use `write_to_file` to create a new markdown KI in `~/.gemini/antigravity/knowledge/` documenting the fix. This expands the Brain continuously.
+
+---
 ## GOVERNANCE AUDIT — Run This to Verify Compliance
 
 ### GA1 — package.json Script Compliance
@@ -180,7 +286,7 @@ ls -la .agent/CODEBASE_MAP.md 2>/dev/null || echo "CODEBASE_MAP.md missing"
 Missing files → auto-scaffold with minimal content.
 
 ### GA6 — Law Table Version Check
-Confirm this governance.md contains 23 laws.
+Confirm this governance.md contains 24 laws.
 If any law is missing from the active GEMINI.md or `.cursorrules` → flag for sync via `dv broadcast`.
 
 ---

@@ -39,7 +39,7 @@ SESSION_PROOF_TOKEN: git:a1b2c3d | ts:2026-04-07T06:40:10Z | downlink:OK | rules
 ### Phase 0b — TypeScript Verification Gate (ALWAYS runs)
 // turbo
 ```bash
-cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
+cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
 ```
 **CRITICAL**: ANY errors → attempt auto-fix if < 5 errors and cause is identifiable. Then re-run gate. If still failing → **HALT**.
 
@@ -196,18 +196,21 @@ Log: `✅ [MCP ANCHOR CONFIRMED] Firebase MCP locked to [PROJECT_ID]`
 
 ---
 
-### STEP 4 — Remote Brain Context Preload (Sprint Intelligence)
+### STEP 4 — Remote Brain Deep Fusion Briefing (Sprint Intelligence)
 
-> ⚡ **LAW**: Every session start MUST preload relevant context from the Remote Brain. This replaces the legacy `mcp_knowledge-graph_read_graph` call (deprecated). Use brain-mcp tools exclusively. If Brain is OFFLINE: skip to Step 5, note "BRAIN DEGRADED" in state declaration.
+> ⚡ **LAW**: Every session start MUST leverage the Brain's **Generative Synthesis** engine. This replaces simple keyword recall. If Brain is OFFLINE: skip to Step 5, note "BRAIN DEGRADED" in state declaration.
 
-**Step 4a — Project Knowledge Recall:**
+**Step 4a — Codex Synthesis & Contradiction Scan:**
 Call `mcp_brain-mcp_search_knowledge` with:
 - `query`: [extract "Next Required Action" text from MISSION_STATE.md as the query]
 - `projectId`: [active project id from .firebaserc]
 - `mode`: `"hybrid"`
 - `limit`: 10
 
-Log the top 3 returned knowledge items (title + summary). These are your **sprint anchors** — the brain's most relevant lessons for the work ahead.
+**Analysis Requirements:**
+1.  **Synthesis**: Absorb the `synthesis` field — this is your primary architectural directive for the session.
+2.  **Contradictions**: If the `contradictions` array contains any items → **HALT**. Display them in a red box and demand a "Sovereign Resolution" before proceeding.
+3.  **Meta-Context**: Identify the `metaContext` (architectural principle). You MUST adhere to this principle for all sub-tasks.
 
 **Step 4b — Portfolio Resonance Recall:**
 Call `mcp_brain-mcp_search_knowledge` with:
@@ -217,19 +220,22 @@ Call `mcp_brain-mcp_search_knowledge` with:
 - `globalSearch`: true
 - `limit`: 5
 
-Log any cross-project KIs returned. These represent patterns from the broader portfolio that apply here.
-
-**Step 4c — Brain Sprint Briefing:**
-Synthesize all KIs retrieved in 4a and 4b into a **Sprint Intelligence Brief**:
+**Step 4c — Brain Sprint Intelligence Brief:**
+Synthesize all inputs into the **Aetheric Brief**:
 
 ```
 🧠 BRAIN SPRINT BRIEF — [PROJECT_NAME]
-Top lessons from memory relevant to this sprint:
-1. [KI title] — [1 sentence actionable insight]
-2. [KI title] — [1 sentence actionable insight]
-3. [KI title] — [1 sentence actionable insight]
-Portfolio resonance: [1 cross-project pattern if any]
-Known failure modes to avoid: [from SECURITY/BUG KIs if any]
+ARCHITECTURAL SYNCHRONIZATION:
+[verbatim synthesis from 4a]
+
+CONTRADICTION SCAN:
+[✅ CLEAN / ❌ WARNING: List any contradictions found]
+
+META-CONTEXT (Sovereign Principle):
+[verbatim metaContext from 4a]
+
+PORTFOLIO RESONANCE:
+[Synthesis of cross-project patterns from 4b]
 ```
 
 **Step 4d — Project State Report (MANDATORY — registers workspace phase in Brain):**
@@ -294,7 +300,7 @@ Expected: Node v22.x. If dirty working tree → run `dv save` or report uncommit
 ### STEP 9 — Functions Test Gate
 // turbo
 ```bash
-cd functions && NODE_OPTIONS=--max-old-space-size=4096 npm test 2>&1 | tail -15
+cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 npm test 2>&1 | tail -15
 ```
 Expected: all tests pass. Any FAIL → **auto-investigate**: read the test file, identify root cause, attempt fix, re-run.
 Zero tolerance for unhandled promise rejections.
@@ -333,7 +339,8 @@ Output strict formatted declaration:
 - **Protocol**: [SYNCHRONIZED / DEGRADED — note if brain offline or phase gap]
 - **Firebase Project**: [PROJECT_ID] ✅ (MCP ANCHOR CONFIRMED)
 - **Brain MCP**: [✅ ONLINE (latency: Xms) / ⚠️ OFFLINE (autoconnect: FAILED — see repair prompt)]
-- **Sprint Anchors**: [top 1-2 KIs from brain preload, or "BRAIN DEGRADED — local KIs only"]
+- **Meta-Context**: [Verbatim metaContext from Step 4c]
+- **Synthesis Brief**: [1-sentence summary of Step 4c synthesis]
 - **Deployed Functions**: [N] live
 - **TypeScript**: [clean / N errors auto-fixed]
 - **Security**: [clean / issues found]

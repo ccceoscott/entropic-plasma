@@ -48,13 +48,17 @@ Log: `✅ [MCP CONNECTIVITY GATE] Brain reachable. Sealing begins.`
 
 ---
 
-## STEP 1 — Full Session Accomplishment Synthesis
+## STEP 1 — Full Session Accomplishment Synthesis (Brain-Driven)
 
 1. Use `view_file` on `MISSION_STATE.md` — note phase at session start.
-2. Use `list_dir` on artifact directory to enumerate what was created/modified.
-3. Synthesize in structured format:
+2. Use `list_dir` on artifact directory to enumerate creations.
+3. Call `mcp_brain-mcp_search_knowledge` with a summary of all local changes as the `query`.
+4. Absorb the `synthesis` result. This is your **Analytical Conclusion** for the session.
+5. Synthesize in structured format:
    - **Phase at Start**: [N]
    - **Phase at End**: [N+k]
+   - **Brain Synthesis**: [Analytical Conclusion from 1.4]
+   - **Meta-Context Alignment**: [Verified / Drift Detected]
    - **Files Modified**: [count] — list most critical
    - **Features Shipped**: bullet list
    - **Bugs Fixed**: bullet list
@@ -129,6 +133,20 @@ Call `mcp_brain-mcp_upsert_project_state` with:
 - `phase`: [current phase]
 - `status`: `"ACTIVE"` (or `"PAUSED"` if handoff)
 - `notes`: `"Sealed Phase [N] — [brief next action for next session]"`
+
+**Step 4c — Autonomous Knowledge Synthesis (Codex Enhancement):**
+
+> ⚡ **LAW**: If the session involved architectural changes (ARCH), complex bug fixes (BUG), or new patterns (PERF/SEC), you MUST autonomously register a new Knowledge Item.
+
+1.  Call `mcp_brain-mcp_add_knowledge_item` with:
+    - `projectId`: [active project ID]
+    - `taxonomy`: `"ARCH" | "BUG" | "PERF" | "SECURITY"`
+    - `content`: [Synthesis of the session's work from Step 1.4]
+    - `metaContext`: [Architectural core principle discovered]
+    - `portfolioAlignment`: true (if fleet-wide)
+    - `tags`: ["phase-[N]", "synthesis"]
+
+2.  Log: `🧠 AI SYNTHESIS: New knowledge node registered in Global Brain.`
 
 ---
 
@@ -236,6 +254,7 @@ Output:
 - [✅/❌] TypeScript: clean
 - [✅/❌] Tests: passing
 - [✅/❌] Security: perimeter clean
+- [✅/❌] MCP Hub: online and validated
 - [✅/❌] Brain Memory: committed to Remote Brain
 - [✅/❌] Project State: marked ACTIVE/PAUSED in Brain registry
 - [✅/❌] MISSION_STATE: updated
@@ -271,6 +290,7 @@ PHASE_GAP       : [ALIGNED / N versions behind / Expected (non-hub workspace)]
 │ Security Scan               │ ✅/❌  │ [clean / N issues]                │
 │ Poison Strings              │ ✅/❌  │ [clean / matches found]           │
 │ Firestore Rules Valid       │ ✅/❌  │ [valid / invalid]                 │
+│ MCP Hub Connectivity        │ ✅/❌  │ [ONLINE / OFFLINE]                │
 │ Brain Memory Commit         │ ✅/⚠️  │ [saved / 429 quota / OFFLINE]     │
 │ Project State Upsert        │ ✅/❌  │ [ACTIVE/PAUSED / FAILED]          │
 │ MISSION_STATE Updated       │ ✅/❌  │ [sealed at phase N]               │
