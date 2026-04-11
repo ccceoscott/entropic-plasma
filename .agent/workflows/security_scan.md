@@ -33,21 +33,15 @@ Errors → auto-fix → re-run. Clean only.
 
 ---
 
-## GATE 1 — Project Identity Lock (Re-Anchor + Dual Verification — Law 22)
+## GATE 1 — Project Identity Lock (Dual Verification)
 
-> ⛔ Re-anchor the `firebase-mcp-server` unconditionally FIRST (Law 22).
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-Then verify: `mcp_firebase-mcp-server_firebase_get_environment` → must show `gen-lang-client-0386732425`.
+Verify MCP Binding:
+Use `mcp_firebase-mcp-server_firebase_get_environment` → must show `gen-lang-client-0386732425`.
 // turbo
 ```bash
 node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"
 ```
-All three must agree: `gen-lang-client-0386732425`. Any mismatch → **HALT**.
+Both must agree: `gen-lang-client-0386732425`. Any mismatch → **HALT**.
 
 ---
 
@@ -159,9 +153,9 @@ Generate pass/fail table:
 
 ---
 
-## GATE 10 — Knowledge Graph Update (MCP)
+## Knowledge Base Persistence (R.A.P.S)
 
-Use `mcp_knowledge-graph_add_observations` to record:
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Run timestamp and result (PASS/BLOCK)
 - Any auto-fixes applied
 - Any P0 patterns found

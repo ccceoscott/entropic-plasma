@@ -82,13 +82,7 @@ node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8
 ```
 Expected: `gen-lang-client-0386732425`
 
-**Key 2 — Firebase MCP Re-Anchor (Law 22 — unconditionally first):**
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-**Key 3 — Verify re-anchor:**
+**Key 2 — Verify MCP Binding:**
 Use `mcp_firebase-mcp-server_firebase_get_environment` → extract `projectId`.
 
 Both must agree. Mismatch → **HALT**. Cross-project bleed detected.
@@ -181,23 +175,16 @@ Log each kill: `🔧 [AUTO-KILLED] Zombie process on port [X] PID [Y]`
 
 ## SECTOR 8 — MCP Server Health (Full Suite)
 
-### 8a — Firebase MCP Re-Anchor + Health Check (Law 22)
-> ⛔ Re-anchor first — never assume MCP is pointed at the right project.
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-Then: `mcp_firebase-mcp-server_firebase_get_environment` → must return `gen-lang-client-0386732425`.
+### 8a — Firebase MCP Health Check
+Use `mcp_firebase-mcp-server_firebase_get_environment` → must return `gen-lang-client-0386732425`.
 ✅ or ❌ log result.
 
 ### 8b — GCloud MCP
 Use `mcp_gcloud_run_gcloud_command` with args `["--version", "--quiet"]`.
 ✅ or ❌ log result.
 
-### 8c — Knowledge Graph MCP
-Use `mcp_knowledge-graph_search_nodes` with query `"infinity protocol"`.
+### Knowledge Base Persistence (R.A.P.S)
+Search standard KIs (`~/.gemini/antigravity/knowledge/`) or `KNOWLEDGE.md` for context.
 Expected: at least 1 result. 0 results = KG empty (normal for new project) or MCP broken.
 ✅ or ❌ log result.
 
@@ -284,8 +271,8 @@ Generate full status table:
 
 ---
 
-## SECTOR 12 — Knowledge Graph Update (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+## Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Environment state at verification time
 - Any auto-heals applied
 - Any persistent warnings documented for future sessions

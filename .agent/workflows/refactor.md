@@ -4,6 +4,7 @@ alwaysApply: false
 ---
 
 # INFINITY PROTOCOL v10.0 — /refactor
+> ⚡ **REQUIRED SKILLS**: `sovereign-refactoring-architect`, `zod-backend-dmz`
 ## Sovereign Refactoring Protocol — Zero Breaking Changes, Full Test Coverage
 
 > ⚡ **MANDATE**: Every refactor is test-gated before AND after. No refactor ships without TypeScript clean and unit tests passing. Self-healing on all regressions.
@@ -55,7 +56,7 @@ Use `grep_search` for the component name across `src/**/*.tsx,src/**/*.ts` to fi
 This is the blast radius. Any change must not break any consumer.
 
 ### 1c — MCP Knowledge Anchoring
-Use `mcp_knowledge-graph_search_nodes` with query: `"refactor pattern [component type]"`.
+Search standard KIs (`~/.gemini/antigravity/knowledge/`) or `KNOWLEDGE.md` for context.
 Check if a refactor pattern for this component type has been established previously.
 If yes → follow the established pattern exactly.
 
@@ -182,8 +183,8 @@ Use `grep_search` for `|| ''` and `|| 0` and `|| []` — confirm null-safe fallb
 
 ## PHASE 6 — Seal & Persistence
 
-### 6a — Knowledge Graph Persistence (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+### Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Refactor pattern used
 - Component type → split strategy
 - Any regression discovered and fixed

@@ -85,55 +85,6 @@ Before planning or executing any non-trivial task:
 - **MCP Watchdog**: `mcp_watchdog.sh` runs every 10 minutes via cron. Trust it. Do not panic-kill with `kill -9`.
 - **Terminal Diagnostics**: Run `dv health` for instant sovereign terminal health snapshot (ports, daemons, env, bloat).
 
-## 8. PHASE 161 MEMORY SOVEREIGNTY (Machine Laws)
-| Law | Rule |
-|---|---|
-| Node V8 | `NODE_OPTIONS=--max-old-space-size=4096` in all `package.json` scripts |
-| JVM | `_JAVA_OPTIONS="-Xmx2048m"` in `~/.zshenv` |
-| IDE | `"typescript.tsserver.maxTsServerMemory": 2048` in `.vscode/settings.json` |
-| EMFILE | `ulimit -n 65536` in `~/.zshrc` (interactive only — NOT in .zshenv, causes IDE probe hang) |
-| Playwright | `workers: process.env.CI ? 1 : 3` — never auto-detect |
-| APFS | `timeout 10 tmutil deletelocalsnapshots / \|\| true` after mass deletions |
-| Video Bloat | `rm -rf ~/.gemini/antigravity/browser_recordings` after browser tasks |
-| Compiler Parity | `productionBrowserSourceMaps: false` and `removeConsole` in `next.config.ts` |
-| Worker Clamp | `experimental.memoryBasedWorkersCount` is strictly BANNED on Apple Silicon |
-| Telemetry | `NEXT_TELEMETRY_DISABLED=1` & `ASTRO_TELEMETRY_DISABLED=1` in `~/.zshenv` |
-| Noise Suppression | `NODE_NO_WARNINGS=1` & `FIREBASE_HIDE_GOOGLE_CLOUD_WARNING=1` in `~/.zshenv` |
-| GNU coreutils | `brew install coreutils` — provides native `timeout` on macOS. All scripts carry pure-bash fallback. |
-| Slow Cmd Detect | `REPORTTIME=5` + `TIMEFMT='⏱ %J: %E real'` in `~/.zshrc` — warns if any command >5s |
-| Git Hang Guard | `GIT_TERMINAL_PROMPT=0` + `GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5"` in `~/.zshrc` |
-| ZSH Exit Hang | `setopt NO_HUP NO_CHECK_JOBS` in `~/.zshrc` — eliminates "you have running jobs" hang on exit |
-| ZSH Paste | `setopt INTERACTIVE_COMMENTS` in `~/.zshrc` — prevents `#` paste errors in interactive shells |
-| Dev Server TTL | `dev_server_guardian.sh` cron (every 30 min) — kills servers older than 6h. Warns at 4h |
-
-## 9. PHASE 57 SOVEREIGN TERMINAL LAWS (Non-Negotiable)
-| Law | Banned | Sovereign Alternative |
-|---|---|---|
-| Project ID | `gcloud config get-value project` | `node -e "console.log(require('${PROJECT_DIR}/.firebaserc').projects.default)"` |
-| E2E Runner | `npx playwright` | `./node_modules/.bin/playwright` |
-| Build Tool | `npx vite build` / `npx tsc` | `./node_modules/.bin/vite` / `./node_modules/.bin/tsc` |
-| Blocking exec | `execSync(cmd)` | `execSync(cmd, { timeout: 8000 })` |
-| Finalize/Session | `run_command` for network/blocking ops | MCP file tools preferred; safe local `rm`/`curl --max-time` ALLOWED |
-| Secret scan | `run_command` grep | `grep_search` MCP tool |
-| Firestore rules | `firebase firestore:rules > /tmp/...` | `mcp_firebase-mcp-server_firebase_get_security_rules` |
-| Fleet audit | bare `gcloud` in `run_command` | `mcp_gcloud_run_gcloud_command` MCP tool |
-| `// turbo-all` | on any workflow with network calls | Remove annotation; use per-step `// turbo` only for local-only ops |
-| Phantom purge | Asking user to run manually | Auto-run via `run_command` — `rm -rf` is local-only, instant, safe |
-| gcloud prompts | bare `gcloud <cmd>` in scripts | Always add `--quiet` flag: `gcloud <cmd> --quiet` |
-| Firebase headless auth | `gcloud auth print-identity-token` | ADC (Application Default Credentials) — GDK confirmed preferred over FIREBASE_TOKEN |
-| MCP Query Freezes | Long semantic queries in `mcp_google-developer-knowledge` | Strictly limit to 2-3 single keyword tokens (e.g. `Vertex AI`). Long queries lock up the MCP completely. |
-| Bash flags in cron | `set -euo pipefail` in scheduled scripts | `set -uo pipefail` — remove `-e`; grep exits 1 on no match and kills script |
-| osascript in scripts | bare `osascript -e "..."` in bash | `timeout 5 osascript -e "..." \|\| true` — GUI calls hang in headless/cron |
-| tmutil in scripts | bare `tmutil deletelocalsnapshots /` | `timeout 10 tmutil deletelocalsnapshots / \|\| true` — needs sudo on some macOS |
-| lsof port check | bare `lsof -ti:PORT` | `timeout 5 lsof -nP -ti:PORT 2>/dev/null` — bare `-i` triggers mDNSResponder DNS resolution → infinite block on macOS. `-n` = no hostname lookup. `-P` = no port-name lookup. Both required. |
-| crontab install | `(crontab -l \| ...) \| crontab -` pipe | tmp file + plain `crontab file` (no timeout — `timeout` is GNU only; tmp file pattern already eliminates deadlock risk) |
-| git fetch in scripts | bare `git fetch --all --prune` | `GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q \|\| true` |
-| TypeScript in hooks | bare `tsc --noEmit` in pre-commit | `timeout 60 tsc --noEmit --skipLibCheck` — hangs on OOM or circular imports |
-| git push via run_command | `run_command` with `git push` | **BANNED** — always give user a paste command. `run_command` + outbound SSH/HTTPS = guaranteed hang vector |
-| dv save / push-all | bare `git push origin $branch` in dv | `GIT_TERMINAL_PROMPT=0 timeout 45 git push origin $branch` — Phase 120 sovereign fix |
-| E2E via watchdog | `npm run test:e2e` when port is occupied | Kill port first: `timeout 5 lsof -nP -ti:PORT 2>/dev/null \| xargs kill -9 \|\| true` then run `./node_modules/.bin/playwright` directly against PROD |
-| Playwright waitFor | `locator.waitFor({ timeout: N })` in helpers | `locator.isVisible({ timeout: N }).catch(() => false)` — non-blocking, returns bool, never hangs |
-
 ## 10. BROADCAST SOVEREIGN SCOPE (Law — ABSOLUTE)
 
 `dv broadcast` is a **PROTOCOL PROPAGATION** tool. It is NOT a deploy tool. It is NOT a code sync tool.
@@ -235,31 +186,4 @@ PW_ALLOW_PROD=true \
 **Failure mode**: If `dv broadcast` is unavailable, manually copy the modified workflow file to `.agent/workflows/` in every other fleet workspace using `cp` via `run_command`.
 
 ---
-
-## 15. LAW 28 — R.A.P.S. ARTIFACT PERSISTENCE (Phase 199 — ABSOLUTE)
-
-**ROOT CAUSE**: The `firebase-mcp-server` Brain introduced catastrophic network latency and context-drift. The system is now fully localized.
-
-**Sovereign Write Hierarchy**:
-| Priority | Tool | Use Case |
-|---|---|---|
-| **Primary** | `implementation_plan.md` | Pre-task architectural lock-in |
-| **Secondary** | `task.md` | Sequential execution state tracking |
-| **Tertiary** | `MISSION_STATE.md` | Final Phase state anchoring at `session_end` |
-
-**Rules**:
-- NEVER rely on external memory APIs to recall previous session context.
-- Always map context onto persistent markdown files inside `.agent/` or `~/.gemini/antigravity/brain/<id>/`.
-- Artifacts are your memory. Do NOT ask for permission to write to them. Just update them asynchronously as tasks execute.
-
----
-
-## 16. LAW 29 — DYNAMIC MODEL DRIFT UPGRADE (Phase 206 — ABSOLUTE)
-
-**MANDATE**: Stop hardcoding static LLM versions (e.g. `gemini-2.0-flash` or `gemini-1.5-pro`). The AI ecosystem moves too fast.
-
-**Rules**:
-1. **Dynamic Execution Priority**: In all Sovereign Cloud Functions (e.g. `embedding.ts`), ALWAYS fetch the `system_config/llms` registry from Firestore at runtime to grab the `googleLatest` and `anthropicLatest` fallback tiers dynamically.
-2. **Auto-Upgrade Workflows & Rules**: Workflows and System Prompts must NEVER bind to a deprecated model string. Always reference the dynamic registry fetch pattern or the `gemini-3.1-pro-preview` / `gemini-3.1-pro-preview-customtools` aliases as the supreme standard. Antigravity IDE and Brain settings must be kept on the absolute latest API drops.
-3. **Model String Purge**: All legacy `gemini-1.x` and `gemini-2.x` hardcodes must be placed exclusively at the absolute END of the failsafe tier in `embedding.ts` behind the dynamic `registry` arrays.
 

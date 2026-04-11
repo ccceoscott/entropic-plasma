@@ -182,8 +182,8 @@ Missing cache headers on read-heavy endpoints → add appropriate TTL.
 ### 8a — Performance Audit Report
 Generate complete findings table with before/after comparisons.
 
-### 8b — Knowledge Graph Persistence (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+### Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Performance baselines for this session  
 - Any optimization applied
 - Any P1/P2 findings deferred

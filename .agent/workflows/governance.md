@@ -77,8 +77,8 @@ NEVER write Firestore queries without pulling schema first.
 ### Law 21 — Universal Upgrade Gate
 Every workflow MUST begin with the Sovereign Upgrade Gate.
 
-### Law 22 — MCP Ghost Context Sovereignty
-Re-anchor `firebase-mcp-server` unconditionally.
+### Law 22 — DEPRECATED (Phase 196.3)
+Previously enforced mandatory MCP re-anchoring. Now obsolete due to stable session-scoped context containers. Kept for historical reference.
 
 ### Law 23 — Fleet Propagation Mandate
 Before checking a workspace, broadcast rules to it.

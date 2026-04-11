@@ -56,7 +56,7 @@ lsof -ti:5001,9099,8080 2>/dev/null | head -5 || echo "emulators offline"
 Record status. Some test suites (integration) require emulators. Unit tests must NOT require emulators.
 
 ### 1d — Testing KI Grounding (MCP)
-Use `mcp_knowledge-graph_search_nodes` with query `"unit testing pattern functions"`.
+Search standard KIs (`~/.gemini/antigravity/knowledge/`) or `KNOWLEDGE.md` for context.
 Load any established testing patterns from previous sessions to avoid re-solving known patterns.
 
 ---
@@ -199,8 +199,8 @@ Any function with `.catch(console.error)` → replace with proper error handling
 cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
 ```
 
-### 8b — Knowledge Graph Persistence (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+### Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Test patterns established
 - Coverage gaps found and filled
 - Auto-fix types applied (A-E classification)

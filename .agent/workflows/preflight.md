@@ -46,15 +46,8 @@ Use `view_file` on `firestore.rules` — full rules source.
 Use `view_file` on `firestore.indexes.json` — full index definitions.
 Use `view_file` on `firebase.json` — deployment configuration.
 
-### G2 — Firebase MCP Re-Anchor + Infrastructure Grounding (Law 22)
-> ⛔ Re-anchor the `firebase-mcp-server` unconditionally — it drifts across workspaces.
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-Then confirm: `mcp_firebase-mcp-server_firebase_get_environment` → project ID must be `gen-lang-client-0386732425`.
+### G2 — Infrastructure Grounding
+Use `mcp_firebase-mcp-server_firebase_get_environment` → project ID must be `gen-lang-client-0386732425`.
 Use `mcp_firebase-mcp-server_firebase_get_security_rules` with type `firestore` → live production rules.
 Use `mcp_firebase-mcp-server_firebase_get_security_rules` with type `storage` → live storage rules.
 Use `mcp_firebase-mcp-server_functions_list_functions` → ALL deployed functions, regions, triggers.
@@ -307,9 +300,9 @@ git add -A && git commit -m "fix: preflight blockers resolved — Phase [N] laun
 
 ---
 
-## STEP 8 — Knowledge Graph Persistence
+## Knowledge Base Persistence (R.A.P.S)
 
-Use `mcp_knowledge-graph_add_observations` to record:
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Blocker patterns found (for cross-session learning)
 - Schema mismatches discovered (to build CODEBASE_MAP.md)
 - Security gaps eradicated

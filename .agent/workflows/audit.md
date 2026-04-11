@@ -61,16 +61,9 @@ Declare: `✅ [UPGRADE GATE PASSED] Phase [N]. TypeScript clean. Audit commencin
 
 ## PHASE 1 — Protocol Compliance Audit (MCP-first)
 
-### 1a — Firebase MCP Re-Anchor + Verification (Law 22)
-> ⛔ The `firebase-mcp-server` is a GLOBAL PROCESS. Re-anchor unconditionally FIRST.
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-Then use `mcp_firebase-mcp-server_firebase_get_environment` → verify `projectId = gen-lang-client-0386732425`.
-Any mismatch after re-anchor → **HALT**. MCP server failure.
+### 1a — MCP Container Integrity Check
+Use `mcp_firebase-mcp-server_firebase_get_environment` → verify `projectId = gen-lang-client-0386732425`.
+Any mismatch → **HALT**. Local MCP server isolated environment failure.
 
 ### 1b — Mission State Integrity
 Use `view_file` on `MISSION_STATE.md`:
@@ -225,7 +218,7 @@ NODE_OPTIONS=--max-old-space-size=4096 timeout 120 ./node_modules/.bin/jest --te
 
 ---
 
-## PHASE 8 — Self-Healing Report & Knowledge Graph Update
+## Knowledge Base Persistence (R.A.P.S)
 
 ### 8a — Structured Audit Report
 Generate markdown table:
@@ -241,8 +234,8 @@ Generate markdown table:
 | Performance | | | | |
 | Tests | | | | |
 
-### 8b — Knowledge Graph Persistence
-Use `mcp_knowledge-graph_add_observations` to record:
+### Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Any new pattern discovered
 - Any auto-fix applied (for learning across sessions)
 - Any P0/P1 issue that was halted on (for history)

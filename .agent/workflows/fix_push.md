@@ -56,22 +56,17 @@ Use `grep_search` for these strings across the entire project:
 
 Any match in project code → **HALT**. Cross-project bleed detected.
 
-### 1c — Project Identity Dual Verification (Law 22)
+### 1c — Project Identity Dual Verification
 Key 1 — local:
 // turbo
 ```bash
 node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"
 ```
-Key 2 — Re-Anchor (unconditionally first):
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
 
-Key 3 — Verify:
+Key 2 — Verify MCP Binding:
 Use `mcp_firebase-mcp-server_firebase_get_environment` → must show `gen-lang-client-0386732425`.
 
-All three must output `gen-lang-client-0386732425`. Mismatch → **HALT**.
+Both must output `gen-lang-client-0386732425`. Mismatch → **HALT**.
 
 ---
 
@@ -133,8 +128,8 @@ Lines remaining → push may have failed — re-issue paste command.
 
 ---
 
-## SECTOR 6 — Knowledge Graph Update (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+## Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Commit hash and branch pushed
 - Any security blocks triggered (for pattern learning)
 

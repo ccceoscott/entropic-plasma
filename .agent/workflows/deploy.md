@@ -4,6 +4,7 @@ alwaysApply: false
 ---
 
 # INFINITY PROTOCOL v10.0 — /deploy
+> ⚡ **REQUIRED SKILLS**: `fleet-deploy-guardian`, `sovereign-terminal-operator`
 ## Safe Deploy Execution — Sovereign, Zero-Trust, Self-Healing
 
 > ⚡ **AUTO-PUSH ACTIVE** (Phase 183.5): `git push` now executes automatically via `run_command` with `GIT_TERMINAL_PROMPT=0 timeout 45` hang guards. SSH auth prompts are the only hang vector — neutralized by `GIT_TERMINAL_PROMPT=0`. This is sovereign policy as of Phase 183.5.
@@ -47,16 +48,9 @@ node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8
 Output MUST be: `gen-lang-client-0386732425`
 Any other output → **HALT**. Wrong project detected.
 
-### 1b — Firebase MCP Re-Anchor + Confirmation (Law 22)
-> ⛔ The `firebase-mcp-server` is a global process that drifts across projects. Re-anchor unconditionally FIRST.
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-Then use `mcp_firebase-mcp-server_firebase_get_environment` → confirm `Active Project ID: gen-lang-client-0386732425`.
-Must match Lock 1a. If still wrong after re-anchor → **HALT**. MCP server failure.
+### 1b — Firebase MCP Confirmation
+Use `mcp_firebase-mcp-server_firebase_get_environment` → confirm `Active Project ID: gen-lang-client-0386732425`.
+Must match Lock 1a. If wrong → **HALT**. MCP server failure.
 
 ### 1c — Directory Proximity Verification
 // turbo
@@ -191,7 +185,7 @@ Timeout → HALT. Report: "Push timed out — check SSH keys or network." Do NOT
 
 ---
 
-## LOCK 8 — MISSION_STATE Seal & Knowledge Graph Update
+## Knowledge Base Persistence (R.A.P.S)
 
 ### 8a — MISSION_STATE Update
 Use file edit tools on `MISSION_STATE.md`:
@@ -199,8 +193,8 @@ Use file edit tools on `MISSION_STATE.md`:
 - Update `**Deployed Scope**:` with this scope
 - Confirm Current Phase reflects latest
 
-### 8b — Knowledge Graph Persistence
-Use `mcp_knowledge-graph_add_observations` to record:
+### Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Deploy scope and outcome
 - Any auto-fixes applied
 - Any P0/P1 incidents

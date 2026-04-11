@@ -56,12 +56,12 @@ grep -rn "Soul Contract\|CareKey\|SARAH\|FirstPick\|epi-hab" src/ package.json f
 ```
 
 ### 2b — Law 29 Dynamic Model Verification
-Verify that legacy static models (e.g., `gemini-1.5-pro`, `gemini-2.0-flash`) have not been re-hardcoded into the execution logic.
+Verify that legacy static models (e.g., `gemini-1.x`, `gemini-2.x`) have not been re-hardcoded into the execution logic. Dynamic fetch must be used via `system_config/llms` registry, or `gemini-3.1-pro-preview` as supreme standard.
 // turbo
 ```bash
 echo "Scanning for Deprecated Static LLM Hardcodes..."
-grep -rn "gemini-1.5-pro" .agent/workflows/ .agent/rules/ || echo "✅ No 1.5 logic drift."
-grep -rn "gemini-2.0-flash" .agent/workflows/ .agent/rules/ || echo "✅ No 2.0 static drift."
+grep -rn "gemini-1." .agent/workflows/ .agent/rules/ || echo "✅ No 1.x logic drift."
+grep -rn "gemini-2." .agent/workflows/ .agent/rules/ || echo "✅ No 2.x static drift."
 ```
 
 ### 2c — Sovereign E2E Locks Check

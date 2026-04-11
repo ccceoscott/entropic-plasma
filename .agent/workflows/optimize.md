@@ -179,7 +179,7 @@ Compare chunk sizes. Log reductions.
 
 ---
 
-## PHASE 8 — TypeScript Final & Knowledge Graph Update
+## Knowledge Base Persistence (R.A.P.S)
 
 ### 8a — TypeScript Final
 // turbo
@@ -187,8 +187,8 @@ Compare chunk sizes. Log reductions.
 cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
 ```
 
-### 8b — Knowledge Graph Persistence (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+### Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Optimization patterns applied
 - Bundle reduction achieved
 - Lighthouse score improvements

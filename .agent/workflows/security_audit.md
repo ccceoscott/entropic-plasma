@@ -39,15 +39,8 @@ Errors → auto-fix → re-run. Clean only.
 
 ## SECTOR 1 — Identity & Project Boundary Hardening
 
-### 1a — Firebase MCP Re-Anchor + Project Lock (Law 22)
-> ⛔ Re-anchor the `firebase-mcp-server` unconditionally FIRST — it drifts across workspaces.
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-Then verify: `mcp_firebase-mcp-server_firebase_get_environment` → must show `gen-lang-client-0386732425`.
+### 1a — Project Lock (Session-Scoped)
+Use `mcp_firebase-mcp-server_firebase_get_environment` → must show `gen-lang-client-0386732425`.
 // turbo
 ```bash
 node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"
@@ -190,8 +183,8 @@ Generate impact table:
 | Dependencies | | | | |
 | App Check | | | | |
 
-### 7a — Knowledge Graph Persistence
-Use `mcp_knowledge-graph_add_observations` to record:
+### Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - All P0/P1 findings (even if fixed)
 - All auto-remediation applied
 - All patterns found (for cross-session learning)

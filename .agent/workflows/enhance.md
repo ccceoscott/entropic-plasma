@@ -44,7 +44,7 @@ Record: current color palette, animation state, glassmorphism depth.
 Store as baseline comparison.
 
 ### 1b — KI Aesthetic Feedback Load
-Use `mcp_knowledge-graph_search_nodes` with query `"aesthetic feedback liquid glass"`.
+Search standard KIs (`~/.gemini/antigravity/knowledge/`) or `KNOWLEDGE.md` for context.
 Load user's documented aesthetic preferences — premium dark mode requirements, glassmorphism depth, animation timing preferences.
 
 ### 1c — Component Inventory
@@ -203,10 +203,10 @@ Any errors from Framer Motion additions → fix immediately.
 
 ---
 
-## PHASE 8 — Knowledge Graph Persistence & Seal
+## Knowledge Base Persistence (R.A.P.S)
 
 ### 8a — Aesthetic Feedback Record (MCP)
-Use `mcp_knowledge-graph_add_observations` for entity `"Agency Owner Aesthetic Preferences"`:
+Update `KNOWLEDGE.md` with entity details:
 - Any new preference observed during this session
 - Any component pattern proven successful
 - Any anti-pattern eradicated
