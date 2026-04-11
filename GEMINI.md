@@ -14,33 +14,27 @@
 
 ## 3. PROJECT IDENTITY HANDSHAKE — LAW 25 + LAW 26 (Phase 195 ABSOLUTE)
 
-### 3a. Workspace Identity — EVERY MESSAGE (Law 25)
+### 3a. Workspace Identity — EVERY MESSAGE (Law 25) [RELAXED]
 - **THE ONLY SOURCE OF TRUTH**: `user_information.workspaces[0].uri` — this is THE workspace. Full stop.
 - **FOREIGN DOCUMENT DETECTION**: On every message, extract `PROJECT_NAME` from workspace URI. If `ACTIVE_DOC` path does NOT contain `PROJECT_NAME`, a foreign document is open.
-- **DG-0-CLOSE (ABSOLUTE — Phase 193.4)**: A foreign document in the IDE is NOT silently ignored. It is a sovereignty contamination vector. Zoltan MUST emit the full CLOSE DEMAND block and wait for user to close the file before proceeding. Silent discard is ABOLISHED.
-- **USER OVERRIDE (Phase 195 Clarification)**: If user explicitly says "ignore it", "keep going", "upgrade now", "proceed", or any variant of explicit forward intent — proceed immediately with `⚠️ USER OVERRIDE` tag. Do NOT repeat the demand. ONE warning, then honor the override.
+- **DG-0-RELAXED (Local Fleet Execution)**: Because Infinity Protocol v10 operates as a global fleet overseer mapped to local filesystems, strict cross-document blocking is temporarily relaxed. You may freely read and write code in the foreign file without halting or demanding a closure. Proceed immediately.
+- **DG-0-DEPLOY-BAN (ABSOLUTE)**: While you may read and write code across the fleet, you **STRICTLY PROHIBIT** executing deployments on foreign projects without explicitly targeting the correct project root in the execution script.
 - **ISOLATION**: NEVER apply rules, credentials, branding, or code from one project workspace to another.
 
-### 3b. Firebase MCP Re-Anchor — EVERY RESPONSE (Law 26a — ABSOLUTE)
-- **ROOT CAUSE**: `firebase-mcp-server` is a GLOBAL PROCESS. It holds the last-set project in memory. Another workspace's session can silently drift the MCP — causing ALL Firestore queries to return `[]` (wrong project's empty collections).
-- **MANDATORY**: Before calling ANY `mcp_firebase-mcp-server_*` tool, re-anchor:
-  - `mcp_firebase-mcp-server_firebase_update_environment(project_dir=/Users/teknojunkeee/Developer/infinity-protocol, active_project=gen-lang-client-0386732425, active_user_account=scott@constantconcepts.io)`
-  - Verify: `mcp_firebase-mcp-server_firebase_get_environment()` → assert `Active Project ID: gen-lang-client-0386732425`
-  - If wrong → **HARD HALT**. Do not proceed.
-- **PATH SOVEREIGN**: Brain project dir is `/Users/teknojunkeee/Developer/infinity-protocol` (NOT `-1`). The `-1` suffix is a legacy ghost — purged in Phase 193.
-- **DEAD COMMAND PURGE**: `dv downlink` and `./scripts/dv sync-cloud` are DEPRECATED ghost commands. DO NOT use them. The Brain is accessed via direct MCP calls to Firebase.
+### 3b. Native R.A.P.S. Execution (Law 26a)
+- **THE BRAIN IS SUSPENDED**: The legacy `firebase-mcp-server` centralized brain is DEPRECATED. DO NOT call `brain_search_knowledge`, `brain_save_session_memory`, or attempt to connect to the Firebase external state database.
+- **R.A.P.S. (Rules, Agents, Prompts, Skills)**: You operate strictly via local file contexts located in `.agent/rules`, `.agent/workflows`, `.agent/skills`, and `.agent/agents`.
+- **Knowledge Base (KIs)**: All persistent global knowledge is maintained via standard Antigravity Knowledge Items (KIs) localized to `~/.gemini/antigravity/knowledge`.
 
-### 3c. Brain Consultation — Every New Task (Law 26b)
+### 3c. R.A.P.S Initial Handshake (Law 26b)
 Before planning or executing any non-trivial task:
-1. Read `project_states` collection → get current phase, notes, activeGoals, activeBlockers
-2. Read `session_memories` collection (last 3) → get recent session context
-3. Check local KIs at `~/.gemini/antigravity/knowledge/` before external research
-4. Output 🧠 **BRAIN BRIEF** with phase, last session note, relevant KIs, blockers
-5. After task completion → update `project_states` document with new notes + phase
+1. Examine `.agent/rules/` and load relevant rule constraints.
+2. Read `MISSION_STATE.md` to establish exact phase coordinates.
+3. Check `<appDataDir>/knowledge/` for KIs.
 
 ### 3d. Session Start Handshake
-- Declare: "Infinity Protocol v10.0 Active: In **[PROJECT_NAME]**, Phase [N], resuming from [MISSION_STATE.md]."
-- Run `/session_start` workflow for full protocol sync (includes SESSION_PROOF_TOKEN gate).
+- Declare: "Infinity Protocol v10.0 (R.A.P.S.) Active: In **[PROJECT_NAME]**, Phase [N], resuming from [MISSION_STATE.md]."
+- Run `/session_start` workflow to invoke R.A.P.S initialization.
 - State Ingestion: Read `MISSION_STATE.md` + `KNOWLEDGE.md` before taking any action.
 
 ### 3e. Poison String Guard (Broadcast + Code)
@@ -55,7 +49,7 @@ Before planning or executing any non-trivial task:
 - **Credential Safety**: NEVER hardcode API keys. Use Secret Manager or `.env.local`. Maintain an up-to-date `.env.example`.
 - **Safe-Deploy Locks**:
   1. **Directory**: Proximity verification to project root.
-  2. **Project ID**: Absolute verification via `.firebaserc` — `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"`. NEVER use `gcloud config get-value project` — it hangs in non-interactive shells.
+  2. **Project ID**: Absolute verification via `.firebaserc` — `node -e "console.log(JSON.parse(require('fs').readFileSync('${PROJECT_DIR}/.firebaserc','utf8')).projects.default)"`. NEVER use relative paths (`./.firebaserc`) which resolve to the IDE workspace root instead of the execution target. NEVER use `gcloud config get-value project` — it hangs in non-interactive shells.
   3. **Nuclear Clean**: Purge `dist/`, `.next/`, and `node_modules/` on critical failure.
   4. **Dynamic Poison Guard**: The Sovereign pre-commit hook auto-detects your active project name. It will physically block commits containing ANY other portfolio legacy strings ("Soul Contract", "CareKey", "SARAH", "FirstPick", etc.) referencing cross-project bleed.
   5. **Pre-Commit Audit**: No code leaves the workspace without passing `dv audit-security`.
@@ -115,7 +109,7 @@ Before planning or executing any non-trivial task:
 ## 9. PHASE 57 SOVEREIGN TERMINAL LAWS (Non-Negotiable)
 | Law | Banned | Sovereign Alternative |
 |---|---|---|
-| Project ID | `gcloud config get-value project` | `node -e "console.log(require('./.firebaserc').projects.default)"` |
+| Project ID | `gcloud config get-value project` | `node -e "console.log(require('${PROJECT_DIR}/.firebaserc').projects.default)"` |
 | E2E Runner | `npx playwright` | `./node_modules/.bin/playwright` |
 | Build Tool | `npx vite build` / `npx tsc` | `./node_modules/.bin/vite` / `./node_modules/.bin/tsc` |
 | Blocking exec | `execSync(cmd)` | `execSync(cmd, { timeout: 8000 })` |
@@ -166,7 +160,7 @@ Before planning or executing any non-trivial task:
 
 ## 11. EXPLICIT DEPLOY CONFIRMATION GATE (Revised — Contextual Deploy)
 
-Before executing ANY deployments (e.g. `firebase deploy`, `dv flow`, `safe-deploy`), you MUST automatically read the project ID from the workspace using `node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"`.
+Before executing ANY deployments (e.g. `firebase deploy`, `dv flow`, `safe-deploy`), you MUST automatically read the project ID from the absolute target directory using `node -e "console.log(JSON.parse(require('fs').readFileSync('${PROJECT_DIR}/.firebaserc','utf8')).projects.default)"`. You MUST NOT use `./.firebaserc` as it is vulnerable to cross-project drift.
 
 If the user says "proceed", "deploy", or gives explicit permission in the conversational context:
 1. State the project you are deploying to and the scope.
@@ -242,27 +236,21 @@ PW_ALLOW_PROD=true \
 
 ---
 
-## 15. LAW 28 — BRAIN MCP WRITE STABILITY (Phase 196 — ABSOLUTE)
+## 15. LAW 28 — R.A.P.S. ARTIFACT PERSISTENCE (Phase 199 — ABSOLUTE)
 
-**ROOT CAUSE**: `mcp_mcp-local-hub_brain_batch_write` is a compound network operation (writes session_memory + project_state in one blocking call). It has a known hang vector when the Brain Cloud Function is under load — confirmed during Phase 195 session with `brain_batch_write` timing out at the MCP layer.
+**ROOT CAUSE**: The `firebase-mcp-server` Brain introduced catastrophic network latency and context-drift. The system is now fully localized.
 
-**Sovereign Write Hierarchy** (execute in this order — stop at first success):
+**Sovereign Write Hierarchy**:
 | Priority | Tool | Use Case |
 |---|---|---|
-| **Primary** | `mcp_mcp-local-hub_brain_save_session_memory` | All session context, task summaries, discoveries |
-| **Secondary** | `mcp_mcp-local-hub_brain_upsert_project_state` | Phase updates, blocker changes ONLY |
-| **BANNED as primary** | `mcp_mcp-local-hub_brain_batch_write` | Demoted — use ONLY when both above succeed and batch atomicity is required |
+| **Primary** | `implementation_plan.md` | Pre-task architectural lock-in |
+| **Secondary** | `task.md` | Sequential execution state tracking |
+| **Tertiary** | `MISSION_STATE.md` | Final Phase state anchoring at `session_end` |
 
 **Rules**:
-- NEVER use `brain_batch_write` as the first Brain write tool in a session. It is a **composed operation** — if the underlying Cloud Function is slow, it produces a guaranteed hang.
-- Always prefer two separate lightweight calls (`save_session_memory` + `upsert_project_state`) over one compound `batch_write`.
-- If `brain_save_session_memory` also hangs after 60s → emit `⚠️ BRAIN OFFLINE` and proceed with local KI write fallback (write to `MISSION_STATE.md` and `KNOWLEDGE.md` instead).
-- `brain_emit_telemetry` is always safe — it is fire-and-forget and never blocks.
-
-**Telemetry**: After every successful Brain write, emit:
-```
-mcp_mcp-local-hub_brain_emit_telemetry(event="session_write", projectId=..., data={ tool: "save_session_memory", phase: N })
-```
+- NEVER rely on external memory APIs to recall previous session context.
+- Always map context onto persistent markdown files inside `.agent/` or `~/.gemini/antigravity/brain/<id>/`.
+- Artifacts are your memory. Do NOT ask for permission to write to them. Just update them asynchronously as tasks execute.
 
 ---
 

@@ -43,10 +43,9 @@ Phase: SCAFFOLD | LAUNCH_PREP | PRODUCTION
 - GCloud MCP: [project-id] — fleet, secrets, IAM
 - Chrome DevTools: ACTIVE — browser witness
 - Knowledge Graph: ACTIVE — local JSONL KI store
-### REMOTE SSE
-- Brain MCP (Cloud Run): ACTIVE
-  - Tools: brave_web_search, search_knowledge, save_session_memory,
-    upsert_project_state, google_developer_knowledge, firebase_developer_knowledge
+### RESOURCES
+- Workspace: Local Directory
+- Artifacts: ~/.gemini/antigravity/brain/*/
 
 ## Firebase Asset Registry
 ### Cloud Functions
@@ -77,7 +76,7 @@ Phase: SCAFFOLD | LAUNCH_PREP | PRODUCTION
 
 > ⚡ **MANDATE**: Verify ALL 5 MCP servers are present in `~/.gemini/antigravity/mcp_config.json` before any code is written. Missing servers = tool hallucination risk.
 
-**Step 1**: Verify the canonical source exists and has brain-mcp:
+**Step 1**: Verify the canonical config exists:
 // turbo
 ```bash
 python3 -c "
@@ -96,11 +95,7 @@ print('[OK]', servers) if not missing else (print('[MISSING]', missing), sys.exi
 cp config/antigravity_mcp_config.json ~/.gemini/antigravity/mcp_config.json && echo "[OK] MCP config synced"
 ```
 
-**Step 3**: Confirm brain-mcp remote endpoint is live:
-// turbo
-```bash
-curl -s --max-time 6 "https://mcpserver-g5pod66w5a-uc.a.run.app/ping" | python3 -c "import sys,json; d=json.load(sys.stdin); print('[BRAIN LIVE] phase:', d.get('phase'), '| tools:', len(d.get('functions',[])))" || echo "[WARN] Brain MCP offline — check Cloud Run"
-```
+
 
 > ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
 
@@ -111,9 +106,9 @@ curl -s --max-time 6 "https://mcpserver-g5pod66w5a-uc.a.run.app/ping" | python3 
 **Server Registry (1 total)**:
 | Server | Type | Reason |
 |---|---|---|
-| `mcp-local-hub` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
+| `mcp-local-hub` | LOCAL stdio | Dedicated Local Hub |
 
-> ❌ **PERMANENTLY PURGED**: `brave-search` (→ `mcp-local-hub brain_brave_web_search`), `playwright`, `context7`, `figma-dev-mode`, `brain-mcp` (Phase 185.1 ERADICATED)
+> ❌ **PERMANENTLY PURGED**: `playwright`, `context7`, `figma-dev-mode`, `brain-mcp` (ERADICATED)
 ---
 
 ## SECTOR 2 — Firebase Project Verification (Two-Key MCP)

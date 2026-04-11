@@ -1,12 +1,12 @@
 ---
-description: Anti-Gravity Audit Protocol — Deep inspection of MCP errors, plugin health, and chat log bloat.
+description: Anti-Gravity Audit Protocol (R.A.P.S) — Deep inspection of MCP errors, plugin health, and chat log bloat.
 ---
 
 # /audit_antigravity — Anti-Gravity Optimization Protocol
 
 **Triggers**: `/audit_antigravity`, or when the user says "audit google antigravity"
 
-**Purpose**: Keep the Google Anti-Gravity IDE optimized routinely. Checks for MCP errors, chat log/history bloat, plugins, APFS bloat, and daemon states. Stores findings in remote Memory.
+**Purpose**: Keep the Google Anti-Gravity IDE optimized routinely. Checks for MCP errors, chat log/history bloat, plugins, APFS bloat, and daemon states. Stores findings in local R.A.P.S memory.
 
 ---
 
@@ -66,24 +66,8 @@ description: Anti-Gravity Audit Protocol — Deep inspection of MCP errors, plug
 
 **Goal**: Catch silent failures resulting from bad Node versions, OOM, or misconfigured MCP proxies.
 
-> 🔴 **PHASE 185.6 SIGTERM ROOT CAUSE** (April 2026):
-> Antigravity IDE sends MCP `initialize` message as bare JSON **WITHOUT trailing \n** before closing stdin.
-> `UniversalReader._drain()` hits `if (newline === -1) break` → message stalls forever → IDE context deadline
-> exceeded → SIGTERM. Fixed by `_isCompleteJson()` brace-depth scan + EOF flush in `readable.on('end')`.
->
-> **CHAIN**: SIGTERM loop → rapid workspace reconnections → Claude Sonnet session handshakes → 503 MODEL_CAPACITY_EXHAUSTED.
-> THE 503 IS A SYMPTOM OF THE SIGTERM LOOP — fixing SIGTERM resolves 503.
-
 // turbo-all
-6. Verify hub is Pure Brain-HTTP proxy (SERVER_PREFIXES must be empty object `{}`):
-   `grep "SERVER_PREFIXES" ~/Developer/infinity-protocol-1/scripts/mcp-local-hub.cjs | head -3`
-   - If any server listed in SERVER_PREFIXES → CRITICAL: double-spawn bug active. Remove all entries.
-
-6b. Verify UniversalReader has Phase 185.6 fixes (EOF flush + _isCompleteJson):
-   `grep -c "_isCompleteJson\|forceFlush\|readable.on('end'" ~/Developer/infinity-protocol-1/scripts/mcp-local-hub.cjs`
-   - Must return `3` or more. If 0 → Phase 185.6 fix missing — re-apply from MISSION_STATE.md.
-
-6c. Check for stale hub processes (should be 0 if IDE is closed, or 1-4 if open):
+6. Check for stale hub processes (should be 0 if IDE is closed, or 1-4 if open):
    `ps aux | grep "mcp-local-hub" | grep -v grep | wc -l`
    - If > 4 → kill stale instances: `pkill -f "mcp-local-hub.cjs"`
 
@@ -91,15 +75,12 @@ description: Anti-Gravity Audit Protocol — Deep inspection of MCP errors, plug
    `cat ~/.gemini/antigravity/mcp_config.json | grep -v "node_modules"`
    - Ensure `@latest` tags are not present (violates Law 13).
    - Ensure `NODE_OPTIONS=--max-old-space-size=4096` is prefixed on all MCP script executions.
-   - Ensure `mcp-local-hub` entry has NO `hubChildren` block (Pure Proxy architecture).
 
 8. Verify MCP Watchdog is registered in Crontab:
    `crontab -l | grep mcp_watchdog`
 
 9. Check watchdog execution logs for background crashes in last 24h:
    `grep -iE "error|violation|killing" ~/.gemini/antigravity/.logs/watchdog.log | tail -n 15`
-
-**Action**: If the Watchdog cron is missing, install it (`*/10 * * * * ~/Developer/infinity-protocol-1/scripts/mcp_watchdog.sh`). If MCP servers are failing to spin up, resolve missing configurations.
 
 ---
 
@@ -121,9 +102,9 @@ description: Anti-Gravity Audit Protocol — Deep inspection of MCP errors, plug
 
 ## DOMAIN 4 — BRAIN SYNCHRONIZATION
 
-**Goal**: Ensure the execution of this audit is stored in the remote brain so that temporal memory records its execution.
+**Goal**: Ensure the execution of this audit is stored in local memory.
 
-13. Run `mcp_brain-mcp_save_session_memory` (if remote brain connected) to log the audit results into the remote Brain (`taxonomy: PERF`, `problem: Antigravity Optimization`).
+13. Generate a Knowledge Item (KI) artifact in `~/.gemini/antigravity/knowledge/` representing the current audit results.
 14. Touch the local marker so the Watchdog knows it was audited:
     `touch ~/.gemini/antigravity/.last_antigravity_audit`
 15. Update `MISSION_STATE.md` Brain Bloat status line with current conversation count and MB.
@@ -147,7 +128,6 @@ RECORDINGS     : [ Total MB ]
 DISK FREE      : [ % Free Space ]
 WATCHDOG CRON  : [ ACTIVE / MISSING ]
 MCP VIOLATIONS : [ Found / None ]
-HUB INTEGRITY  : [ SERVER_PREFIXES={} ✅ | 185.6 reader ✅ ]
 ZOMBIE AGENTS  : [ Count killed ]
 
 OVERALL: [🟢 OPTIMAL / 🟡 DEGRADED / 🔴 CRITICAL ]

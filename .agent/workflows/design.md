@@ -20,6 +20,12 @@ Before any design execution, run a `grep_search` across `src/**/*.tsx` and `src/
 > ⛔ **BANNED TOKENS**: `slate-`, `zinc-`.
 If these flat, legacy tokens exist, they MUST be purged. You will transition all gray scales to the Premium Blue-Tinted Charcoal palette (`neutral-`, specifically matching the `#030712` base logic).
 
+### Phase 0c — Liquid Glass Standard Constants
+Strict volumetric depth enforcement must be maintained:
+- **Shadows**: Base element shadows must use `shadow-2xl shadow-black/40` to project depth, never flat 0 opacity. 
+- **Borders**: All structural boundaries must be translucent: `border-white/5` or `border-neutral-200/50`. Absolute colors like `border-gray-500` are banned.
+- **Radii**: Employ `rounded-2xl`, `rounded-[24px]`, or `rounded-full` for all bounding containers.
+
 ---
 
 ## SECTOR 1 — Premium Dark Mode Elevation (Liquid Glass v2)
@@ -90,6 +96,50 @@ Once the DOM is rendered and styled:
 2. Confirm the Premium Blue-Tinted Neutral background depth is visible.
 3. Confirm the `backdrop-blur` successfully renders depth underneath cards.
 4. Record pass/fail metrics.
+
+---
+
+## SECTOR 6 — Conversational Interface Architecture (Chat UI Mastery)
+
+> ⚡ **MANDATE**: The LLM Chat interface is the brain's manifestation. Default widget templates are insulting. 
+
+### 6a — Message Bubble Sovereignty
+- **Agent Bubbles**: Must possess structural depth. Employ `bg-white/[0.04] backdrop-blur-xl border border-white/[0.08]` in dark mode. Flat `bg-gray-200` blocks are strictly forbidden.
+- **User Bubbles**: Must utilize the core system accent (e.g., `bg-brand-primary` or a distinct gradient) paired closely with `shadow-[0_0_15px_rgba(var(--brand-primary),0.3)]` so user input physically glows over the background.
+
+### 6b — The Interface Shell (Input & Frame)
+- **Chat Input Frame**: Must NOT be a harsh solid rectangle. Enforce a floating, pill-shaped design utilizing `rounded-full` or `rounded-[32px]` with `border-white/10` and deep internal shadow `inset 0 1px 2px rgba(0,0,0,0.2)`. 
+- **Micro-Typography**: Component labels, timestamps, and typing indicators must strictly be sized at `text-[10px]`, weighted `font-black`, and spaced `tracking-[0.2em] uppercase`.
+
+---
+
+## SECTOR 7 — Ambient Luminous Fields (Peripheral Glow)
+
+> ⚡ **MANDATE**: A true Liquid Glass matrix must emit its own ambient light. Flat objects sitting on a void are disconnected.
+
+### 7a — Sub-Surface Scattering (Background Blurs)
+Key layout focal points (Primary CTA, Hero Headers, Dashboard metrics) MUST be backed by an ambient luminous field. 
+- Ensure a structural underlying div employing `absolute -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-primary/20 to-transparent blur-[120px]` exists behind critical sections to visually float the content above the `#030712` floor.
+
+---
+
+## SECTOR 8 — Scrollbar & Overflow Sovereignty
+
+### 8a — Eradication of System Scrollbars
+Native OS scrollbars shatter the illusion of a dimensional UI.
+- All horizontally scrolling element arrays (e.g. Chat Chips, Carousels) MUST utilize `scrollbar-hide` (or equivalent `.no-scrollbar` CSS) to maintain unbroken borders.
+- Vertical page scrollbars MUST be custom-profiled if visible, employing a dark track `bg-neutral-950` with a translucent thumb `bg-white/10 hover:bg-brand-primary/50`.
+
+### 8b — Overflow Masking
+Mask edges of scrollable content matrices utilizing linear gradients to fade them smoothly into the background, preventing harsh cut-offs at container bounds (`mask-image: linear-gradient(to_bottom, black_80%, transparent)`).
+
+---
+
+## SECTOR 9 — Typography Fluidity & Structural Balance
+
+### 9a — The Death of Ragged Text
+- All massive headers (`<h1>`, `<h2>`, `<header>`) MUST utilize `text-balance` to eradicate typographic widows and orphan lines.
+- All body text and massive readable copy (`<p>`, `<blockquote>`) MUST utilize `text-pretty` (in Tailwind 3.4+) to fluidly stabilize wrapping.
 
 ## ⚡ Phantom Purge
 // turbo

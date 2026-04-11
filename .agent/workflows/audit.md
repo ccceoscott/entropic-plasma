@@ -284,7 +284,6 @@ UPGRADE STATUS  : [✅ WORKSPACE UPGRADED TO CURRENT PROTOCOL / ⚠️ GAP DETEC
 │ Workflow Compliance          │ ✅/⚠️   │ [N workflows scanned / issues]     │
 │ Node V8 Law (functions)      │ ✅/❌   │ [4096 present / missing]          │
 │ CORS Restriction             │ ✅/❌   │ [restricted / wildcard detected]   │
-│ Brain MCP Connectivity       │ ✅/⚠️   │ [ONLINE / OFFLINE]                │
 │ Test Suite                   │ ✅/❌   │ [pass / N failures]               │
 │ MISSION_STATE Freshness      │ ✅/⚠️   │ [<48h / STALE: last updated X]    │
 │ Performance Budget           │ ✅/⚠️   │ [within budget / exceeded]        │
@@ -311,11 +310,6 @@ Result: [fixed / FAILED]
 
 If failed — manual fix:
   [exact command or action for user to take]
-
-For Brain offline failures:
-  Option 1: Restart IDE → brain-mcp reconnects automatically.
-  Option 2: firebase deploy --only functions --project [PROJECT_ID]
-  Option 3: Type "continue brain offline" to audit without memory.
 
 Type "fix [issue name]" to have Zoltan attempt deeper resolution.
 ═══════════════════════════════════════════

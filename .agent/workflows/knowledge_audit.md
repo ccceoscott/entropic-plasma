@@ -1,204 +1,103 @@
 ---
-description: Knowledge drift detection — audit active project against official docs and backup findings to Firebase Storage
+description: Local Brain Audit — Test physical integrity, drift, and rules formatting of the Sovereign Knowledge Base (R.A.P.S)
 alwaysApply: false
 ---
 
 # INFINITY PROTOCOL v10.0 — /knowledge_audit
-## Knowledge Drift Detection & Firebase Brain Sync — MCP-First
+## Local Brain Integrity and R.A.P.S. System Check
 
-> ⚡ **MANDATE**: Architecture decisions must be grounded in current official documentation, not memory. This workflow compares implementation against live docs and persists findings.
+> ⚡ **MANDATE**: Since the suspension of the remote Firebase Brain MCP, all intelligence is stored locally in `~/.gemini/antigravity/knowledge/`. This audit tests indexing, storage bloat, rules drift, and dynamic model compliance.
 
 ---
 
-## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST
+## PHASE 1 — Physical Storage Audit (The Local Brain)
 
-### Phase 0a — Protocol Version Snapshot
-Use `view_file` on `MISSION_STATE.md` → extract `**Current Phase**:`.
-If stale → auto-upgrade (0b). If current → confirm (0c).
-
-### Phase 0b — Auto-Upgrade
+### 1a — Knowledge Directory Indexing
+Run a structural read on the local knowledge base directory to ensure validity.
 // turbo
 ```bash
-GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q || true
-./scripts/dv downlink 2>&1 | tail -10
-./scripts/dv rules 2>&1 | tail -10
+KNOWLEDGE_DIR=~/.gemini/antigravity/knowledge
+echo "--- Knowledge Base Filesize Check ---"
+du -sh $KNOWLEDGE_DIR/* 2>/dev/null || echo "No KIs found or directory is empty"
+echo "--- KI Count ---"
+find $KNOWLEDGE_DIR -type f -name "metadata.json" | wc -l
 ```
 
-### Phase 0c — TypeScript Gate
+### 1b — Metadata Schema Validation
+Verify that all stored items have valid JSON mappings and enforce project-scoping boundaries.
 // turbo
 ```bash
-cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
+for file in ~/.gemini/antigravity/knowledge/*/metadata.json; do
+  if [ -f "$file" ]; then
+    node -e "
+      try {
+        const data = require('$file');
+        if (!data.project) throw new Error('Missing project property');
+      } catch(e) {
+        console.error('Schema Violation in:', '$file', '->', e.message);
+        process.exit(1);
+      }
+    " || exit 1
+  fi
+done
+echo "JSON Schema validation complete. All KIs are project-scoped."
 ```
 
 ---
 
-## PHASE 1 — Current Implementation Snapshot
+## PHASE 2 — Rules & Protocol Drift (R.A.P.S.)
 
-### 1a — Technology Stack Inventory
-Use `view_file` on `package.json` to extract all dependencies and versions.
-Use `view_file` on `functions/package.json` for server-side stack.
-Record:
-- Firebase SDK version (client)
-- firebase-admin version (server)
-- firebase-functions version
-- Next.js version
-- Framer Motion version
-- TypeScript version
-
-### 1b — Knowledge Graph Current State (MCP)
-Use `mcp_knowledge-graph_read_graph` — full entity dump.
-Identify all KIs currently stored. Note timestamps and freshness.
-
-### 1c — KNOWLEDGE.md State
-Use `view_file` on `KNOWLEDGE.md` — read architectural decisions section.
-Note any decisions that reference external APIs or library behavior.
-
----
-
-## PHASE 2 — Official Documentation Cross-Reference (MCP)
-
-> ⚠️ **LAW**: Max 2-3 keyword tokens per search. Long queries hang the MCP.
-
-### 2a — Firebase SDK Drift Check
-Use `mcp_firebase-mcp-server_developerknowledge_search_documents` with query `"Firebase Web SDK v10"`.
-Compare documented API surface against current `import` patterns in `src/**/*.ts`.
-
-### 2b — Cloud Functions Node 22 Check
-Use `mcp_firebase-mcp-server_developerknowledge_search_documents` with query `"Cloud Functions Node 22"`.
-Confirm: `"engines": { "node": "22" }` in functions/package.json.
-Verify no deprecated v1 `functions.https.onRequest` patterns still in use (v2 `onRequest` preferred).
-
-### 2c — Firestore Rules Best Practices
-Use `mcp_firebase-mcp-server_developerknowledge_search_documents` with query `"Firestore security rules"`.
-Compare with current `firestore.rules` — identify any deprecated rule syntax.
-
-### 2d — Next.js App Router Check
-Use `mcp_firebase-mcp-server_developerknowledge_search_documents` with query `"Next.js App Router"`.
-Confirm: no Pages Router patterns (`/pages/api/`) in `src/`.
-Confirm: `'use client'` directives are appropriately scoped.
-
-### 2e — Framer Motion LazyMotion
-Use `mcp_firebase-mcp-server_developerknowledge_search_documents` with query `"Framer Motion LazyMotion"`.
-Confirm: all animation components use `LazyMotion + domAnimation + m.` pattern.
-
-### 2f — GCP Secret Manager
-Use `mcp_firebase-mcp-server_developerknowledge_search_documents` with query `"Secret Manager"`.
-Confirm secret access pattern in functions matches `defineSecret()` v2 pattern.
-
----
-
-## PHASE 3 — Drift Analysis
-
-For each area audited in Phase 2:
-
-| Area | Current Pattern | Official Recommended | Drift Level | Action |
-|---|---|---|---|---|
-| Firebase SDK | | | None/Minor/Major | |
-| CF Node Version | | | | |
-| CF API Version | | | | |
-| Firestore Rules | | | | |
-| Next.js Patterns | | | | |
-| Framer Motion | | | | |
-| Secret Manager | | | | |
-
-**Drift Severity Classification:**
-- **None**: Implementation matches current docs
-- **Minor**: Compatible but not latest pattern (P3 — schedule for next major upgrade)
-- **Major**: Deprecated or breaking pattern detected (P1 — fix in this session)
-
----
-
-## PHASE 4 — Auto-Remediation of Major Drift
-
-For each **Major** drift item:
-1. Use `grep_search` to find all instances in the codebase
-2. Apply fix using file edit tools
-3. Run TypeScript check after each fix:
-```bash
-cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
-```
-4. Log: `🔧 [DRIFT-FIX] [area]: [old pattern] → [new pattern]`
-
-For each **Minor** drift → document in `KNOWLEDGE.md` under "Deferred Upgrades".
-
----
-
-## PHASE 5 — Firebase Brain Backup
-
-### 5a — Audit Report Generation
-Create structured audit report as markdown content.
-
-### 5b — Firebase Storage Backup (MCP)
-Use `mcp_gcloud_run_gcloud_command` with args to upload to Storage:
-```
-["storage", "cp", "/tmp/knowledge_audit.md", 
- "gs://gen-lang-client-0386732425.firebasestorage.app/knowledge_audits/[YYYY-MM-DD].md",
- "--quiet"]
-```
-
-### 5c — Firestore Record (MCP)
-Use `mcp_firebase-mcp-server_firestore_add_document` to record the audit run:
-```json
-{
-  "parent": "projects/gen-lang-client-0386732425/databases/(default)/documents",
-  "collectionId": "knowledge_audits",
-  "document": {
-    "fields": {
-      "runDate": { "stringValue": "[ISO timestamp]" },
-      "phase": { "stringValue": "[current phase]" },
-      "driftItems": { "integerValue": "[count]" },
-      "majorDrift": { "integerValue": "[count]" },
-      "autoFixed": { "integerValue": "[count]" }
-    }
-  }
-}
-```
-
----
-
-## PHASE 6 — Knowledge Graph Update (MCP)
-
-### 6a — New Entity Creation
-For any new pattern discovered → use `mcp_knowledge-graph_create_entities`:
-- Entity name: `"[Technology] Pattern [Year]"`
-- Entity type: `"ArchitecturalPattern"`
-- Observations: documented pattern, source URL, date confirmed
-
-### 6b — Existing Entity Update
-For each existing KI with drift detected → use `mcp_knowledge-graph_add_observations`:
-- Record: drift found, version difference, fix applied
-
-### 6c — Deprecation Records
-For each deprecated pattern found and fixed → add as observation to warn future sessions.
-
----
-
-## PHASE 7 — KNOWLEDGE.md Update
-
-Use `view_file` on `KNOWLEDGE.md`, then apply updates:
-- Update `Last Knowledge Audit:` timestamp
-- Add new confirmed patterns under "Established Patterns"
-- Add deferred minor drift under "Deferred Upgrades"
-- Remove any entries that are now resolved
-
----
-
-## PHASE 8 — Final Verification
-
-### 8a — TypeScript Final Gate
+### 2a — Poison String Sweep
+Ensure no cross-project bleed has entered the local protocol bounds.
 // turbo
 ```bash
-cd functions && NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
+echo "Scanning for Poison Strings in active project..."
+grep -rn "Soul Contract\|CareKey\|SARAH\|FirstPick\|epi-hab" src/ package.json functions/ 2>/dev/null || echo "✅ No protocol bleed detected."
 ```
 
-### 8b — MISSION_STATE Update
-Bump phase. Log: `Knowledge audit: [N] areas checked, [X] major drift fixed, [Y] minor deferred.`
+### 2b — Law 29 Dynamic Model Verification
+Verify that legacy static models (e.g., `gemini-1.5-pro`, `gemini-2.0-flash`) have not been re-hardcoded into the execution logic.
+// turbo
+```bash
+echo "Scanning for Deprecated Static LLM Hardcodes..."
+grep -rn "gemini-1.5-pro" .agent/workflows/ .agent/rules/ || echo "✅ No 1.5 logic drift."
+grep -rn "gemini-2.0-flash" .agent/workflows/ .agent/rules/ || echo "✅ No 2.0 static drift."
+```
+
+### 2c — Sovereign E2E Locks Check
+Verify that `playwright.config.ts` or package.json E2E scripts respect the new port resolution protocols and worker isolation.
+Use `grep_search` to ensure `workers: process.env.CI ? 1 : 1` or similar strict limits are employed.
 
 ---
 
+## PHASE 3 — Workspace Integrity & Fleet Audit
+
+### 3a — Terminal & Cache Profiling
+Scan the `.next`, `dist`, and `node_modules` sizes to check for ghost processes or bloat.
+// turbo
+```bash
+du -sh .next dist node_modules ~/.gemini/antigravity/browser_recordings 2>/dev/null || echo "Storage profiles generated."
+```
+
+### 3b — Port Ghosting & Watchdog Health
+Run the Sovereign Health script to check daemons and hanging process trees.
+// turbo
+```bash
+timeout 5 lsof -nP -iTCP -sTCP:LISTEN | grep -E "3000|5173|8080|5001" || echo "Ports clear."
+```
+
+---
+
+## PHASE 4 — Final Diagnosis and MISSION_STATE Rollup
+
+1. Generate a report detailing corrupted KIs, poison strings found, and bloated recordings.
+2. If tests output clean (`Exit code 0`), the Local Brain is fully operational, proving physical data autonomy.
+3. Update `MISSION_STATE.md` indicating that the R.A.P.S `/knowledge_audit` was successful and local constraints tested identical to the remote.
+
+---
 ## ⚡ Phantom Purge
 // turbo
 ```bash
 rm -rf ~/.gemini/antigravity/browser_recordings
 ```
-`🧹 Knowledge audit complete. Brain backed up.`
+`🧹 Local Knowledge Audit complete. Brain physical structure validated.`
