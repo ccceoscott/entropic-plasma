@@ -263,3 +263,15 @@ PW_ALLOW_PROD=true \
 ```
 mcp_mcp-local-hub_brain_emit_telemetry(event="session_write", projectId=..., data={ tool: "save_session_memory", phase: N })
 ```
+
+---
+
+## 16. LAW 29 — DYNAMIC MODEL DRIFT UPGRADE (Phase 206 — ABSOLUTE)
+
+**MANDATE**: Stop hardcoding static LLM versions (e.g. `gemini-2.0-flash` or `gemini-1.5-pro`). The AI ecosystem moves too fast.
+
+**Rules**:
+1. **Dynamic Execution Priority**: In all Sovereign Cloud Functions (e.g. `embedding.ts`), ALWAYS fetch the `system_config/llms` registry from Firestore at runtime to grab the `googleLatest` and `anthropicLatest` fallback tiers dynamically.
+2. **Auto-Upgrade Workflows & Rules**: Workflows and System Prompts must NEVER bind to a deprecated model string. Always reference the dynamic registry fetch pattern or the `gemini-3.1-pro-preview` / `gemini-3.1-pro-preview-customtools` aliases as the supreme standard. Antigravity IDE and Brain settings must be kept on the absolute latest API drops.
+3. **Model String Purge**: All legacy `gemini-1.x` and `gemini-2.x` hardcodes must be placed exclusively at the absolute END of the failsafe tier in `embedding.ts` behind the dynamic `registry` arrays.
+
