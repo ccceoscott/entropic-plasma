@@ -1,7 +1,10 @@
 ---
 name: pdf-resilience-architect
-description: Mastery of pdf-resilience-architect within the R.A.P.S. fleet.
-version: v10.0
+description: PDF generation and processing resilience architect — Puppeteer/PDFKit hardening, memory leak prevention, timeout management, and S3/GCS upload patterns.
+version: v10.1
+phase: "209"
+category: backend
+tags: ["pdf", "puppeteer", "pdfkit", "resilience", "generation"]
 ---
 
 # Pdf Resilience Architect (R.A.P.S.) — Phase 207.16

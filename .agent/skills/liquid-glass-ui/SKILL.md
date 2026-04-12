@@ -1,7 +1,10 @@
 ---
 name: liquid-glass-ui
-description: Mastery of liquid-glass-ui within the R.A.P.S. fleet.
-version: v10.0
+description: Liquid Glass UI scaffolder — premium dark-mode component architecture with translucency, glassmorphism, Framer Motion animations, and fluid typography.
+version: v10.1
+phase: "209"
+category: frontend
+tags: ["liquid-glass", "dark-mode", "glassmorphism", "framer-motion", "ui"]
 ---
 
 # Liquid Glass Ui (R.A.P.S.) — Phase 207.16

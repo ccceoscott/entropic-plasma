@@ -1,7 +1,10 @@
 ---
 name: security-auditor
-description: Mastery of security-auditor within the R.A.P.S. fleet.
-version: v10.0
+description: Full-spectrum security auditor — secret scanning, hardcoded key detection, OWASP Top 10 surface analysis, and dependency vulnerability assessment.
+version: v10.1
+phase: "209"
+category: security
+tags: ["security", "secrets", "OWASP", "vulnerability", "audit"]
 ---
 
 # Security Auditor (R.A.P.S.) — Phase 207.16

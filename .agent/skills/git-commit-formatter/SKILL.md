@@ -1,7 +1,10 @@
 ---
 name: git-commit-formatter
-description: Mastery of git-commit-formatter within the R.A.P.S. fleet.
-version: v10.0
+description: Conventional commit formatter — enforces semantic commit messages, changelog generation, and Infinity Protocol commit tagging standards.
+version: v10.1
+phase: "209"
+category: protocol
+tags: ["git", "commits", "conventional-commits", "changelog", "semver"]
 ---
 
 # Git Commit Formatter (R.A.P.S.) — Phase 207.16

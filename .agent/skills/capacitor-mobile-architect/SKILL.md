@@ -1,7 +1,10 @@
 ---
 name: capacitor-mobile-architect
-description: Mastery of capacitor-mobile-architect within the R.A.P.S. fleet.
-version: v10.0
+description: Capacitor native bridge architect — iOS/Android deep linking, push notifications, native API access, and App Store compliance specialist.
+version: v10.1
+phase: "209"
+category: mobile
+tags: ["capacitor", "ios", "android", "native-bridge", "deep-linking"]
 ---
 
 # Capacitor Mobile Architect (R.A.P.S.) — Phase 207.16

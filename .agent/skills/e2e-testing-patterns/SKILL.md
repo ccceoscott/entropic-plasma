@@ -1,7 +1,10 @@
 ---
 name: e2e-testing-patterns
-description: Mastery of e2e-testing-patterns within the R.A.P.S. fleet.
-version: v10.0
+description: Playwright E2E testing pattern library — sovereign test patterns, fixture management, network mocking, and multi-environment test matrix design.
+version: v10.1
+phase: "209"
+category: testing
+tags: ["playwright", "e2e", "testing", "fixtures", "patterns"]
 ---
 
 # E2E Testing Patterns (R.A.P.S.) — Phase 207.16

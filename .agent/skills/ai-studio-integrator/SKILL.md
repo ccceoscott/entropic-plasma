@@ -1,7 +1,10 @@
 ---
 name: ai-studio-integrator
-description: Mastery of ai-studio-integrator within the R.A.P.S. fleet.
-version: v10.0
+description: Google AI Studio export integrator — automated induction and wiring of AI Studio web app exports into Next.js with Law 20 precision.
+version: v10.1
+phase: "209"
+category: ai
+tags: ["ai-studio", "google-ai", "next-js", "integration", "export"]
 ---
 
 # Ai Studio Integrator (R.A.P.S.) — Phase 207.16

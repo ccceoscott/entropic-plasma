@@ -1,7 +1,10 @@
 ---
 name: zod-backend-dmz
-description: Mastery of zod-backend-dmz within the R.A.P.S. fleet.
-version: v10.0
+description: Zod validation DMZ for Cloud Functions — schema-first callable validation, input sanitization, and type-safe request/response contracts.
+version: v10.1
+phase: "209"
+category: backend
+tags: ["zod", "validation", "cloud-functions", "schema", "type-safety"]
 ---
 
 # Zod Backend Dmz (R.A.P.S.) — Phase 207.16

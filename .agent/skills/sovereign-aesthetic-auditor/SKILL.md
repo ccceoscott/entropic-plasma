@@ -1,7 +1,10 @@
 ---
 name: sovereign-aesthetic-auditor
-description: Mastery of sovereign-aesthetic-auditor within the R.A.P.S. fleet.
-version: v10.0
+description: Sovereign aesthetic auditor — dark mode integrity, FOUC detection, color palette compliance, glassmorphism consistency, and visual regression detection.
+version: v10.1
+phase: "209"
+category: frontend
+tags: ["aesthetic", "dark-mode", "FOUC", "glassmorphism", "visual-regression"]
 ---
 
 # Sovereign Aesthetic Auditor (R.A.P.S.) — Phase 207.16

@@ -1,7 +1,10 @@
 ---
 name: code-refactoring-refactor-clean
-description: Mastery of code-refactoring-refactor-clean within the R.A.P.S. fleet.
-version: v10.0
+description: Safe systemic code refactoring architect — module extraction, dead code elimination, dependency inversion, and zero-regression refactor protocols.
+version: v10.1
+phase: "209"
+category: backend
+tags: ["refactoring", "clean-code", "modules", "dead-code", "DI"]
 ---
 
 # Code Refactoring Refactor Clean (R.A.P.S.) — Phase 207.16

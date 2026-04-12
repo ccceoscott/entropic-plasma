@@ -1,7 +1,10 @@
 ---
 name: database-schema-validator
-description: Mastery of database-schema-validator within the R.A.P.S. fleet.
-version: v10.0
+description: Firestore and RTDB schema validator — enforces collection naming conventions, field type contracts, required field audits, and migration safety.
+version: v10.1
+phase: "209"
+category: backend
+tags: ["firestore", "schema", "validation", "migration", "rtdb"]
 ---
 
 # Database Schema Validator (R.A.P.S.) — Phase 207.16

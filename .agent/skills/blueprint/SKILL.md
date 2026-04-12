@@ -1,7 +1,10 @@
 ---
 name: blueprint
-description: Mastery of blueprint within the R.A.P.S. fleet.
-version: v10.0
+description: System blueprint generator — produces C4 diagrams, architecture decision records (ADRs), and data flow maps for new and existing systems.
+version: v10.1
+phase: "209"
+category: protocol
+tags: ["blueprint", "architecture", "ADR", "c4", "documentation"]
 ---
 
 # Blueprint (R.A.P.S.) — Phase 207.16

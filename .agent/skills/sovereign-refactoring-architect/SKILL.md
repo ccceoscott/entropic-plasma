@@ -1,7 +1,10 @@
 ---
 name: sovereign-refactoring-architect
-description: Mastery of sovereign-refactoring-architect within the R.A.P.S. fleet.
-version: v10.0
+description: Sovereign refactoring architect — safe, systemic code evolution with side-effect analysis, module extraction, and zero-regression enforcement.
+version: v10.1
+phase: "209"
+category: backend
+tags: ["refactoring", "architecture", "side-effects", "modules", "evolution"]
 ---
 
 # Sovereign Refactoring Architect (R.A.P.S.) — Phase 207.16

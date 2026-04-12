@@ -1,7 +1,10 @@
 ---
 name: fleet-deploy-guardian
-description: Mastery of fleet-deploy-guardian within the R.A.P.S. fleet.
-version: v10.0
+description: Fleet-wide deployment guardian — safe-deploy protocol, project ID verification, pre-commit hooks, rollback patterns, and multi-gate deploy execution.
+version: v10.1
+phase: "209"
+category: ops
+tags: ["deploy", "firebase", "safe-deploy", "rollback", "pre-commit"]
 ---
 
 # Fleet Deploy Guardian (R.A.P.S.) — Phase 207.16

@@ -1,7 +1,10 @@
 ---
 name: antigravity-ide-architect
-description: Mastery of antigravity-ide-architect within the R.A.P.S. fleet.
-version: v10.0
+description: Antigravity IDE performance optimizer — manages MCP server health, browser subagent orchestration, artifact pipelines, and IDE configuration.
+version: v10.1
+phase: "209"
+category: protocol
+tags: ["antigravity", "ide", "mcp", "performance", "r.a.p.s"]
 ---
 
 # Antigravity Ide Architect (R.A.P.S.) — Phase 207.16

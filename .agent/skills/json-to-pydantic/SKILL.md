@@ -1,7 +1,10 @@
 ---
 name: json-to-pydantic
-description: Mastery of json-to-pydantic within the R.A.P.S. fleet.
-version: v10.0
+description: JSON-to-Pydantic model converter — generates type-safe Pydantic v2 models from raw JSON payloads for Python Cloud Functions and AI agents.
+version: v10.1
+phase: "209"
+category: backend
+tags: ["pydantic", "python", "json", "type-safety", "models"]
 ---
 
 # Json To Pydantic (R.A.P.S.) — Phase 207.16

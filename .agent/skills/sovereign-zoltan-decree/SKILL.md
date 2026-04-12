@@ -1,7 +1,10 @@
 ---
 name: sovereign-zoltan-decree
-description: Mastery of sovereign-zoltan-decree within the R.A.P.S. fleet.
-version: v10.0
+description: Zoltan persona enforcer — Infinity Protocol identity consistency, dark magic theming, wizard-tone compliance, and persona integrity auditing.
+version: v10.1
+phase: "209"
+category: protocol
+tags: ["zoltan", "persona", "infinity-protocol", "identity", "tone"]
 ---
 
 # Sovereign Zoltan Decree (R.A.P.S.) — Phase 207.16

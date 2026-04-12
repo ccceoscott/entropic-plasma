@@ -1,7 +1,10 @@
 ---
 name: llm-structured-output
-description: Mastery of llm-structured-output within the R.A.P.S. fleet.
-version: v10.0
+description: LLM structured output engineer — enforces JSON schema constraints, Zod/Pydantic validation on model responses, and retry logic for malformed outputs.
+version: v10.1
+phase: "209"
+category: ai
+tags: ["llm", "structured-output", "json-schema", "zod", "validation"]
 ---
 
 # LLM Structured Output (R.A.P.S.) — Phase 207.16

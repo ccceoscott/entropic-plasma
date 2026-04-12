@@ -1,7 +1,10 @@
 ---
 name: sovereign-playwright-e2e
-description: Mastery of sovereign-playwright-e2e within the R.A.P.S. fleet.
-version: v10.0
+description: Sovereign Playwright E2E master — production test execution, Stripe CSP handling, multi-environment matrix, and worker concurrency governance.
+version: v10.1
+phase: "209"
+category: testing
+tags: ["playwright", "e2e", "production-testing", "stripe", "chromium"]
 ---
 
 # Sovereign Playwright E2E (R.A.P.S.) — Phase 207.16

@@ -1,7 +1,10 @@
 ---
 name: sovereign-skill-library
-description: Mastery of sovereign-skill-library within the R.A.P.S. fleet.
-version: v10.0
+description: R.A.P.S. skill library manager — skill catalog governance, frontmatter standardization, bundle management, and fleet-wide skill propagation.
+version: v10.1
+phase: "209"
+category: protocol
+tags: ["skills", "catalog", "r.a.p.s", "bundles", "governance"]
 ---
 
 # Sovereign Skill Library (R.A.P.S.) — Phase 207.16

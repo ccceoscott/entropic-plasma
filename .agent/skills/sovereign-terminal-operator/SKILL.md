@@ -1,7 +1,10 @@
 ---
 name: sovereign-terminal-operator
-description: Mastery of sovereign-terminal-operator within the R.A.P.S. fleet.
-version: v10.0
+description: Sovereign terminal operator — Phase 57 hang-eradication patterns, non-blocking grep, timeout-safe CLI invocations, and shell diagnostic protocols.
+version: v10.1
+phase: "209"
+category: ops
+tags: ["terminal", "bash", "hang-eradication", "cli", "diagnostics"]
 ---
 
 # Sovereign Terminal Operator (R.A.P.S.) — Phase 207.16

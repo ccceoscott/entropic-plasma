@@ -1,7 +1,10 @@
 ---
 name: auth-security-architect
-description: Mastery of auth-security-architect within the R.A.P.S. fleet.
-version: v10.0
+description: Firebase Authentication and IAM security architect — custom claims, Firestore rule hardening, IDOR prevention, and zero-trust access enforcement.
+version: v10.1
+phase: "209"
+category: security
+tags: ["firebase-auth", "IAM", "security-rules", "IDOR", "custom-claims"]
 ---
 
 # Auth Security Architect (R.A.P.S.) — Phase 207.16

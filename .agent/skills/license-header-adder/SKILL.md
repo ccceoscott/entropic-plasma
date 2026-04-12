@@ -1,7 +1,10 @@
 ---
 name: license-header-adder
-description: Mastery of license-header-adder within the R.A.P.S. fleet.
-version: v10.0
+description: Source file license header enforcer — injects and validates copyright headers, SPDX identifiers, and proprietary notices across all file types.
+version: v10.1
+phase: "209"
+category: protocol
+tags: ["license", "copyright", "SPDX", "headers", "compliance"]
 ---
 
 # License Header Adder (R.A.P.S.) — Phase 207.16

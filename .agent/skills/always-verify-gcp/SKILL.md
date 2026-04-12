@@ -1,7 +1,10 @@
 ---
 name: always-verify-gcp
-description: Mastery of always-verify-gcp within the R.A.P.S. fleet.
-version: v10.0
+description: GCP resource verification enforcer — mandates project ID confirmation, IAM audit, and quota checks before any gcloud or Firebase operation.
+version: v10.1
+phase: "209"
+category: ops
+tags: ["gcp", "verification", "iam", "project-guard", "firebase"]
 ---
 
 # Always Verify Gcp (R.A.P.S.) — Phase 207.16

@@ -1,7 +1,10 @@
 ---
 name: performance-engineer
-description: Mastery of performance-engineer within the R.A.P.S. fleet.
-version: v10.0
+description: Full-stack performance engineer — Core Web Vitals, Firestore index coverage, Cloud Function cold start profiling, and rate limiting design.
+version: v10.1
+phase: "209"
+category: ops
+tags: ["performance", "LCP", "INP", "firestore-indexes", "cold-start"]
 ---
 
 # Performance Engineer (R.A.P.S.) — Phase 207.16

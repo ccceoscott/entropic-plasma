@@ -1,7 +1,10 @@
 ---
 name: 007
-description: Mastery of 007 within the R.A.P.S. fleet.
-version: v10.0
+description: Chief Security Architect specializing in STRIDE/PASTA, Red/Blue teaming, SAST, dependency audits, and infrastructure hardening.
+version: v10.1
+phase: "209"
+category: security
+tags: ["security", "penetration-testing", "STRIDE", "SAST", "hardening"]
 ---
 
 # 007 (R.A.P.S.) — Phase 207.16

@@ -1,7 +1,10 @@
 ---
 name: zustand-firebase-sync
-description: Mastery of zustand-firebase-sync within the R.A.P.S. fleet.
-version: v10.0
+description: Zustand global state and Firebase real-time sync master — store architecture, Firestore listeners, optimistic updates, and persistence patterns.
+version: v10.1
+phase: "209"
+category: frontend
+tags: ["zustand", "firebase", "state-management", "real-time", "persistence"]
 ---
 
 # Zustand Firebase Sync (R.A.P.S.) — Phase 207.16

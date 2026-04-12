@@ -1,7 +1,10 @@
 ---
 name: email-delivery-architect
-description: Mastery of email-delivery-architect within the R.A.P.S. fleet.
-version: v10.0
+description: Transactional email delivery architect — Resend/SendGrid/SES integration, SPF/DKIM/DMARC setup, template design, and live delivery verification.
+version: v10.1
+phase: "209"
+category: backend
+tags: ["email", "resend", "sendgrid", "ses", "DKIM", "transactional"]
 ---
 
 # Email Delivery Architect (R.A.P.S.) — Phase 207.16
