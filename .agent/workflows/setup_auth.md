@@ -10,6 +10,11 @@ alwaysApply: false
 
 > 🔑 **AUTH-MISMATCH PREVENTION**: The agent MUST verify actual Custom Claims on live accounts before writing any rules or functions that depend on them. Re-prompting loops end here.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/auth-security-architect/SKILL.md` — Custom claims, IDOR prevention, zero-trust rules
+2. `.agent/skills/database-schema-validator/SKILL.md` — Collection naming, field type contracts, migration safety
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

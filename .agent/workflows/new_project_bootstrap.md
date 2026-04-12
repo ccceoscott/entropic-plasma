@@ -6,6 +6,16 @@ alwaysApply: false
 # INFINITY PROTOCOL v10.0 — /new_project_bootstrap
 ## Sovereign New Project Bootstrap — Blackboard-First, Zero-Hallucination From Day One
 
+> ⚡ **MANDATE**: This workflow creates a sovereign, production-grade foundation. Every project starts here. No shortcuts. No half-measures.
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/blueprint/SKILL.md` — C4 diagrams, ADRs, data flow maps for new systems
+2. `.agent/skills/liquid-glass-ui/SKILL.md` — Glassmorphism, Framer Motion, dark-mode from day one
+3. `.agent/skills/fleet-deploy-guardian/SKILL.md` — Safe-deploy protocol, project ID verification, multi-gate
+
+---
+
 > ⚡ **MANDATE**: New projects start with the Blackboard (`state.md`), SSOT files, and MCP verification BEFORE any code is written. This kills hallucinations at birth.
 
 > 🏗️ **ARCHITECT FIRST**: No code until `implementation_plan.md` is approved by user. No deployment until `task.md` shows 100% complete.

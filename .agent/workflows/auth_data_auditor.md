@@ -8,6 +8,10 @@ alwaysApply: false
 
 > ⚡ **LAW 19 (Auth Claim Verification)**: NEVER write Firestore Security Rules containing `request.auth.token.[claim]` without first verifying via Firebase Admin MCP that the claim actually exists on real user accounts. Auth-Mismatch = BLOCKER.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` before proceeding:
+1. `.agent/skills/auth-security-architect/SKILL.md` — Custom claims forensics, IDOR prevention, zero-trust rule auditing
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

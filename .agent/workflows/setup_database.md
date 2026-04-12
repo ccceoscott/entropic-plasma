@@ -10,6 +10,11 @@ alwaysApply: false
 
 > 🔑 **DATA HALLUCINATION PREVENTION**: Hallucinations occur when agents assume field names, types, or collection structures. Schema-Guard eliminates this by anchoring to live data.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/data-model-architect/SKILL.md` — Firestore schema governance, indexing, migrations
+2. `.agent/skills/database-schema-validator/SKILL.md` — Field type contracts, naming conventions, drift detection
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

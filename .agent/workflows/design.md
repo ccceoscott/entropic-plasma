@@ -8,6 +8,11 @@ alwaysApply: false
 
 > ⚡ **MANDATE**: The User Interface is the ultimate manifestation of the Infinity Protocol. A flat, lifeless, or poorly elevated DOM is considered a hostile structural failure. This workflow enforces the direct visual decrees issued by the Agency Owner, mapped directly from the Sovereign Brain.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/liquid-glass-ui/SKILL.md` — Glassmorphism, Framer Motion, dark-mode component architecture
+2. `.agent/skills/sovereign-aesthetic-auditor/SKILL.md` — FOUC detection, palette compliance, visual regression
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

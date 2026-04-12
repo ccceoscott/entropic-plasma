@@ -8,6 +8,10 @@ alwaysApply: false
 
 > ⚡ **CRITICAL LAW**: This sequence executes the Local R.A.P.S Initialization. The legacy Firebase Centralized Brain is DEPRECATED. We operate on sovereign, local context arrays.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` before proceeding:
+1. `.agent/skills/sovereign-zoltan-decree/SKILL.md` — Persona integrity, identity consistency, dark-magic tone enforcement
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY

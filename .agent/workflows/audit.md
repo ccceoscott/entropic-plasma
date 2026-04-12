@@ -8,6 +8,12 @@ alwaysApply: false
 
 > ⚡ **MANDATE**: Every finding is auto-triage'd. Warnings → fix immediately. Errors → escalate with root cause diagnosis. Zero passive observation.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/security-auditor/SKILL.md` — Secret scanning, OWASP surface, dependency CVEs
+2. `.agent/skills/typescript-safety-enforcer/SKILL.md` — Strict type enforcement, `any` eradication
+3. `.agent/skills/performance-engineer/SKILL.md` — Core Web Vitals, Firestore index coverage, cold start profiling
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

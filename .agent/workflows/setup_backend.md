@@ -8,6 +8,11 @@ alwaysApply: false
 
 > ⚡ **MANDATE**: Backend setup requires verified schema (run `/setup_database` first), verified auth (run `/setup_auth` first), and confirmed project identity. No guessing.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/backend-architect/SKILL.md` — Cloud Functions architecture, CORS, idempotency
+2. `.agent/skills/zod-backend-dmz/SKILL.md` — Schema-first callable validation, input sanitization
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

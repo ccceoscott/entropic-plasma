@@ -8,6 +8,11 @@ alwaysApply: false
 
 > ⚡ **MANDATE**: This workflow scaffolds the entire financial core. Pre-requisites: `/setup_auth` and `/setup_database` must be COMPLETE.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/ecommerce-reviewer/SKILL.md` — Order lifecycle, Stripe idempotency, inventory atomicity
+2. `.agent/skills/fleet-deploy-guardian/SKILL.md` — Safe-deploy protocol, project ID verification, rollback
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

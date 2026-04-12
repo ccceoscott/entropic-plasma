@@ -26,6 +26,10 @@ Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
 
 ## Mid-Task Sovereign Handoff Protocol
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` before proceeding:
+1. `.agent/skills/sovereign-terminal-operator/SKILL.md` — Hang-eradication, non-blocking CLI, timeout-safe invocations
+
 > ⚡ **MANDATE**: Run this when the user says "turnover" or warns of an impending rate limit mid-task. The Remote Brain is DEPRECATED. All handover data must be written to `.agent/` and `MISSION_STATE.md`.
 
 ---

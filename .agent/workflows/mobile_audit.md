@@ -8,6 +8,11 @@ alwaysApply: false
 
 > ⚡ **LAW 23 (Capacitor/Native Bridge)**: NEVER modify native code (`ios/`, `android/`) without first checking `capacitor.config.ts`. Drifting native state from config = P1 FAILURE.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/capacitor-mobile-architect/SKILL.md` — iOS/Android deep linking, push notifications, App Store compliance
+2. `.agent/skills/sovereign-playwright-e2e/SKILL.md` — Production E2E, Stripe CSP, multi-environment matrix
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

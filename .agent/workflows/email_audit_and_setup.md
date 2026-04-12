@@ -8,6 +8,10 @@ alwaysApply: false
 
 > ⚡ **LAW 22 (Email Delivery Integrity)**: NEVER trigger a transactional email without a verified `email_log` entry in Firestore. Missing tracking = P2 FAIL. Never hardcode email content in logic; use Templates or a specialized Dispatch Router.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` before proceeding:
+1. `.agent/skills/email-delivery-architect/SKILL.md` — Resend/SendGrid/SES, SPF/DKIM/DMARC, template design, delivery verification
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST

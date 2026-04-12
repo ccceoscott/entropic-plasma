@@ -8,6 +8,10 @@ alwaysApply: false
 
 > ⚡ **MANDATE**: Every session must be sealed with full state persistence locally into `MISSION_STATE.md`. The Remote Brain is DEPRECATED.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` before proceeding:
+1. `.agent/skills/git-commit-formatter/SKILL.md` — Semantic commit messages, changelog generation, Infinity Protocol tagging
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY

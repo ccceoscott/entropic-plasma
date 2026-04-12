@@ -26,7 +26,11 @@ Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
 
 ## Always-On Workspace Sovereignty Protocol
 
-> 🔴 **ALWAYS-ON**: This is NOT a session-start workflow. It is wired to `alwaysApply: true`. It fires on EVERY message.
+> ⚡ **MANDATE**: This guard fires on EVERY message. It is the first line of defense against cross-project contamination. It is ALWAYS-ON and cannot be disabled.
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` before proceeding:
+1. `.agent/skills/always-verify-gcp/SKILL.md` — Project ID confirmation, IAM audit, quota checks before any GCP operation
 
 ---
 

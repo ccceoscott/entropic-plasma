@@ -5,6 +5,14 @@ alwaysApply: false
 
 # 👁️ The Sovereign Agent Catalog
 
+⚡ **MANDATE**: The Agent Catalog is the fleet's nervous system. It must be kept current. Every new agent or skill must be registered here immediately upon creation.
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` before proceeding:
+1. `.agent/skills/sovereign-skill-library/SKILL.md` — Skill catalog governance, frontmatter standardization, fleet propagation
+
+--- Agent Catalog
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

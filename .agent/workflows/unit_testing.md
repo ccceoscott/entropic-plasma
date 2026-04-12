@@ -8,6 +8,11 @@ alwaysApply: false
 
 > ⚡ **MANDATE**: Every test failure triggers immediate root-cause analysis and auto-fix attempt. Tests are truth. Never modify tests to make code pass — fix the code.
 
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest these skills** via `view_file` on each `SKILL.md` before proceeding:
+1. `.agent/skills/e2e-testing-patterns/SKILL.md` — Sovereign test patterns, fixture management, network mocking
+2. `.agent/skills/typescript-safety-enforcer/SKILL.md` — Strict type enforcement, `any` eradication in tests
+
 ---
 
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY — RUNS FIRST
