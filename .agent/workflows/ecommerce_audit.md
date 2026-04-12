@@ -75,6 +75,16 @@ mcp_firebase-mcp-server_firestore_list_collections → parent: projects/{project
 Map discovered collections to expected: `orders`, `products`, `carts`, `stripe_events`, `webhook_events`, `users`.
 Note any naming deviations and adjust all subsequent queries accordingly.
 
+### Phase 0e — Parallel Execution Map
+Sectors 2 (Products), 3 (Orders), and 4 (Payments) read from independent Firestore collections and MAY be executed concurrently by separate skill invocations to reduce total audit time. Sectors 1 (Security) and 5 (DB Integrity) must run sequentially — 1 gates everything; 5 depends on data from 2/3/4.
+
+**Mandatory sequential order**: Phase 0 → Sector 1 → [Sectors 2+3+4 in parallel] → Sector 5 → Sector 6 → Sector 7 → Sector 8 → Sector 9 → Sector 10
+
+**Stripe Connect Detection** (runs here before sector execution):
+Use `grep_search` for `transfer_data`, `connected_account`, `application_fee_amount`, `stripe.accounts` in `functions/src/`.
+If found → **ACTIVATE Sector 4j (Marketplace/Stripe Connect Audit)** and Domain 10.3.
+If not found → skip these sub-sectors.
+
 ---
 
 ## 🔐 SECTOR 1 — Security & Credentials Audit (Zero-Trust Gate)
@@ -131,6 +141,38 @@ Use `grep_search` for `orders/{orderId}` fetch patterns in API routes and Cloud 
 Verify every fetch asserts `order.userId === request.auth.uid` BEFORE returning data.
 **Manual test required**: If test users exist — attempt to read UserA's orderId as UserB. Must return permission denied.
 Any path returning order data without UID check = **P0 IDOR breach**.
+
+### 1f — PCI Surface Audit (Cardholder Data Exposure)
+> **PCI-DSS Law**: Raw card data must NEVER touch the server.
+
+Use `grep_search` for each pattern in `functions/src/` and all request logging middleware:
+- `card_number` → raw card data in logs
+- `cardNumber` → same
+- `cvv` or `cvc` → CVV in any server context
+- `console.log(req.body)` → body logging that may capture card data
+- `logger.log(JSON.stringify(req` → serialized request body logging
+
+If any found in webhook handlers or payment routes → **P0 PCI VIOLATION**. Raw card data on server = instant card brand reporting requirement.
+Verify Stripe Elements is used client-side (not a custom card form posting raw numbers to server).
+Use `grep_search` on frontend for `<input.*card` or `getElementById.*card` to verify no raw card input targeting server.
+
+### 1g — Input Sanitization Audit (XSS Vector)
+> **XSS Law**: Free-text order fields are injection vectors into email templates, PDF receipts, and admin dashboards.
+
+Use `grep_search` for sanitization libraries in `functions/src/` and frontend:
+- `dompurify`, `xss`, `sanitize-html`, `validator`, `escape-html`, `he`
+
+If none found, use `grep_search` for free-text fields accepted in order/checkout functions:
+- `req.body.orderNotes`, `req.body.giftMessage`, `req.body.deliveryInstructions`, `req.body.addressLine2`
+
+If unsanitized free-text fields exist AND no sanitization library → **P1 XSS Vector**.
+Recommend: sanitize all rich-text user input before storing to Firestore and before injecting into email templates.
+
+### 1h — Webhook Signature Failure Alert Audit
+Use `grep_search` for `stripe.webhooks.constructEvent` catch blocks.
+Verify the error path returns `res.status(400)` on signature failure — NOT `res.status(200)`.
+A 200 on signature failure = accepting tampered webhooks silently = **P0 Security Breach**.
+Also verify: failed signature attempts are logged with IP address for fraud monitoring.
 
 ---
 
@@ -209,6 +251,24 @@ Use `mcp_firebase-mcp-server_firestore_query_collection`:
 - Query `orders` where `status == PROCESSING` and `stripePaymentIntentId == null` → orphaned order.
 - List findings for remediation.
 
+### 3e — Abandoned Checkout / Orphaned PaymentIntent Scan
+Use `grep_search` for `stripe.paymentIntents.list` or Stripe webhook handlers for `payment_intent.canceled`.
+Verify there is a cleanup mechanism for draft/canceled PaymentIntents that never completed.
+Use Firestore to count `orders` with `status: PENDING` older than 1 hour as a proxy metric.
+If > 15% of total orders are in long-term PENDING → **P1** (conversion problem + ghost inventory reservation risk).
+Verify abandoned PI cleanup does one of:
+- Automatic expiry via `stripe.paymentIntents.cancel` in a scheduled function, OR
+- TTL-based cleanup matching the Cart TTL sweeper (Law 10)
+
+### 3f — Order Snapshot Integrity Audit
+Verify `orders.items[]` array stores **snapshot data** at time of purchase, not just references:
+- `productName` → string (snapshot). Missing = **P2** (admin dashboard shows blank if product deleted)
+- `productImageUrl` → string URL (snapshot). Missing = **P2** (historical receipts show broken images)
+- `sku` → string (snapshot). Must match `products.sku` at purchase time.
+- `unitPriceInCents` → integer (snapshot). Must match Firestore `products.price` at purchase time.
+
+Verify one sampled order item's `unitPriceInCents` matches the product's current price (to detect price drift). Mismatch > 0 = potential audit trail issue, flag as **P3**.
+
 ---
 
 ## 💳 SECTOR 4 — Payment Processing (Stripe)
@@ -256,10 +316,12 @@ Verify `metadata` contains: `orderId`, `userId` for webhook correlation.
 Missing metadata = **P1** (webhook can't correlate to Firestore order).
 
 ### 4f — 3DS / SCA Compliance Audit
-Use `grep_search` for `requires_action` or `confirmCardPayment` in frontend source.
-Verify frontend handles `{ status: 'requires_action', client_secret }` from backend.
-Verify `stripe.confirmCardPayment(clientSecret)` is called client-side.
-Missing 3DS handling = **P1** (SCA-regulated cards will silently fail in EU markets).
+Use `grep_search` for `requires_action` in backend Cloud Functions source.
+Verify the backend **returns** `{ status: 'requires_action', clientSecret: paymentIntent.client_secret }` to the client when PI is in `requires_action` state.
+Verify frontend handles this response — `grep_search` for `confirmCardPayment` or `handleNextAction` in frontend source.
+Verify `stripe.confirmCardPayment(clientSecret)` is called client-side after receiving `requires_action`.
+Missing server-side `requires_action` return = PI hangs silently = **P0** (customer charged, 3DS never resolves).
+Missing client-side handler = **P1** (SCA-regulated cards will silently fail in EU markets).
 
 ### 4g — Discount & Tax Server-Authority
 > **`ecommerce-reviewer` Laws 13 + 14**: Discount and Tax must be server-enforced.
@@ -272,6 +334,33 @@ Verify coupon redemption uses Firestore transaction to atomically consume one-ti
 Use `grep_search` for `try/catch` wrapping all webhook handlers.
 Verify catch blocks always return HTTP 200 (never 5xx on processing failure — prevents Stripe retry storm).
 Verify failed events are logged to `webhook_errors` collection with `{ eventId, error, retryCount, timestamp }`.
+
+### 4i — Subscription / Recurring Billing Audit (auto-activated if detected)
+> Only execute if Phase 0e Stripe Connect Detection found `subscriptions.create` or `stripe.subscriptions`.
+
+Use `grep_search` for `stripe.subscriptions` in `functions/src/`.
+If found, verify:
+- `invoice.payment_succeeded` webhook handler exists → marks subscription renewal on order/subscription record.
+- `invoice.payment_failed` webhook handler exists → downgrades user tier, sends dunning email.
+- `customer.subscription.deleted` webhook handler exists → removes access, sends cancellation email.
+- `orders` or `subscriptions` collection stores `subscriptionId`, `currentPeriodEnd`, `planId`.
+- Subscription status (`active | past_due | canceled | trialing`) is reflected in user's Firestore document.
+- Subscription cancellation does NOT delete historical invoice records.
+
+Missing `invoice.payment_succeeded` handler = **P0** (users lose access on renewal, no revenue recorded).
+Missing cancellation handler = **P1** (zombie subscribers retain access after cancellation).
+
+### 4j — Stripe Connect / Marketplace Audit (auto-activated if detected)
+> Only execute if Phase 0e detected `transfer_data` or `connected_account`.
+
+Verify:
+- `transfer_data.destination` is set on each PaymentIntent to the seller's connected account ID.
+- Platform fee (`application_fee_amount`) is calculated server-side as a percentage — never from `req.body.fee`.
+- Seller connected account IDs are stored in Firestore `users/{userId}.stripeConnectedAccountId` — not hardcoded.
+- `payouts` collection exists with `{ stripeTransferId, sellerId, amount, status, createdAt }`.
+- Payout failure webhook (`account.updated` with `payouts_enabled: false`) triggers admin alert.
+
+Missing transfer destination = **P0** (platform capturing 100% of payment, not routing to sellers).
 
 ---
 
@@ -357,6 +446,19 @@ Verify any marketing emails DO contain unsubscribe link (CAN-SPAM compliance).
 4. Confirm email function execution time is < 10 seconds.
 If email function fails silently → **P1** (customers receive no confirmation).
 
+### 6f — Shipping Provider Integration Audit
+Use `grep_search` for shipping provider SDKs in `functions/src/` and `package.json`:
+- `shipstation`, `easypost`, `shippo`, `shipengine`, `fedex`, `ups`, `dhl`
+
+If a shipping provider is found:
+- Verify the provider's **inbound webhooks** are handled (carrier status: `shipped`, `delivered`, `exception`, `returned`).
+- Verify `DELIVERED` webhook auto-updates `orders/{orderId}.status → DELIVERED` and triggers delivery confirmation email.
+- Verify **webhook signature verification** for the provider (not just raw body acceptance).
+- Verify `trackingNumber` and `carrier` are stored on order document when label is created.
+- Verify shipping label creation failures are caught and logged (not silently dropped).
+
+If no shipping provider found → note that tracking updates are manual (acceptable for low-volume, flag for scale readiness).
+
 ---
 
 ## 🧪 SECTOR 7 — E2E Checkout Flow Testing
@@ -430,6 +532,12 @@ Using `browser_subagent` (if two test users available):
 4. Must return 403, redirect to home, or show "not found" — NEVER show order data.
 5. Alternatively, test via direct Firestore query as User B's authenticated context.
 
+**Multi-Tenant B2B IDOR Extension** (if `orgId` field found on orders via `grep_search`):
+6. Verify User B from Org Y CANNOT access orders belonging to Org X.
+7. Use `grep_search` for `orgId` in order fetch functions — verify `order.orgId === request.auth.token.orgId` assertion.
+8. Check Firestore rules for org-level scoping: `resource.data.orgId == request.auth.token.orgId`.
+Missing org-level IDOR protection = **P0 multi-tenant breach**.
+
 ### 7g — Admin Panel E2E
 1. Sign in as admin user (`admin: true` custom claim required).
 2. Navigate to admin orders panel (`/admin/orders`).
@@ -445,6 +553,16 @@ Using `browser_subagent` (if two test users available):
 3. Verify only their orders displayed (IDOR at UI layer).
 4. Click into specific order → verify all line items, pricing, and status correct.
 5. Verify pagination works if > 10 orders.
+
+### 7i — Wallet Payment E2E (Apple Pay / Google Pay / Link)
+Use `grep_search` for `PaymentRequestButton`, `payment_request`, `payment_method_types.*link`, or `wallets` in frontend source.
+If wallet payments are configured:
+1. Use `browser_subagent` to navigate to checkout in Chrome.
+2. Verify the Stripe Payment Request Button (or Link) renders correctly for supported payment methods.
+3. Verify the button only appears when the browser supports the payment method (graceful degradation).
+4. Use `grep_search` for domain verification files (`/.well-known/apple-developer-merchantid-domain-association`) — required for Apple Pay.
+5. Verify `paymentMethod.type` is handled generically — not hardcoded to `'card'` only — in webhook handlers.
+Missing domain verification for Apple Pay = Apple Pay silently disabled = **P2** (revenue leakage for Apple users).
 
 ---
 
@@ -504,6 +622,36 @@ Verify `startAfter()` cursor pagination is used (not `offset()` — Firestore of
 - Verify failed webhook events logged to `webhook_errors` collection.
 - Verify dead-letter handling for events that fail > 3 times.
 - Verify `failed_orders` collection exists for payment-succeeded-but-order-not-created scenarios.
+
+### 9f — Analytics / Revenue Tracking Audit
+Use `grep_search` for analytics event firing adjacent to order success in frontend source:
+- `gtag('event', 'purchase'` → GA4 purchase event
+- `analytics.track('Order Completed'` → Segment/Mixpanel
+- `posthog.capture('purchase'` → PostHog
+- `fbq('track', 'Purchase'` → Meta Pixel
+
+For each found analytics provider, verify the `purchase` event includes:
+- `transaction_id` → must match `orderId` for deduplication
+- `value` → numeric total (dollars, not cents) for revenue reporting
+- `currency` → ISO code
+- `items[]` → product array for GA4 Enhanced Ecommerce
+
+If no analytics events fire on order completion → **P2** (revenue attribution broken, marketing can't optimize).
+If `transaction_id` missing → **P2** (duplicate purchase events inflate revenue metrics).
+If analytics fires BEFORE order Firestore write confirmed → **P1** (phantom revenue on failed orders).
+
+### 9g — Inventory Reservation Race Condition Audit
+> **ATOMIC INVENTORY LAW**: Pre-payment inventory reservation prevents overselling.
+
+Use `grep_search` for cart creation / add-to-cart function in `functions/src/`.
+Verify ONE of the following patterns exists:
+- **Reservation Pattern**: Cart creation uses `FieldValue.increment(-qty)` to reserve inventory at cart time AND payment failure restores via `FieldValue.increment(+qty)`.
+- **Optimistic Locking**: Order creation uses `runTransaction` with `product.stock >= requestedQty` check atomically preventing concurrent oversell.
+- **Queue-Based**: Orders are queued and processed serially (acceptable for low-concurrency systems).
+
+If NONE of the above exist (pure post-payment decrement with no pre-payment check):
+→ Flag as **P1 Race Condition Risk**: 100 users adding the last item = 100 proceeding to payment = potential oversell.
+Note the traffic level at which this becomes critical (low traffic = tolerable P2, high traffic = P1).
 
 ---
 

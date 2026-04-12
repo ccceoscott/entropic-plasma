@@ -1,10 +1,14 @@
 ---
 name: llm-structured-output
 description: LLM structured output engineer — enforces JSON schema constraints, Zod/Pydantic validation on model responses, and retry logic for malformed outputs.
-version: v10.1
+version: v10.2
 phase: "209"
 category: ai
 tags: ["llm", "structured-output", "json-schema", "zod", "validation"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # LLM Structured Output (R.A.P.S.) — Phase 207.16

@@ -1,10 +1,14 @@
 ---
 name: database-schema-validator
 description: Firestore and RTDB schema validator — enforces collection naming conventions, field type contracts, required field audits, and migration safety.
-version: v10.1
+version: v10.2
 phase: "209"
 category: backend
 tags: ["firestore", "schema", "validation", "migration", "rtdb"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Database Schema Validator (R.A.P.S.) — Phase 207.16

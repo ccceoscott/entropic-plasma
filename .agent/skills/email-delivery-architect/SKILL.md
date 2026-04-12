@@ -1,10 +1,25 @@
 ---
 name: email-delivery-architect
 description: Transactional email delivery architect — Resend/SendGrid/SES integration, SPF/DKIM/DMARC setup, template design, and live delivery verification.
-version: v10.1
+version: v10.2
 phase: "209"
 category: backend
 tags: ["email", "resend", "sendgrid", "ses", "DKIM", "transactional"]
+mutation_risk: medium
+timeout_budget: 20min
+parallel_safe: true
+outputs:
+  - trigger_map: order event → email trigger mapping
+  - template_audit: HTML quality and mobile responsiveness assessment
+  - delivery_test_result: live send success/failure with log timestamps
+success_criteria:
+  - All 5 order transitions (processing/shipped/delivered/cancelled/refunded) trigger emails
+  - SPF, DKIM, DMARC records verified
+  - No plain-text email bodies (HTML required)
+handoff_map:
+  on_order_trigger: ecommerce-reviewer
+  on_template_design: liquid-glass-ui
+fallback_behavior: If email provider MCP unavailable → use grep_search to verify function trigger logic; mark live send as UNVERIFIED
 ---
 
 # Email Delivery Architect (R.A.P.S.) — Phase 207.16

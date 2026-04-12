@@ -1,10 +1,14 @@
 ---
 name: 007
 description: Chief Security Architect specializing in STRIDE/PASTA, Red/Blue teaming, SAST, dependency audits, and infrastructure hardening.
-version: v10.1
+version: v10.2
 phase: "209"
 category: security
 tags: ["security", "penetration-testing", "STRIDE", "SAST", "hardening"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # 007 (R.A.P.S.) — Phase 207.16

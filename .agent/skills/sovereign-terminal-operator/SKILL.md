@@ -1,10 +1,14 @@
 ---
 name: sovereign-terminal-operator
 description: Sovereign terminal operator — Phase 57 hang-eradication patterns, non-blocking grep, timeout-safe CLI invocations, and shell diagnostic protocols.
-version: v10.1
+version: v10.2
 phase: "209"
 category: ops
 tags: ["terminal", "bash", "hang-eradication", "cli", "diagnostics"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Terminal Operator (R.A.P.S.) — Phase 207.16

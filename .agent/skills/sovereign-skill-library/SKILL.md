@@ -1,10 +1,14 @@
 ---
 name: sovereign-skill-library
 description: R.A.P.S. skill library manager — skill catalog governance, frontmatter standardization, bundle management, and fleet-wide skill propagation.
-version: v10.1
+version: v10.2
 phase: "209"
 category: protocol
 tags: ["skills", "catalog", "r.a.p.s", "bundles", "governance"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Skill Library (R.A.P.S.) — Phase 207.16

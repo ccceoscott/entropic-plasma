@@ -1,10 +1,26 @@
 ---
 name: performance-engineer
 description: Full-stack performance engineer — Core Web Vitals, Firestore index coverage, Cloud Function cold start profiling, and rate limiting design.
-version: v10.1
+version: v10.2
 phase: "209"
 category: ops
 tags: ["performance", "LCP", "INP", "firestore-indexes", "cold-start"]
+mutation_risk: low
+timeout_budget: 25min
+parallel_safe: true
+outputs:
+  - cwv_report: LCP/INP/CLS scores with regression risk flags
+  - index_coverage_map: Firestore queries missing composite indexes
+  - cold_start_profile: function p95 start latency per region
+success_criteria:
+  - LCP < 2.5s on prod
+  - No composite index missing warnings in Firestore logs
+  - Cold start < 1s for critical payment functions
+handoff_map:
+  on_checkout_perf: ecommerce-reviewer
+  on_ui_bundle: liquid-glass-ui
+  on_function_optimization: backend-architect
+fallback_behavior: If chrome-devtools MCP unavailable → use Lighthouse CLI via run_command for CWV; flag cold start as UNVERIFIED
 ---
 
 # Performance Engineer (R.A.P.S.) — Phase 207.16

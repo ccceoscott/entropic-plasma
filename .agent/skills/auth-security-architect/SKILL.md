@@ -1,10 +1,26 @@
 ---
 name: auth-security-architect
 description: Firebase Authentication and IAM security architect — custom claims, Firestore rule hardening, IDOR prevention, and zero-trust access enforcement.
-version: v10.1
+version: v10.2
 phase: "209"
 category: security
 tags: ["firebase-auth", "IAM", "security-rules", "IDOR", "custom-claims"]
+mutation_risk: high
+timeout_budget: 20min
+parallel_safe: false
+outputs:
+  - rules_diff: proposed Firestore security rules changes
+  - idor_report: list of endpoints with IDOR exposure risk
+  - claims_map: custom claim structure and enforcement points
+success_criteria:
+  - All rule reads verify auth.uid matches resource owner
+  - No public write rules on sensitive collections
+  - All admin claims gated by custom claim verification
+handoff_map:
+  on_payment_security: ecommerce-reviewer
+  on_infra_hardening: 007
+  on_deploy: fleet-deploy-guardian
+fallback_behavior: If Firebase MCP unavailable → use grep_search on firestore.rules file directly
 ---
 
 # Auth Security Architect (R.A.P.S.) — Phase 207.16

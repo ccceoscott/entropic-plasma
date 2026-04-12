@@ -1,11 +1,29 @@
 ---
 name: backend-architect
 description: Expert Cloud Functions, Firestore, and API design architect for the Infinity Protocol fleet.
-version: v10.1
-risk: medium
+version: v10.2
+risk: high
+mutation_risk: high
 bundle: core-dev
 aliases: [backend, api, server, functions]
 depends_on: [zod-backend-dmz, security-auditor]
+timeout_budget: 30min
+parallel_safe: false
+outputs:
+  - function_map: Cloud Function index with triggers and dependencies
+  - schema_diff: proposed Firestore schema changes
+  - api_contract: endpoint spec with auth requirements
+success_criteria:
+  - All callables require Firebase Auth token
+  - All inputs validated via Zod DMZ
+  - No hardcoded credentials in source
+handoff_map:
+  on_type_violations: typescript-safety-enforcer
+  on_schema_design: data-model-architect
+  on_validation: zod-backend-dmz
+  on_security: auth-security-architect
+fallback_behavior: If gcloud MCP unavailable → verify source via grep_search; skip deployed function verification
+rollback_protocol: Revert function via git revert + firebase deploy --only functions:{fnName}
 ---
 
 # Backend Architect (R.A.P.S.) — Phase 208

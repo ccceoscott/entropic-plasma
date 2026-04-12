@@ -1,10 +1,14 @@
 ---
 name: blueprint
 description: System blueprint generator — produces C4 diagrams, architecture decision records (ADRs), and data flow maps for new and existing systems.
-version: v10.1
+version: v10.2
 phase: "209"
 category: protocol
 tags: ["blueprint", "architecture", "ADR", "c4", "documentation"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Blueprint (R.A.P.S.) — Phase 207.16

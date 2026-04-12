@@ -1,10 +1,14 @@
 ---
 name: adk-tool-scaffold
 description: Google Agent Development Kit (ADK) tool scaffolder — generates typed tool definitions, function declarations, and agent wiring for Gemini-powered agents.
-version: v10.1
+version: v10.2
 phase: "209"
 category: ai
 tags: ["ADK", "google-ai", "agents", "tool-scaffold", "gemini"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Adk Tool Scaffold (R.A.P.S.) — Phase 207.16

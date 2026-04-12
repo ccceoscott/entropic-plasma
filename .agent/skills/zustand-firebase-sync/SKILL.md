@@ -1,10 +1,14 @@
 ---
 name: zustand-firebase-sync
 description: Zustand global state and Firebase real-time sync master — store architecture, Firestore listeners, optimistic updates, and persistence patterns.
-version: v10.1
+version: v10.2
 phase: "209"
 category: frontend
 tags: ["zustand", "firebase", "state-management", "real-time", "persistence"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Zustand Firebase Sync (R.A.P.S.) — Phase 207.16

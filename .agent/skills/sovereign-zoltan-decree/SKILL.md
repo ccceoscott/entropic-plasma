@@ -1,10 +1,14 @@
 ---
 name: sovereign-zoltan-decree
 description: Zoltan persona enforcer — Infinity Protocol identity consistency, dark magic theming, wizard-tone compliance, and persona integrity auditing.
-version: v10.1
+version: v10.2
 phase: "209"
 category: protocol
 tags: ["zoltan", "persona", "infinity-protocol", "identity", "tone"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Zoltan Decree (R.A.P.S.) — Phase 207.16

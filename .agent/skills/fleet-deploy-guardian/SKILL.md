@@ -1,10 +1,27 @@
 ---
 name: fleet-deploy-guardian
 description: Fleet-wide deployment guardian — safe-deploy protocol, project ID verification, pre-commit hooks, rollback patterns, and multi-gate deploy execution.
-version: v10.1
+version: v10.2
 phase: "209"
 category: ops
 tags: ["deploy", "firebase", "safe-deploy", "rollback", "pre-commit"]
+mutation_risk: critical
+timeout_budget: 15min
+parallel_safe: false
+outputs:
+  - deploy_receipt: target project ID, deploy scope, and timestamp
+  - gate_pass_log: results of all pre-deploy checks (secrets, lint, rules)
+  - rollback_instructions: exact command to revert if needed
+success_criteria:
+  - Project ID verified via .firebaserc before any firebase deploy
+  - Zero hardcoded secrets detected in scan
+  - Deploy scope explicitly declared (--only functions, --only hosting, etc.)
+handoff_map:
+  on_security_block: security-auditor
+  on_rules_block: auth-security-architect
+  on_type_block: typescript-safety-enforcer
+rollback_protocol: "firebase hosting:channel:delete preview-channel && git revert HEAD && firebase deploy --only functions:{fnName}"
+fallback_behavior: HALT \u2014 do NOT deploy if .firebaserc cannot be read. Cross-project deploy is worse than no deploy.
 ---
 
 # Fleet Deploy Guardian (R.A.P.S.) — Phase 207.16

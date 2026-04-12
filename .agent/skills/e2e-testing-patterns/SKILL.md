@@ -1,10 +1,14 @@
 ---
 name: e2e-testing-patterns
 description: Playwright E2E testing pattern library — sovereign test patterns, fixture management, network mocking, and multi-environment test matrix design.
-version: v10.1
+version: v10.2
 phase: "209"
 category: testing
 tags: ["playwright", "e2e", "testing", "fixtures", "patterns"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # E2E Testing Patterns (R.A.P.S.) — Phase 207.16

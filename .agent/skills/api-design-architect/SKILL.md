@@ -1,10 +1,14 @@
 ---
 name: api-design-architect
 description: REST/gRPC API design authority — versioning strategy, rate limiting, OpenAPI spec generation, backward compatibility governance, and contract-first development.
-version: v10.1
+version: v10.2
 phase: "209"
 category: backend
 tags: ["api-design", "REST", "gRPC", "OpenAPI", "versioning", "rate-limiting"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # API Design Architect (R.A.P.S.) — Phase 209

@@ -1,10 +1,14 @@
 ---
 name: code-refactoring-refactor-clean
 description: Safe systemic code refactoring architect — module extraction, dead code elimination, dependency inversion, and zero-regression refactor protocols.
-version: v10.1
+version: v10.2
 phase: "209"
 category: backend
 tags: ["refactoring", "clean-code", "modules", "dead-code", "DI"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Code Refactoring Refactor Clean (R.A.P.S.) — Phase 207.16

@@ -1,10 +1,30 @@
 ---
 name: ecommerce-reviewer
 description: Full-spectrum sovereign e-commerce audit covering order lifecycle, product integrity, payment processing, database validation, email delivery, and E2E testing.
-version: v11.0
+version: v12.0
 risk: high
+mutation_risk: critical
 bundles: [security, ops]
 aliases: [ecommerce, commerce-audit, shop-review]
+timeout_budget: 45min
+parallel_safe: false
+outputs:
+  - audit_report: structured severity-ranked JSON of all P0-P3 findings
+  - remediation_plan: ordered fix priority list with file paths
+  - financial_summary: reconciliation delta and inventory coherence status
+handoff_map:
+  on_p0_security: auth-security-architect
+  on_email_failure: email-delivery-architect
+  on_e2e_needed: sovereign-playwright-e2e
+  on_performance_gap: performance-engineer
+  on_type_violations: typescript-safety-enforcer
+triggers:
+  - pre-deploy payment feature
+  - post-Stripe integration
+  - quarterly commerce audit
+  - P0 financial incident investigation
+fallback_behavior: If Firestore MCP unavailable → use grep_search on source code only, flag all schema checks as UNVERIFIED
+rollback_protocol: N/A — audit-only skill, no mutations
 ---
 
 # Ecommerce Reviewer — Sovereign Commerce Auditor v11.0 (R.A.P.S.)
@@ -70,6 +90,9 @@ This skill is the **commerce anchor** for `/ecommerce_audit`. It coordinates wit
 14. **TAX SERVER-AUTHORITY LAW**: Tax rates are calculated server-side using a Firestore-stored rate table or a tax API (TaxJar, Avalara). Never from `req.body.taxAmount`. Tax amount is bundled into PaymentIntent server-side.
 15. **IDOR ZERO-TOLERANCE LAW**: Users can ONLY read their own orders. Any endpoint or Firestore rule that allows cross-user order access = P0 security breach. Verified via auth-scoped query AND Firestore rules.
 16. **WEBHOOK RETRY RESILIENCE LAW**: Stripe retries webhooks for up to 72 hours on failure. Idempotency dedup collection MUST handle re-delivery gracefully. Any stateful side effect (email, inventory) must be guarded against double-execution.
+17. **PCI SURFACE LAW**: Raw card numbers (`card_number`, `cardNumber`, `pan`), CVV (`cvv`, `cvc`), or full magnetic stripe data must NEVER appear in server logs, Cloud Function request bodies, or Firestore documents. Any `console.log(req.body)` adjacent to payment flows = P0 PCI violation requiring immediate log purge.
+18. **INPUT SANITIZATION LAW**: All free-text fields accepted from users (`orderNotes`, `giftMessage`, `deliveryInstructions`) MUST be sanitized server-side before: (a) storing to Firestore, (b) injecting into email templates, (c) rendering in admin dashboards. Unsanitized user input in email HTML = XSS escalation vector. Use `he`, `sanitize-html`, or `dompurify` (server build).
+19. **MULTI-TENANT IDOR LAW**: In B2B or marketplace architectures with `orgId` on orders, Firestore rules AND Cloud Functions MUST assert `order.orgId === request.auth.token.orgId`. Cross-organization order exposure in multi-tenant systems = P0, equivalent severity to cross-user IDOR.
 
 ---
 
@@ -124,6 +147,18 @@ Use `grep_search` to find all locations that write `status` to orders:
 ### 2.4 Partial Fulfillment
 - Check if multi-item orders support partial shipments.
 - If yes: verify `fulfillmentStatus` transitions to `partial` correctly and remaining items are tracked.
+
+### 2.5 Order Snapshot Integrity
+Orders must store **purchase-time snapshots** of product data, not just references. Verify `orders.items[]` contains:
+- `productName` → string. Missing = **P2** (admin shows blank name if product later deleted or renamed).
+- `productImageUrl` → string URL. Missing = **P2** (historical receipts show broken images).
+- `sku` → string. Must be captured at purchase time.
+- `unitPriceInCents` → integer. Must match `products.{productId}.price` at time of purchase (price drift detection).
+- `totalInCents` → integer. Must equal `unitPriceInCents * qty`.
+
+**Price Drift Check**: Sample the most recent 5 completed orders. Verify each order's `unitPriceInCents` matches the corresponding `products.{productId}.price`. If mismatch found on any item → flag as **P3** (audit trail integrity issue, not fraud by default).
+
+**Soft Delete Safety**: If a product is archived/deleted and an order references its `productId`, the order should still render correctly because of snapshot data. Verify this assumption by sampling a completed order whose product status is `archived`.
 
 ---
 
@@ -196,6 +231,28 @@ Query for:
 ### 4.4 Financial Reconciliation
 - Total revenue in Firestore (`sum of orders.totalInCents where status !== CANCELLED`) should match Stripe dashboard payout totals.
 - Any discrepancy > 0 = P0 financial integrity failure.
+
+### 4.4a Inventory Reservation Race Condition Audit
+> **AutoGen-pattern**: Pre-payment reservation prevents concurrent oversell.
+
+Use `grep_search` for add-to-cart / create-cart Cloud Function:
+
+**Pattern A — Reservation at Cart Time** (Preferred):
+- `FieldValue.increment(-qty)` on `products.stock` when cart item is added.
+- `FieldValue.increment(+qty)` on payment failure OR cart abandonment (TTL sweeper).
+- This requires `reservedStock` and `availableStock` fields separated on product document.
+
+**Pattern B — Optimistic Locking via Transaction** (Acceptable):
+- `runTransaction(() => { if (product.stock >= qty) { decrement; create order } else throw OUT_OF_STOCK })`
+- Atomic — prevents concurrent oversell within a single transaction.
+
+**Pattern C — Queue-Based Serialization** (Acceptable for low-volume):
+- All cart/order operations funneled through a Firestore-triggered queue processed serially.
+
+**If none of the above**:
+- Pure POST-payment decrement with no pre-check = **P1 Race Condition**.
+- Under concurrent load: N users add last item → N proceed to Stripe → N pay → 1 gets inventory, N-1 get oversold orders.
+- Flag with recommended pattern based on project traffic profile.
 
 ---
 

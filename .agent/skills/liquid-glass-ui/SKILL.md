@@ -1,10 +1,25 @@
 ---
 name: liquid-glass-ui
 description: Liquid Glass UI scaffolder — premium dark-mode component architecture with translucency, glassmorphism, Framer Motion animations, and fluid typography.
-version: v10.1
+version: v10.2
 phase: "209"
 category: frontend
 tags: ["liquid-glass", "dark-mode", "glassmorphism", "framer-motion", "ui"]
+mutation_risk: low
+timeout_budget: 20min
+parallel_safe: true
+outputs:
+  - component_manifest: list of scaffolded components with class names
+  - token_map: design token assignments (colors, glass opacity, border-radius)
+  - animation_spec: Framer Motion variant definitions
+success_criteria:
+  - No FOUC on page load (theme class applied before paint)
+  - All glassmorphism elements use backdrop-filter
+  - Framer Motion wrapped in LazyMotion
+handoff_map:
+  on_fouc_detected: sovereign-aesthetic-auditor
+  on_perf_regression: performance-engineer
+fallback_behavior: Proceed with design review via screenshot comparison if browser subagent unavailable
 ---
 
 # Liquid Glass Ui (R.A.P.S.) — Phase 207.16

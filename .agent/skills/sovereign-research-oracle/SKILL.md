@@ -1,11 +1,15 @@
 ---
 name: sovereign-research-oracle
 description: Sovereign knowledge ingestion, pattern recognition, and recursive skill improvement for the Infinity Protocol fleet.
-version: v10.1
+version: v10.2
 risk: low
 bundle: research
 aliases: [oracle, research, ki, knowledge]
 depends_on: [sovereign-skill-library]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Research Oracle (R.A.P.S.) — Phase 208

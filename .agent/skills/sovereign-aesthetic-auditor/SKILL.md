@@ -1,10 +1,25 @@
 ---
 name: sovereign-aesthetic-auditor
 description: Sovereign aesthetic auditor — dark mode integrity, FOUC detection, color palette compliance, glassmorphism consistency, and visual regression detection.
-version: v10.1
+version: v10.2
 phase: "209"
 category: frontend
 tags: ["aesthetic", "dark-mode", "FOUC", "glassmorphism", "visual-regression"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+outputs:
+  - fouc_report: detected FOUC vectors with CSS/JS root cause
+  - palette_compliance: color tokens vs. design system reference
+  - visual_regression_screenshots: before/after comparison captures
+success_criteria:
+  - Zero FOUC on hard page reload
+  - All components use design system tokens (no raw hex overrides)
+  - Dark mode loads without flash on prefers-color-scheme: dark
+handoff_map:
+  on_perf_impact: performance-engineer
+  on_component_rebuild: liquid-glass-ui
+fallback_behavior: If browser subagent unavailable → use chrome-devtools MCP screenshot + color picker analysis
 ---
 
 # Sovereign Aesthetic Auditor (R.A.P.S.) — Phase 207.16

@@ -1,11 +1,28 @@
 ---
 name: data-model-architect
 description: Firestore schema governance, collection design, indexing strategy, and data migration specialist for the Infinity Protocol fleet.
-version: v10.1
-risk: medium
+version: v10.2
+risk: high
+mutation_risk: high
 bundle: core-dev
 aliases: [schema, firestore, db, data-model, collections]
 depends_on: [backend-architect, auth-security-architect]
+timeout_budget: 20min
+parallel_safe: false
+outputs:
+  - schema_map: collection hierarchy with field types and access patterns
+  - index_requirements: composite indexes needed for each query pattern
+  - migration_plan: ordered field/collection changes with rollback steps
+success_criteria:
+  - All monetary fields are integer (cents) — no floats
+  - All collections have security rules that scope to authenticated user
+  - All query patterns covered by declared composite indexes
+handoff_map:
+  on_rules_needed: auth-security-architect
+  on_validation: zod-backend-dmz
+  on_financial_integrity: ecommerce-reviewer
+rollback_protocol: Schema migrations are additive-only. New fields do not break existing reads. Collection renames require data copy + verify + delete pattern.
+fallback_behavior: If Firestore MCP unavailable → infer schema from grep_search on Cloud Function source code
 ---
 
 # Data Model Architect (R.A.P.S.) — Phase 208

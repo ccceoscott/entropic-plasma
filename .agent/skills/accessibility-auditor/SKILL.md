@@ -1,10 +1,14 @@
 ---
 name: accessibility-auditor
 description: WCAG 2.1 AA accessibility compliance auditor — screen reader testing, color contrast, keyboard navigation, ARIA labeling, and axe-core integration for Next.js/React.
-version: v10.1
+version: v10.2
 phase: "209"
 category: frontend
 tags: ["accessibility", "WCAG", "a11y", "screen-reader", "ARIA", "keyboard-navigation", "axe-core"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Accessibility Auditor (R.A.P.S.) — Phase 209

@@ -1,10 +1,26 @@
 ---
 name: sovereign-playwright-e2e
 description: Sovereign Playwright E2E master — production test execution, Stripe CSP handling, multi-environment matrix, and worker concurrency governance.
-version: v10.1
+version: v10.2
 phase: "209"
 category: testing
 tags: ["playwright", "e2e", "production-testing", "stripe", "chromium"]
+mutation_risk: low
+timeout_budget: 60min
+parallel_safe: false
+outputs:
+  - test_report: pass/fail matrix per scenario with timing
+  - screenshot_artifacts: browser subagent captures
+  - failure_log: structured error objects with selector and network context
+success_criteria:
+  - All P0 checkout flows pass (4242, 3DS, declined)
+  - IDOR cross-user order test returns 403
+  - Admin panel gated by admin claim
+handoff_map:
+  on_auth_failure: auth-security-architect
+  on_payment_failure: ecommerce-reviewer
+  on_ui_regression: sovereign-aesthetic-auditor
+fallback_behavior: If browser subagent unavailable → use DOM snapshots via chrome-devtools MCP; log as PARTIAL_VERIFICATION
 ---
 
 # Sovereign Playwright E2E (R.A.P.S.) — Phase 207.16

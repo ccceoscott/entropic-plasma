@@ -1,11 +1,26 @@
 ---
 name: typescript-safety-enforcer
 description: Eliminates `any` casts, enforces strict type-safety, and governs TypeScript excellence across the Infinity Protocol fleet.
-version: v10.1
+version: v10.2
 risk: low
+mutation_risk: low
 bundle: core-dev
 aliases: [ts, types, typesafety, strict]
 depends_on: [zod-backend-dmz]
+timeout_budget: 15min
+parallel_safe: true
+outputs:
+  - any_cast_report: list of `any` usages with file paths and suggested types
+  - strict_mode_gaps: tsconfig settings diverging from strict standard
+  - type_coverage_score: percentage of typed surface area
+success_criteria:
+  - Zero `any` casts in payment/order logic
+  - tsconfig.json has strict:true
+  - No @ts-ignore comments without justification comment
+handoff_map:
+  on_validation_gap: zod-backend-dmz
+  on_api_contract: api-design-architect
+fallback_behavior: Run tsc --noEmit via run_command as fallback if grep_search misses inferred any
 ---
 
 # TypeScript Safety Enforcer (R.A.P.S.) — Phase 208

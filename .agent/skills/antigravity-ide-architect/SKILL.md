@@ -1,10 +1,14 @@
 ---
 name: antigravity-ide-architect
 description: Antigravity IDE performance optimizer — manages MCP server health, browser subagent orchestration, artifact pipelines, and IDE configuration.
-version: v10.1
+version: v10.2
 phase: "209"
 category: protocol
 tags: ["antigravity", "ide", "mcp", "performance", "r.a.p.s"]
+mutation_risk: low
+timeout_budget: 15min
+parallel_safe: true
+fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Antigravity Ide Architect (R.A.P.S.) — Phase 207.16
