@@ -49,15 +49,8 @@ Use `view_file` on `.firebaserc` — confirm correct project.
 
 ## SECTOR 1 — Live Auth Environment Audit (Two-Key MCP)
 
-### 1a — Firebase MCP Re-Anchor + Verification (Law 22)
-> ⛔ Re-anchor unconditionally FIRST — the MCP drifts to whichever project last called update_environment.
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
-
-Then confirm: `mcp_firebase-mcp-server_firebase_get_environment` → active project = `gen-lang-client-0386732425`.
+### 1a — Firebase MCP Container Verification
+Confirm binding: `mcp_firebase-mcp-server_firebase_get_environment` → active project = `gen-lang-client-0386732425`.
 Use `mcp_firebase-mcp-server_firebase_get_project` → confirm Auth is enabled.
 
 ### 1b — Auth Provider Verification (Key 2 — gcloud MCP)
@@ -219,8 +212,8 @@ interface AuthUser {
 
 ---
 
-## SECTOR 9 — Knowledge Graph Persistence (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+## Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Verified Auth providers for this project
 - Actual Custom Claims structure (not assumed)
 - UID-path bindings confirmed

@@ -61,9 +61,16 @@ Declare: `✅ [UPGRADE GATE PASSED] Phase [N]. TypeScript clean. Audit commencin
 
 ## PHASE 1 — Protocol Compliance Audit (MCP-first)
 
-### 1a — MCP Container Integrity Check
-Use `mcp_firebase-mcp-server_firebase_get_environment` → verify `projectId = gen-lang-client-0386732425`.
-Any mismatch → **HALT**. Local MCP server isolated environment failure.
+### 1a — Firebase MCP Re-Anchor + Verification (Law 22)
+> ⛔ The `firebase-mcp-server` is a GLOBAL PROCESS. Re-anchor unconditionally FIRST.
+
+Use `mcp_firebase-mcp-server_firebase_update_environment` with:
+- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
+- `active_project`: `gen-lang-client-0386732425`
+- `active_user_account`: `scott@constantconcepts.io`
+
+Then use `mcp_firebase-mcp-server_firebase_get_environment` → verify `projectId = gen-lang-client-0386732425`.
+Any mismatch after re-anchor → **HALT**. MCP server failure.
 
 ### 1b — Mission State Integrity
 Use `view_file` on `MISSION_STATE.md`:
@@ -218,7 +225,7 @@ NODE_OPTIONS=--max-old-space-size=4096 timeout 120 ./node_modules/.bin/jest --te
 
 ---
 
-## Knowledge Base Persistence (R.A.P.S)
+## PHASE 8 — Self-Healing Report & Knowledge Graph Update
 
 ### 8a — Structured Audit Report
 Generate markdown table:
@@ -234,8 +241,8 @@ Generate markdown table:
 | Performance | | | | |
 | Tests | | | | |
 
-### Knowledge Base Persistence (R.A.P.S)
-Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
+### 8b — Knowledge Graph Persistence
+Use `mcp_knowledge-graph_add_observations` to record:
 - Any new pattern discovered
 - Any auto-fix applied (for learning across sessions)
 - Any P0/P1 issue that was halted on (for history)
@@ -277,6 +284,7 @@ UPGRADE STATUS  : [✅ WORKSPACE UPGRADED TO CURRENT PROTOCOL / ⚠️ GAP DETEC
 │ Workflow Compliance          │ ✅/⚠️   │ [N workflows scanned / issues]     │
 │ Node V8 Law (functions)      │ ✅/❌   │ [4096 present / missing]          │
 │ CORS Restriction             │ ✅/❌   │ [restricted / wildcard detected]   │
+│ Brain MCP Connectivity       │ ✅/⚠️   │ [ONLINE / OFFLINE]                │
 │ Test Suite                   │ ✅/❌   │ [pass / N failures]               │
 │ MISSION_STATE Freshness      │ ✅/⚠️   │ [<48h / STALE: last updated X]    │
 │ Performance Budget           │ ✅/⚠️   │ [within budget / exceeded]        │
@@ -303,6 +311,11 @@ Result: [fixed / FAILED]
 
 If failed — manual fix:
   [exact command or action for user to take]
+
+For Brain offline failures:
+  Option 1: Restart IDE → brain-mcp reconnects automatically.
+  Option 2: firebase deploy --only functions --project [PROJECT_ID]
+  Option 3: Type "continue brain offline" to audit without memory.
 
 Type "fix [issue name]" to have Zoltan attempt deeper resolution.
 ═══════════════════════════════════════════

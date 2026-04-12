@@ -222,8 +222,8 @@ Remove references or add deprecation notices.
 
 ---
 
-## SECTOR 8 — Knowledge Graph Persistence (MCP)
-Use `mcp_knowledge-graph_add_observations` and `mcp_knowledge-graph_create_entities` to record:
+## Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Live collection registry with document count estimates
 - TypeScript interface schemas (key fields only)
 - Composite index map

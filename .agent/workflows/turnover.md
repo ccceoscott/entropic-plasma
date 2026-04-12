@@ -4,6 +4,26 @@ alwaysApply: false
 ---
 
 # INFINITY PROTOCOL v10.0 (R.A.P.S.) — /turnover
+
+## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
+
+### Phase 0a — Protocol Sync
+// turbo
+```bash
+bash ./scripts/session-proof.sh 2>&1
+```
+
+### Phase 0b — TypeScript Verification
+// turbo
+```bash
+cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
+```
+
+### Phase 0c — DUAL PHASE SNAPSHOT
+Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
+
+---
+
 ## Mid-Task Sovereign Handoff Protocol
 
 > ⚡ **MANDATE**: Run this when the user says "turnover" or warns of an impending rate limit mid-task. The Remote Brain is DEPRECATED. All handover data must be written to `.agent/` and `MISSION_STATE.md`.

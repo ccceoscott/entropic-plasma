@@ -59,22 +59,17 @@ This is the AUTHORITATIVE function registry. Do not duplicate or shadow existing
 
 ---
 
-## SECTOR 2 — Project Identity (Re-Anchor + Dual Verification — Law 22)
+## SECTOR 2 — Project Identity (Dual Verification)
 
 Key 1:
 // turbo
 ```bash
 node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)"
 ```
-Key 2 — Re-Anchor (FIRST — unconditionally):
-Use `mcp_firebase-mcp-server_firebase_update_environment` with:
-- `project_dir`: `/Users/teknojunkeee/Developer/infinity-protocol-1`
-- `active_project`: `gen-lang-client-0386732425`
-- `active_user_account`: `scott@constantconcepts.io`
 
-Key 3 — Verify re-anchor succeeded:
+Key 2 — Verify MCP Binding:
 Use `mcp_firebase-mcp-server_firebase_get_environment` → confirm project ID.
-All three must be `gen-lang-client-0386732425`. Any mismatch → **HALT**.
+Both must be `gen-lang-client-0386732425`. Any mismatch → **HALT**.
 
 ---
 
@@ -211,8 +206,8 @@ Zero errors = green light for deploy.
 
 ---
 
-## SECTOR 11 — Knowledge Graph Persistence (MCP)
-Use `mcp_knowledge-graph_add_observations` to record:
+## Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to record:
 - Functions inventory snapshot (names, triggers, configs)
 - Secrets registry map
 - CORS configuration

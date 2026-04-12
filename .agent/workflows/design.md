@@ -4,7 +4,6 @@ alwaysApply: false
 ---
 
 # INFINITY PROTOCOL v10.0 — /design
-> ⚡ **REQUIRED SKILLS**: `sovereign-aesthetic-auditor`, `liquid-glass-ui-scaffolder`
 ## The Architect's Decree: Visual Splendor, Thematic Integrity, and Aesthetic Sovereignty
 
 > ⚡ **MANDATE**: The User Interface is the ultimate manifestation of the Infinity Protocol. A flat, lifeless, or poorly elevated DOM is considered a hostile structural failure. This workflow enforces the direct visual decrees issued by the Agency Owner, mapped directly from the Sovereign Brain.

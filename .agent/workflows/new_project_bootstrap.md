@@ -83,7 +83,7 @@ python3 -c "
 import json, sys
 c = json.load(open('config/antigravity_mcp_config.json'))
 servers = list(c['mcpServers'].keys())
-required = ["mcp-local-hub"]  # auto-synced from config/antigravity_mcp_config.json
+required = ["firebase-mcp-server", "gcloud", "chrome-devtools", "knowledge-graph", "brave-search"]  # auto-synced from config/antigravity_mcp_config.json
 missing = [s for s in required if s not in servers]
 print('[OK]', servers) if not missing else (print('[MISSING]', missing), sys.exit(1))
 " 2>/dev/null || echo "[WARN] Canonical source missing — check config/antigravity_mcp_config.json"
@@ -103,12 +103,24 @@ cp config/antigravity_mcp_config.json ~/.gemini/antigravity/mcp_config.json && e
 
 > ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
 
-**Server Registry (1 total)**:
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+**Server Registry (5 total)**:
 | Server | Type | Reason |
 |---|---|---|
-| `mcp-local-hub` | LOCAL stdio | Dedicated Local Hub |
+| `firebase-mcp-server` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
+| `gcloud` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
+| `chrome-devtools` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
+| `knowledge-graph` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
+| `brave-search` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
 
-> ❌ **PERMANENTLY PURGED**: `playwright`, `context7`, `figma-dev-mode`, `brain-mcp` (ERADICATED)
+> ❌ **PERMANENTLY PURGED**: `mcp-local-hub`, `remote-brain`, `playwright`, `context7`, `figma-dev-mode`, `brain-mcp` (Phase 207 ERADICATED)
 ---
 
 ## SECTOR 2 — Firebase Project Verification (Two-Key MCP)
@@ -119,14 +131,8 @@ Key 1 — Local:
 node -e "console.log(JSON.parse(require('fs').readFileSync('./.firebaserc','utf8')).projects.default)" 2>/dev/null || echo "new project — no .firebaserc yet"
 ```
 
-Key 2 — Firebase MCP Re-Anchor (Law 22 — unconditionally):
-> ⛔ Re-anchor FIRST to confirm which project the MCP is actually pointing to before taking any action.
-
-Use `mcp_firebase-mcp-server_firebase_update_environment` with the correct values for THIS new project:
-- `project_dir`: `[path to this new project root]`
-- `active_project`: `[newly confirmed project ID from Key 1 or new project just created]`
-
-Then: `mcp_firebase-mcp-server_firebase_get_environment` → confirm which project is active.
+Key 2 — Firebase MCP Container Verification:
+Confirm binding: `mcp_firebase-mcp-server_firebase_get_environment` → confirm which project is active.
 Use `mcp_firebase-mcp-server_firebase_get_project` → confirm project details.
 
 If new project being created:
@@ -356,8 +362,8 @@ GIT_TERMINAL_PROMPT=0 timeout 45 git push -u origin main
 
 ---
 
-## SECTOR 13 — Knowledge Graph Bootstrap (MCP)
-Use `mcp_knowledge-graph_create_entities` to initialize:
+## Knowledge Base Persistence (R.A.P.S)
+Update `KNOWLEDGE.md` and/or `MISSION_STATE.md` to initialize:
 - Project entity with name, framework, Firebase project ID
 - Initial architecture entity with component map
 

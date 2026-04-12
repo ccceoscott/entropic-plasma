@@ -4,6 +4,26 @@ alwaysApply: true
 ---
 
 # INFINITY PROTOCOL v10.0 — DRIFT GUARD v5.0 (R.A.P.S)
+
+## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
+
+### Phase 0a — Protocol Sync
+// turbo
+```bash
+bash ./scripts/session-proof.sh 2>&1
+```
+
+### Phase 0b — TypeScript Verification
+// turbo
+```bash
+cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
+```
+
+### Phase 0c — DUAL PHASE SNAPSHOT
+Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
+
+---
+
 ## Always-On Workspace Sovereignty Protocol
 
 > 🔴 **ALWAYS-ON**: This is NOT a session-start workflow. It is wired to `alwaysApply: true`. It fires on EVERY message.
@@ -80,10 +100,10 @@ Every Message Receipt:
 Before New Task:
   3. Read `.agent/rules/` and `MISSION_STATE.md` locally via R.A.P.S
   4. Check local KIs before external research (DG-1)
-
+  
 During Task:
   5. Poison string scan on all writes (DG-2)
-
+  
 After Task:
   6. Write updated state to `MISSION_STATE.md` and `task.md` locally.
 ```
