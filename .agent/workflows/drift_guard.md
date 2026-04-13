@@ -5,22 +5,12 @@ alwaysApply: true
 
 # INFINITY PROTOCOL v10.0 — DRIFT GUARD v5.0 (R.A.P.S)
 
-## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
+## ⚡ INSTANT SOVEREIGNTY CHECK (Read-Only — No Terminal Commands)
 
-### Phase 0a — Protocol Sync
-// turbo
-```bash
-bash ./scripts/session-proof.sh 2>&1
-```
+> **TERMINATION LAW**: drift_guard MUST NOT run terminal commands. `session-proof.sh` and `tsc` belong in `/session_start` only. Running them here = 60s block on every message = context budget collapse = agent termination.
 
-### Phase 0b — TypeScript Verification
-// turbo
-```bash
-cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
-```
-
-### Phase 0c — DUAL PHASE SNAPSHOT
-Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
+### Phase 0a — Protocol Anchor (READ ONLY)
+Read `WORKSPACE_PHASE` from `MISSION_STATE.md` mentally or via `view_file` only if context is missing. **Do NOT execute any bash commands here.**
 
 ---
 
@@ -28,9 +18,10 @@ Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
 
 > ⚡ **MANDATE**: This guard fires on EVERY message. It is the first line of defense against cross-project contamination. It is ALWAYS-ON and cannot be disabled.
 
-## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
-**Automatically ingest this skill** via `view_file` before proceeding:
-1. `.agent/skills/always-verify-gcp/SKILL.md` — Project ID confirmation, IAM audit, quota checks before any GCP operation
+## 🧠 Skill Ingestion (On-Demand ONLY — NOT on every message)
+> **LAW**: Do NOT auto-load any skill file on every message. Load skills only when the task explicitly requires them:
+- If performing a GCP operation → load `.agent/skills/always-verify-gcp/SKILL.md`
+- If invoking `browser_subagent` → load `.agent/rules/multiagent_laws.mdc` first
 
 ---
 

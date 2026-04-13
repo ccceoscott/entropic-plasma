@@ -485,16 +485,50 @@ PW_ALLOW_PROD=true \
 ```
 
 ### 7a — Full Happy Path (browser_subagent)
-Invoke `browser_subagent` (Zoltan's Eye). Apply sovereign-playwright-e2e non-blocking patterns:
-1. Navigate to product page — verify price displays correctly (CENTS/100 = dollars).
-2. Add to cart — verify cart count increments, cart total correct.
-3. Proceed to checkout — verify shipping form validation (required fields enforced).
-4. Enter test card `4242 4242 4242 4242`, expiry `12/34`, CVC `123`.
-5. Submit payment — verify redirect to order confirmation/success page.
-6. Immediately after: query `mcp_firebase-mcp-server_firestore_query_collection` on `orders` (filter: most recent) — verify `status: PROCESSING`, `stripePaymentIntentId` populated.
-7. Query `stripe_events` — verify deduplication record created.
-8. Query `products/{productId}` — verify `stock` decremented by ordered qty.
-9. Check function logs — verify confirmation email function executed successfully.
+> ⚡ **LAWS A1-A7 ACTIVE**: Single-objective per invocation. ≤400 word Task. Explicit return. Sequential chaining.
+> ⚡ **LAW A8 FALLBACK**: If subagent unavailable → use `mcp_chrome-devtools_navigate_page` + `mcp_chrome-devtools_take_screenshot`.
+
+Spawn **Invocation 1 — Product → Cart** only:
+```
+TaskName: "Add Product to Cart"
+RecordingName: "add_to_cart"
+TaskSummary: "Verify product page loads, price is correct, and item can be added to cart."
+Task: |
+  OBJECTIVE: Navigate to the product page and add an item to the cart.
+  START URL: [PRODUCT_PAGE_URL]
+  STEPS:
+  1. Navigate to the product URL.
+  2. Note the displayed price (exact text visible on page).
+  3. Click the Add to Cart button.
+  4. Take a screenshot showing cart count updated.
+  RETURN:
+  - Price text displayed on the page
+  - Whether Add to Cart succeeded (yes/no)
+  - Screenshot of cart state
+  - URL you ended on
+```
+
+After Invocation 1 returns — spawn **Invocation 2 — Checkout → Payment** separately:
+```
+TaskName: "Complete Test Checkout"
+RecordingName: "checkout_payment"
+TaskSummary: "Complete the checkout flow using Stripe test card 4242 and verify order confirmation."
+Task: |
+  OBJECTIVE: Complete checkout and reach the order confirmation page.
+  START URL: [CHECKOUT_URL or navigate from cart]
+  STEPS:
+  1. Proceed to checkout from cart.
+  2. Fill shipping form: name=Test User, address=123 Test St, city=Testville, zip=12345.
+  3. On the payment step, enter test card: 4242 4242 4242 4242, expiry 12/34, CVC 123.
+  4. Submit the payment.
+  5. Wait up to 15 seconds for redirect.
+  6. Take a screenshot of the final page.
+  RETURN:
+  - URL you landed on after payment
+  - Whether an order confirmation/success message is visible (yes/no, quote exact text)
+  - Screenshot of the confirmation page
+  - Any error messages visible
+```
 
 ### 7b — Declined Payment Path
 1. Use card `4000 0000 0000 0002` (generic decline).
@@ -524,18 +558,49 @@ Invoke `browser_subagent` (Zoltan's Eye). Apply sovereign-playwright-e2e non-blo
 
 ### 7f — IDOR Cross-User Order Access (Security E2E)
 > **`auth-security-architect` IDOR test protocol**
+> ⚡ **LAW A2**: Two separate subagent invocations if two test users available. Never batch both users in one Task.
 
-Using `browser_subagent` (if two test users available):
-1. Sign in as User A, place order, capture `orderId`.
-2. Sign out. Sign in as User B.
-3. Attempt to navigate to `/orders/{orderId}` (User A's order).
-4. Must return 403, redirect to home, or show "not found" — NEVER show order data.
-5. Alternatively, test via direct Firestore query as User B's authenticated context.
+If two test users are available, spawn **Invocation A — Place Order as User A**:
+```
+TaskName: "Place Order as User A"
+RecordingName: "idor_user_a_order"
+TaskSummary: "Sign in as User A, navigate to any order URL, and capture the orderId."
+Task: |
+  OBJECTIVE: Sign in as User A and capture an existing order ID from the URL.
+  START URL: [APP_URL]
+  STEPS:
+  1. Sign in as User A (email: [USER_A_EMAIL], password: [USER_A_PASS]).
+  2. Navigate to order history page.
+  3. Click into any existing order.
+  4. Copy the orderId from the URL (the path segment after /orders/).
+  RETURN:
+  - The orderId captured from the URL
+  - Screenshot of the order detail page
+  - Whether order data is visible
+```
+
+After Invocation A returns with orderId, spawn **Invocation B — IDOR Attempt as User B**:
+```
+TaskName: "Test IDOR as User B"
+RecordingName: "idor_user_b_attempt"
+TaskSummary: "Sign in as User B and attempt to access User A order. Must be denied."
+Task: |
+  OBJECTIVE: Verify User B CANNOT access User A's order.
+  START URL: [APP_URL]
+  STEPS:
+  1. Sign out if currently logged in.
+  2. Sign in as User B (email: [USER_B_EMAIL], password: [USER_B_PASS]).
+  3. Navigate directly to [APP_URL]/orders/[ORDER_ID_FROM_USER_A].
+  4. Take a screenshot of the result.
+  RETURN:
+  - Whether User A order data was visible to User B (YES = P0 IDOR BREACH, NO = secure)
+  - HTTP status or redirect destination visible
+  - Screenshot of the access-denied state or error
+```
 
 **Multi-Tenant B2B IDOR Extension** (if `orgId` field found on orders via `grep_search`):
-6. Verify User B from Org Y CANNOT access orders belonging to Org X.
-7. Use `grep_search` for `orgId` in order fetch functions — verify `order.orgId === request.auth.token.orgId` assertion.
-8. Check Firestore rules for org-level scoping: `resource.data.orgId == request.auth.token.orgId`.
+Use `grep_search` for `orgId` in order fetch functions — verify `order.orgId === request.auth.token.orgId` assertion.
+Check Firestore rules for org-level scoping: `resource.data.orgId == request.auth.token.orgId`.
 Missing org-level IDOR protection = **P0 multi-tenant breach**.
 
 ### 7g — Admin Panel E2E
@@ -557,12 +622,21 @@ Missing org-level IDOR protection = **P0 multi-tenant breach**.
 ### 7i — Wallet Payment E2E (Apple Pay / Google Pay / Link)
 Use `grep_search` for `PaymentRequestButton`, `payment_request`, `payment_method_types.*link`, or `wallets` in frontend source.
 If wallet payments are configured:
-1. Use `browser_subagent` to navigate to checkout in Chrome.
-2. Verify the Stripe Payment Request Button (or Link) renders correctly for supported payment methods.
-3. Verify the button only appears when the browser supports the payment method (graceful degradation).
+1. Use `mcp_chrome-devtools_navigate_page` to navigate to checkout URL in Chrome (**Law A8 preferred** — single-page verification, no full subagent needed).
+2. Use `mcp_chrome-devtools_take_screenshot` to capture the payment method area.
+3. Verify the Stripe Payment Request Button renders correctly via screenshot.
 4. Use `grep_search` for domain verification files (`/.well-known/apple-developer-merchantid-domain-association`) — required for Apple Pay.
-5. Verify `paymentMethod.type` is handled generically — not hardcoded to `'card'` only — in webhook handlers.
+5. Verify `paymentMethod.type` is handled generically via `grep_search` for `'card'` hardcodes in webhook handlers.
 Missing domain verification for Apple Pay = Apple Pay silently disabled = **P2** (revenue leakage for Apple users).
+
+---
+
+### 🧹 7z — Post-Sector Phantom Purge (Law A5 — MANDATORY after all subagent calls complete)
+> **Run AFTER all Sector 7 invocations have returned. NEVER inside a Task field.**
+// turbo
+```bash
+rm -rf ~/.gemini/antigravity/browser_recordings 2>/dev/null || true
+```
 
 ---
 

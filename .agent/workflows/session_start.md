@@ -42,7 +42,8 @@ Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
 ### STEP 2 — R.A.P.S Context Extraction (Mandatory Substitution for Legacy Brain)
 1. Use `view_file` to ingest `MISSION_STATE.md`. Extract `WORKSPACE_PHASE`, "Next Session Entry Point", and exact architectural rules.
 2. Use `list_dir` on `.agent/rules/` and `view_file` on rules pertinent to the "Next Session Entry Point".
-3. Use `list_dir` on `~/.gemini/antigravity/knowledge/` to identify relevant past architecture decisions (KIs).
+3. **MANDATORY**: Use `view_file` on `.agent/rules/multiagent_laws.mdc` — load Laws A1-A10 into active context before ANY `browser_subagent` call this session.
+4. Use `list_dir` on `~/.gemini/antigravity/knowledge/` to identify relevant past architecture decisions (KIs).
 
 Do NOT attempt to use `mcp_local-hub_brain` tools.
 

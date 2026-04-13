@@ -155,11 +155,31 @@ Use `mcp_firebase-mcp-server_functions_get_logs` with `min_severity: "ERROR"` an
 Any new errors post-deploy → treat as P0. Investigate immediately.
 
 ### 6b — Browser Verification
-Use `browser_subagent` to navigate to production URL and verify:
-- Page loads without console errors
-- Auth flow works
-- Core user journey is functional
-- Report screenshot findings.
+> ⚡ **LAW A1-A3 COMPLIANCE REQUIRED**: Single-objective task, ≤400 word Task field, explicit return condition.
+> **FALLBACK (Law A8)**: If subagent unavailable → use `mcp_chrome-devtools_navigate_page` + `mcp_chrome-devtools_take_screenshot` directly.
+
+Invoke `browser_subagent` with **this exact structure**:
+```
+TaskName: "Verify Production Deploy"
+RecordingName: "prod_deploy_verify"
+TaskSummary: "Verify the newly deployed app loads correctly and the core UI is functional."
+Task: |
+  OBJECTIVE: Verify the production deployment is live and functional.
+  START URL: https://[PRODUCTION_URL]
+  STEPS:
+  1. Navigate to the production URL.
+  2. Wait for the page to fully load (3 seconds).
+  3. Take a screenshot of the landing page.
+  4. Check the browser console for any red errors (open DevTools if possible).
+  5. If a login button is visible, click it and verify the auth page loads.
+  RETURN:
+  - Screenshot of landing page
+  - Whether any console errors appeared (yes/no, describe if yes)
+  - The exact URL you ended on
+  - Whether the core UI rendered (yes/no)
+```
+
+> After subagent RETURNS: Run the Phantom Purge (separate step below, Law A5).
 
 ### 6c — Lighthouse Spot Check (MCP)
 Use `mcp_chrome-devtools_lighthouse_audit` on production URL in `navigation` mode.
@@ -207,9 +227,10 @@ Use `mcp_knowledge-graph_add_observations` to record:
 
 ---
 
-## ⚡ Phantom Purge (Final Step — ALWAYS)
+## ⚡ Phantom Purge (Final Step — Law A5 — MUST run AFTER subagent returns)
+> **LAW A5**: Run ONLY after browser_subagent has returned. Never inside a Task field. Never in parallel.
 // turbo
 ```bash
-rm -rf ~/.gemini/antigravity/browser_recordings
+rm -rf ~/.gemini/antigravity/browser_recordings 2>/dev/null || true
 ```
-`🧹 Phantom purge complete.`
+`🧹 Phantom purge complete. Agent termination vectors cleared.`
