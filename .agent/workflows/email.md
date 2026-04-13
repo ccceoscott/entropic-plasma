@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Email Architect (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/email-delivery-architect/SKILL.md` — Transactional email, SPF/DKIM/DMARC, Resend/SendGrid, live delivery tests
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

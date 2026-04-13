@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: State Master (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/zustand-firebase-sync/SKILL.md` — Zustand store architecture, Firestore listeners, optimistic updates, persistence
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: UI Architect (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/liquid-glass-ui/SKILL.md` — Premium dark-mode components, glassmorphism, Framer Motion, fluid typography
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

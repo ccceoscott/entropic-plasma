@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: IDE Architect (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/antigravity-ide-architect/SKILL.md` — MCP server health, browser subagent orchestration, IDE performance
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

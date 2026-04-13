@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Aesthetic Auditor (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/sovereign-aesthetic-auditor/SKILL.md` — FOUC detection, dark mode integrity, glassmorphism compliance
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

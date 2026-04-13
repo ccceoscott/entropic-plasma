@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Zod Architect (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/zod-backend-dmz/SKILL.md` — Schema-first Cloud Function validation, input sanitization, type-safe contracts
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

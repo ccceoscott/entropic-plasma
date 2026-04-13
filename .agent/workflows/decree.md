@@ -1,5 +1,10 @@
 # Workflow: The Great Decree (Zoltan's Mandat)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/sovereign-zoltan-decree/SKILL.md` — Zoltan persona enforcement, Infinity Protocol identity, dark-magic tone compliance
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

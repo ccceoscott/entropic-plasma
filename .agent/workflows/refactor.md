@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Refactor Architect (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/sovereign-refactoring-architect/SKILL.md` — Safe systemic refactoring, module extraction, zero-regression enforcement
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

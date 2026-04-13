@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Auth Architect (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/auth-security-architect/SKILL.md` — Firebase Auth, custom claims, Firestore rule hardening, IDOR prevention
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

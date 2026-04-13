@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Mobile Architect (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/capacitor-mobile-architect/SKILL.md` — iOS/Android deep linking, push notifications, native API, App Store compliance
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

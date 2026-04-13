@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Deploy Guardian (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/fleet-deploy-guardian/SKILL.md` — Safe-deploy protocol, project ID verification, multi-gate deployment
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

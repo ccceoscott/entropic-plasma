@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: Research Oracle (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/sovereign-research-oracle/SKILL.md` — Knowledge ingestion, pattern recognition, recursive skill improvement
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

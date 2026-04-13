@@ -5,6 +5,11 @@ alwaysApply: false
 
 # Workflow: E2E Master (Summoned)
 
+
+## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
+**Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
+1. `.agent/skills/sovereign-playwright-e2e/SKILL.md` — Production E2E testing, Stripe CSP handling, multi-environment matrix
+
 ## 🔐 SOVEREIGN UPGRADE GATE — MANDATORY
 
 ### Phase 0a — Protocol Sync

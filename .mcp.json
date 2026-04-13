@@ -1,0 +1,26 @@
+{
+  "_comment": "Sovereignty Broadcast v13.1 — workspace .mcp.json. Deployed fleet-wide by sovereign_broadcast.sh. DO NOT EDIT MANUALLY — managed by Infinity Protocol hub.",
+  "_comment2": "All paths point to the sovereign mcp-deps installation at ~/.gemini/mcp-deps/node_modules. Node 22 LTS sovereign path enforced.",
+  "mcpServers": {
+    "gcloud": {
+      "command": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+      "args": [
+        "/Users/teknojunkeee/.gemini/mcp-deps/node_modules/.bin/gcloud-mcp"
+      ],
+      "env": {
+        "PATH": "/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/share/google-cloud-sdk/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        "NODE_OPTIONS": "--max-old-space-size=4096"
+      }
+    },
+    "chrome-devtools": {
+      "command": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+      "args": [
+        "/Users/teknojunkeee/.gemini/mcp-deps/node_modules/.bin/chrome-devtools-mcp"
+      ],
+      "env": {
+        "PATH": "/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        "NODE_OPTIONS": "--max-old-space-size=4096"
+      }
+    }
+  }
+}
