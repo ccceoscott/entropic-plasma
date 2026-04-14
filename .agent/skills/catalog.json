@@ -1,0 +1,43 @@
+{
+  "version": "v12.0",
+  "phase": 217,
+  "updated": "2026-04-14",
+  "count": 5,
+  "skills": [
+    {
+      "name": "skill_sovereign_architect",
+      "bundle": "architect",
+      "risk": "medium",
+      "aliases": ["backend", "api", "data", "schema", "logic", "types"],
+      "size_hint": "large"
+    },
+    {
+      "name": "skill_sovereign_vision",
+      "bundle": "vision",
+      "risk": "low",
+      "aliases": ["ui", "css", "aesthetic", "glass", "design"],
+      "size_hint": "large"
+    },
+    {
+      "name": "skill_sovereign_hammer",
+      "bundle": "hammer",
+      "risk": "medium",
+      "aliases": ["test", "e2e", "ops", "performance", "deploy"],
+      "size_hint": "large"
+    },
+    {
+      "name": "skill_sovereign_shield",
+      "bundle": "shield",
+      "risk": "high",
+      "aliases": ["security", "auth", "identity", "rules"],
+      "size_hint": "large"
+    },
+    {
+      "name": "sovereign-research-oracle",
+      "bundle": "oracle",
+      "risk": "low",
+      "aliases": ["research", "knowledge", "ki"],
+      "size_hint": "large"
+    }
+  ]
+}
