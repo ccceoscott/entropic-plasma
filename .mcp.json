@@ -1,8 +1,8 @@
 {
-  "_version": "211.3",
-  "_comment": "Phase 211.3 — WORKSPACE-SCOPED MCP CONFIG. Watchdog §13 stamps this to every fleet workspace. _note fields may reference deprecated proxy names as documentation — do NOT grep-scan notes for dead proxies; use JSON parser on mcpServers keys only.",
-  "_comment2": "Servers here: gcloud + chrome-devtools ONLY. The 3 global servers (firebase, knowledge-graph, brave-search) are registered in ~/.gemini/antigravity/mcp_config.json and do NOT need to be repeated here.",
-  "_comment3": "This prevents the N-tab process multiplication: each workspace window adds only gcloud + chrome (2 processes), not 5.",
+  "_version": "216.5",
+  "_comment": "Phase 216.5 — WORKSPACE-SCOPED MCP CONFIG. Broadcast stamps this + _version to every fleet workspace.",
+  "_comment2": "Servers here: gcloud + chrome-devtools + context7 ONLY. The 3 global servers (firebase, knowledge-graph, brave-search) are registered in ~/.gemini/mcp_config.json and do NOT need to be repeated here.",
+  "_comment3": "This prevents the N-tab process multiplication: each workspace window adds only gcloud + chrome + context7 (3 processes), not 5.",
   "_hang_note": "CI=true on gcloud prevents interactive gcloud auth prompts that block stdio in non-TTY MCP processes.",
   "mcpServers": {
     "gcloud": {
@@ -26,6 +26,16 @@
         "PATH": "/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
         "NODE_OPTIONS": "--max-old-space-size=4096",
         "UV_THREADPOOL_SIZE": "32"
+      }
+    },
+    "context7": {
+      "command": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+      "args": [
+        "/Users/teknojunkeee/.gemini/mcp-deps/node_modules/.bin/context7-mcp"
+      ],
+      "env": {
+        "PATH": "/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        "NODE_OPTIONS": "--max-old-space-size=4096"
       }
     }
   }
