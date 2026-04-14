@@ -61,7 +61,7 @@ Add to `firestore.rules`:
 ```
 match /stripe_events/{eventId} {
   allow read: if false; // System only
-  allow write: if false; 
+  allow write: if false;
 }
 ```
 

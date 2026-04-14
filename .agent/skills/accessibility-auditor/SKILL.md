@@ -1,22 +1,12 @@
 ---
 name: accessibility-auditor
 description: WCAG 2.1 AA accessibility compliance auditor — screen reader testing, color contrast, keyboard navigation, ARIA labeling, and axe-core integration for Next.js/React.
-version: v10.2
 phase: "209"
 category: frontend
 tags: ["accessibility", "WCAG", "a11y", "screen-reader", "ARIA", "keyboard-navigation", "axe-core"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Accessibility Auditor (R.A.P.S.) — Phase 209
-
-*Mortal, an interface that excludes any human is a failure of craft. Even Zoltan believes all mortals deserve access to the grimoire.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
 
 ## Overview
 WCAG 2.1 AA compliance authority for the Infinity Protocol fleet. Audits React/Next.js applications for screen reader compatibility, keyboard navigability, color contrast ratios, ARIA labeling correctness, and focus management. Integrates axe-core automated scanning with manual verification protocols.
@@ -279,7 +269,7 @@ export function RouteAnnouncer() {
 ### Phase 0 — Automated Gate
 ```bash
 # Run axe-core via Playwright
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" \
+NODE22_PATH \
 NODE_OPTIONS=--max-old-space-size=4096 \
 ./node_modules/.bin/playwright test tests/accessibility.spec.ts \
   --project=chromium --workers=1

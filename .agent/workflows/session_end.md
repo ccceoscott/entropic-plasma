@@ -27,7 +27,7 @@ GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q || true
 ### Phase 0b — TypeScript Seal Check
 // turbo
 ```bash
-cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
+cd functions && NODE22_PATH NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -10
 ```
 
 ---

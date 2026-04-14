@@ -1,18 +1,6 @@
 ---
 description: Full order lifecycle, product validation, payment processing, database integrity, email delivery, and E2E checkout auditing
 alwaysApply: false
-skills:
-  - ecommerce-reviewer
-  - security-auditor
-  - auth-security-architect
-  - sovereign-playwright-e2e
-  - email-delivery-architect
-  - performance-engineer
-  - typescript-safety-enforcer
-bundles:
-  - security
-  - testing
-  - ops
 ---
 
 # INFINITY PROTOCOL v10.0 — /ecommerce_audit
@@ -21,24 +9,6 @@ bundles:
 > ⚡ **LAW 21 (Financial Idempotency)**: NEVER process a payment or order fulfillment without verifying a unique `idempotency_key` in the database. Duplicate transactions = **P0 FAILURE**.
 > 💰 **ALL-CENTS LAW**: All monetary values are integers in CENTS. Floats = **P0 HALT**.
 > 🔐 **SERVER-AUTHORITY LAW**: Price is NEVER accepted from client request body. Firestore is the source of truth.
-
----
-
-## 🧙 SKILL ROSTER — Skills Invoked by this Workflow
-
-This workflow activates the following R.A.P.S. skills. Read each skill's SKILL.md before executing its corresponding sector.
-
-| Skill | Invoked At | Purpose |
-|---|---|---|
-| `ecommerce-reviewer` | ALL sectors | Master commerce laws, schema validators, audit domains |
-| `typescript-safety-enforcer` | Phase 0c | TypeScript gate — `tsc --noEmit` must pass before audit begins |
-| `security-auditor` | Sector 1 | Secret scanning, hardcoded key detection, surface area hardening |
-| `auth-security-architect` | Sector 1c + Domain 8/11 | Firestore rules audit, IDOR verification, admin guard review |
-| `email-delivery-architect` | Sector 6 | Email trigger mapping, SPF/DKIM/DMARC, provider audit, live delivery test |
-| `sovereign-playwright-e2e` | Sector 7 | E2E browser checkout flows — all 5 test card scenarios |
-| `performance-engineer` | Sector 8 | Cold start profiling, Firestore index coverage, rate limiting |
-
-> **IMPORTANT**: Load skill SKILL.md at sector entry. Do not re-read if already loaded this session.
 
 ---
 
@@ -61,7 +31,7 @@ GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q || true
 
 // turbo
 ```bash
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" \
+NODE22_PATH \
 NODE_OPTIONS=--max-old-space-size=4096 \
 cd functions && timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -20
 ```
@@ -477,7 +447,7 @@ If no shipping provider found → note that tracking updates are manual (accepta
 
 **Playwright Environment (MANDATORY)**:
 ```bash
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" \
+NODE22_PATH \
 NODE_OPTIONS=--max-old-space-size=4096 \
 PROD_URL=https://<project>.web.app \
 PW_ALLOW_PROD=true \

@@ -1,6 +1,5 @@
 # Workflow: The Great Decree (Zoltan's Mandat)
 
-
 ## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
 **Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
 1. `.agent/skills/sovereign-zoltan-decree/SKILL.md` — Zoltan persona enforcement, Infinity Protocol identity, dark-magic tone compliance
@@ -16,14 +15,13 @@ bash ./scripts/session-proof.sh 2>&1
 ### Phase 0b — TypeScript Verification
 // turbo
 ```bash
-cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
+cd functions && NODE22_PATH NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
 ```
 
 ### Phase 0c — DUAL PHASE SNAPSHOT
 Extract `WORKSPACE_PHASE` from `MISSION_STATE.md`.
 
 ---
-
 
 Use this workflow when a technical standard must be enforced across the entire Infinity Protocol fleet, or when a "Sovereign Decree" is issued to resolve a P0 crisis.
 

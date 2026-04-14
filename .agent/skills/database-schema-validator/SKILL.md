@@ -1,23 +1,12 @@
 ---
 name: database-schema-validator
 description: Firestore and RTDB schema validator — enforces collection naming conventions, field type contracts, required field audits, and migration safety.
-version: v10.2
 phase: "209"
 category: backend
 tags: ["firestore", "schema", "validation", "migration", "rtdb"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Database Schema Validator (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **database-schema-validator** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Policies Enforced
 1. **Safety**: No `DROP TABLE` statements.
@@ -29,7 +18,7 @@ fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool un
 1. **Do not read the file manually** to check for errors. The rules are complex and easily missed by eye.
 2. **Run the Validation Script**:
    Use the `run_command` tool to execute the python script provided in the `scripts/` folder against the user's file.
-   
+
    ```bash
    python scripts/validate_schema.py <path_to_user_file>
    ```

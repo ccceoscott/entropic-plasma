@@ -105,8 +105,6 @@ print('[OK]', servers) if not missing else (print('[MISSING]', missing), sys.exi
 cp config/antigravity_mcp_config.json ~/.gemini/antigravity/mcp_config.json && echo "[OK] MCP config synced"
 ```
 
-
-
 > ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
 
 > ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.

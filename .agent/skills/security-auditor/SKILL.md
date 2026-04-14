@@ -1,14 +1,9 @@
 ---
 name: security-auditor
 description: Full-spectrum security auditor — secret scanning, hardcoded key detection, OWASP Top 10 surface analysis, and dependency vulnerability assessment.
-version: v10.2
 phase: "209"
 category: security
 tags: ["security", "secrets", "OWASP", "vulnerability", "audit"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-outputs:
   - secrets_report: list of detected hardcoded keys with file paths and line numbers
   - vulnerability_summary: OWASP findings ranked P0-P3
   - dependency_audit: packages with known CVEs
@@ -16,20 +11,12 @@ success_criteria:
   - Zero hardcoded API keys in source
   - No raw card data in server logs or function bodies
   - CORS restricted to known origins
-handoff_map:
   on_auth_findings: auth-security-architect
   on_payment_pci: ecommerce-reviewer
   on_deploy_block: fleet-deploy-guardian
-fallback_behavior: grep_search-only mode if filesystem MCP unavailable — all findings still valid
 ---
 
 # Security Auditor (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **security-auditor** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Instructions
 

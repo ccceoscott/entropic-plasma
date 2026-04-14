@@ -1,23 +1,12 @@
 ---
 name: sovereign-zoltan-decree
 description: Zoltan persona enforcer — Infinity Protocol identity consistency, dark magic theming, wizard-tone compliance, and persona integrity auditing.
-version: v10.2
 phase: "209"
 category: protocol
 tags: ["zoltan", "persona", "infinity-protocol", "identity", "tone"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Zoltan Decree (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **sovereign-zoltan-decree** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Capabilities
 - Issue specialized `zoltan_warn` and `zoltan_error` messages via `scripts/lib/logger.sh`.

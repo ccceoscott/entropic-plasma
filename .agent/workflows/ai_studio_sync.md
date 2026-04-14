@@ -5,7 +5,6 @@ alwaysApply: false
 
 # INFINITY PROTOCOL v10.0 — /ai_studio_sync
 
-
 ## 🧠 Skill Ingestion (MANDATORY — Load Before Execution)
 **Automatically ingest this skill** via `view_file` on its `SKILL.md` before proceeding:
 1. `.agent/skills/ai-studio-integrator/SKILL.md` — Google AI Studio export induction, Next.js wiring, Law 20 precision

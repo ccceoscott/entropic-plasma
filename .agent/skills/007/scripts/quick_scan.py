@@ -1,14 +1,3 @@
-"""007 Quick Scan -- Fast automated security scan of a target directory.
-
-Recursively scans files in a target directory for secret patterns, dangerous
-code constructs, permission issues, and oversized files.  Produces a scored
-summary report in text or JSON format.
-
-Usage:
-    python quick_scan.py --target /path/to/project
-    python quick_scan.py --target /path/to/project --output json --verbose
-"""
-
 import argparse
 import json
 import os
@@ -17,9 +6,6 @@ import sys
 import time
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Imports from the 007 config hub (same directory)
-# ---------------------------------------------------------------------------
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from config import (
@@ -36,10 +22,6 @@ from config import (
     setup_logging,
 )
 
-# ---------------------------------------------------------------------------
-# Constants local to the quick scan
-# ---------------------------------------------------------------------------
-
 SCORE_DEDUCTIONS = {
     "CRITICAL": 10,
     "HIGH": 5,
@@ -48,51 +30,39 @@ SCORE_DEDUCTIONS = {
     "INFO": 0,
 }
 
-REDACT_KEEP_CHARS = 6  # Number of leading chars to keep in redacted snippets
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+REDACT_KEEP_CHARS = 6  
 
 def _redact(text: str) -> str:
-    """Return a redacted version of *text*, keeping only the first few chars."""
+    
     text = text.strip()
     if len(text) <= REDACT_KEEP_CHARS:
         return text
     return text[:REDACT_KEEP_CHARS] + "****"
 
-
 def _snippet(line: str, match_start: int, context: int = 40) -> str:
-    """Extract a short redacted snippet around the match position."""
+    
     start = max(0, match_start - context // 2)
     end = min(len(line), match_start + context)
     raw = line[start:end].strip()
     return _redact(raw)
 
-
 def _should_skip_dir(name: str) -> bool:
-    """Return True if directory *name* should be skipped."""
+    
     return name in SKIP_DIRECTORIES
 
-
 def _is_scannable(path: Path) -> bool:
-    """Return True if the file extension is in the SCANNABLE_EXTENSIONS set."""
-    # Handle compound suffixes like .env.example
+    
+    
     name = path.name
     for ext in SCANNABLE_EXTENSIONS:
         if name.endswith(ext):
             return True
-    # Also check the normal suffix
+    
     return path.suffix.lower() in SCANNABLE_EXTENSIONS
 
-
 def _check_permissions(filepath: Path) -> dict | None:
-    """Check for overly permissive file modes on Unix-like systems.
-
-    Returns a finding dict or None.
-    """
-    # Only meaningful on systems that implement os.stat st_mode properly
+    
+    
     if sys.platform == "win32":
         return None
     try:
@@ -120,22 +90,13 @@ def _check_permissions(filepath: Path) -> dict | None:
         pass
     return None
 
-
-# ---------------------------------------------------------------------------
-# Core scanning logic
-# ---------------------------------------------------------------------------
-
 def collect_files(target: Path, logger) -> list[Path]:
-    """Walk *target* recursively and return scannable file paths.
-
-    Respects SKIP_DIRECTORIES and SCANNABLE_EXTENSIONS from config.
-    Stops at LIMITS['max_files_per_scan'] with a warning.
-    """
+    
     files: list[Path] = []
     max_files = LIMITS["max_files_per_scan"]
 
     for root, dirs, filenames in os.walk(target):
-        # Prune skipped directories in-place so os.walk does not descend
+        
         dirs[:] = [d for d in dirs if not _should_skip_dir(d)]
 
         for fname in filenames:
@@ -151,12 +112,8 @@ def collect_files(target: Path, logger) -> list[Path]:
 
     return files
 
-
 def scan_file(filepath: Path, verbose: bool = False, logger=None) -> list[dict]:
-    """Scan a single file for secrets and dangerous patterns.
-
-    Returns a list of finding dicts.
-    """
+    
     findings: list[dict] = []
     max_findings = LIMITS["max_findings_per_file"]
 
@@ -165,7 +122,7 @@ def scan_file(filepath: Path, verbose: bool = False, logger=None) -> list[dict]:
     except OSError:
         return findings
 
-    # Large file check
+    
     if size > LIMITS["max_file_size_bytes"]:
         findings.append({
             "type": "large_file",
@@ -177,12 +134,12 @@ def scan_file(filepath: Path, verbose: bool = False, logger=None) -> list[dict]:
         })
         return findings
 
-    # Permission check
+    
     perm_finding = _check_permissions(filepath)
     if perm_finding:
         findings.append(perm_finding)
 
-    # Read file content
+    
     try:
         text = filepath.read_text(encoding="utf-8", errors="replace")
     except OSError as exc:
@@ -196,7 +153,7 @@ def scan_file(filepath: Path, verbose: bool = False, logger=None) -> list[dict]:
         if len(findings) >= max_findings:
             break
 
-        # -- Secret patterns --
+        
         for pattern_name, regex, severity in SECRET_PATTERNS:
             m = regex.search(line)
             if m:
@@ -209,7 +166,7 @@ def scan_file(filepath: Path, verbose: bool = False, logger=None) -> list[dict]:
                     "snippet": _snippet(line, m.start()),
                 })
 
-        # -- Dangerous code patterns --
+        
         for pattern_name, regex, severity in DANGEROUS_PATTERNS:
             m = regex.search(line)
             if m:
@@ -224,25 +181,16 @@ def scan_file(filepath: Path, verbose: bool = False, logger=None) -> list[dict]:
 
     return findings
 
-
 def compute_score(findings: list[dict]) -> int:
-    """Compute a quick score starting at 100, deducting by severity.
-
-    Returns an integer score clamped between 0 and 100.
-    """
+    
     score = 100
     for f in findings:
         deduction = SCORE_DEDUCTIONS.get(f["severity"], 0)
         score -= deduction
     return max(0, score)
 
-
-# ---------------------------------------------------------------------------
-# Aggregation
-# ---------------------------------------------------------------------------
-
 def aggregate_by_severity(findings: list[dict]) -> dict[str, int]:
-    """Count findings per severity level."""
+    
     counts: dict[str, int] = {sev: 0 for sev in SEVERITY}
     for f in findings:
         sev = f.get("severity", "INFO")
@@ -250,20 +198,14 @@ def aggregate_by_severity(findings: list[dict]) -> dict[str, int]:
             counts[sev] += 1
     return counts
 
-
 def top_critical_findings(findings: list[dict], n: int = 10) -> list[dict]:
-    """Return the top *n* most critical findings, sorted by severity weight."""
+    
     sorted_findings = sorted(
         findings,
         key=lambda f: SEVERITY.get(f.get("severity", "INFO"), 0),
         reverse=True,
     )
     return sorted_findings[:n]
-
-
-# ---------------------------------------------------------------------------
-# Report formatters
-# ---------------------------------------------------------------------------
 
 def format_text_report(
     target: str,
@@ -274,7 +216,7 @@ def format_text_report(
     verdict: dict,
     elapsed: float,
 ) -> str:
-    """Build a human-readable text report."""
+    
     lines: list[str] = []
 
     lines.append("=" * 70)
@@ -282,7 +224,7 @@ def format_text_report(
     lines.append("=" * 70)
     lines.append("")
 
-    # Metadata
+    
     lines.append(f"  Target:       {target}")
     lines.append(f"  Timestamp:    {get_timestamp()}")
     lines.append(f"  Duration:     {elapsed:.2f}s")
@@ -290,17 +232,17 @@ def format_text_report(
     lines.append(f"  Total findings: {len(findings)}")
     lines.append("")
 
-    # Severity breakdown
+    
     lines.append("-" * 70)
     lines.append("  FINDINGS BY SEVERITY")
     lines.append("-" * 70)
     for sev in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"):
         count = severity_counts.get(sev, 0)
-        bar = "#" * min(count, 40)
+        bar = "
         lines.append(f"    {sev:<10} {count:>5}  {bar}")
     lines.append("")
 
-    # Top critical findings
+    
     top = top_critical_findings(findings)
     if top:
         lines.append("-" * 70)
@@ -317,7 +259,7 @@ def format_text_report(
             )
         lines.append("")
 
-    # Score and verdict
+    
     lines.append("=" * 70)
     lines.append(f"  QUICK SCORE:  {score} / 100")
     lines.append(f"  VERDICT:      {verdict['emoji']} {verdict['label']}")
@@ -326,7 +268,6 @@ def format_text_report(
     lines.append("")
 
     return "\n".join(lines)
-
 
 def build_json_report(
     target: str,
@@ -337,7 +278,7 @@ def build_json_report(
     verdict: dict,
     elapsed: float,
 ) -> dict:
-    """Build a structured JSON-serializable report dict."""
+    
     return {
         "scan": "quick_scan",
         "target": target,
@@ -355,16 +296,8 @@ def build_json_report(
         "findings": findings,
     }
 
-
-# ---------------------------------------------------------------------------
-# Main entry point
-# ---------------------------------------------------------------------------
-
 def run_scan(target_path: str, output_format: str = "text", verbose: bool = False) -> dict:
-    """Execute the quick scan and return the JSON-style report dict.
-
-    Also prints the report to stdout in the requested format.
-    """
+    
     logger = setup_logging("007-quick-scan")
     ensure_directories()
 
@@ -379,12 +312,12 @@ def run_scan(target_path: str, output_format: str = "text", verbose: bool = Fals
     logger.info("Starting quick scan of %s", target)
     start_time = time.time()
 
-    # Collect files
+    
     files = collect_files(target, logger)
     total_files = len(files)
     logger.info("Collected %d scannable files", total_files)
 
-    # Scan each file
+    
     all_findings: list[dict] = []
     max_report_findings = LIMITS["max_report_findings"]
 
@@ -405,12 +338,12 @@ def run_scan(target_path: str, output_format: str = "text", verbose: bool = Fals
         total_files, len(all_findings), elapsed,
     )
 
-    # Aggregation
+    
     severity_counts = aggregate_by_severity(all_findings)
     score = compute_score(all_findings)
     verdict = get_verdict(score)
 
-    # Audit log
+    
     log_audit_event(
         action="quick_scan",
         target=str(target),
@@ -422,7 +355,7 @@ def run_scan(target_path: str, output_format: str = "text", verbose: bool = Fals
         },
     )
 
-    # Build structured report (always, for return value)
+    
     report = build_json_report(
         target=str(target),
         total_files=total_files,
@@ -433,7 +366,7 @@ def run_scan(target_path: str, output_format: str = "text", verbose: bool = Fals
         elapsed=elapsed,
     )
 
-    # Output
+    
     if output_format == "json":
         print(json.dumps(report, indent=2, ensure_ascii=False))
     else:
@@ -448,11 +381,6 @@ def run_scan(target_path: str, output_format: str = "text", verbose: bool = Fals
         ))
 
     return report
-
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

@@ -1,23 +1,12 @@
 ---
 name: capacitor-mobile-architect
 description: Capacitor native bridge architect — iOS/Android deep linking, push notifications, native API access, and App Store compliance specialist.
-version: v10.2
 phase: "209"
 category: mobile
 tags: ["capacitor", "ios", "android", "native-bridge", "deep-linking"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Capacitor Mobile Architect (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **capacitor-mobile-architect** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Capacitor Mobile Architect Sovereign Instructions:
 

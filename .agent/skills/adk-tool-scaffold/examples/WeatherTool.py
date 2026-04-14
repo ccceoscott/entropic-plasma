@@ -2,9 +2,7 @@ from adk.tools import BaseTool, ToolContext
 from typing import Dict, Any, Optional
 
 class WeatherLookupTool(BaseTool):
-    """
-    Retrieves current weather information for a specific location.
-    """
+    
     
     def __init__(self):
         super().__init__(
@@ -14,7 +12,7 @@ class WeatherLookupTool(BaseTool):
 
     def execute(self, inputs: Dict[str, Any], context: Optional[ToolContext] = None) -> Dict[str, Any]:
         city = inputs.get('city')
-        # Mock implementation
+        
         return {
             "temperature": 72,
             "condition": "Sunny",

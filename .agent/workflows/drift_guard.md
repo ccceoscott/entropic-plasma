@@ -70,9 +70,9 @@ Before performing external research:
 On every task involving code reads/writes, scan for these FORBIDDEN strings in new code:
 ```
 POISON STRINGS (block if found in infinity-protocol code):
-- "Soul Contract" | "SoulContract"  
+- "Soul Contract" | "SoulContract"
 - "CareKey" | "carekey"
-- "SARAH" | "sarah-456f1"  
+- "SARAH" | "sarah-456f1"
 - "FirstPick" | "first-pick" | "firstpick-8317a"
 - "epi-hab" | "epihab"
 - "epiHab"
@@ -91,14 +91,14 @@ If detected → **ABORT write operation**:
 Every Message Receipt:
   1. Read workspace URI → PROJECT_NAME = last segment
   2. Map to ACTIVE_DOC (Law 25)
-  
+
 Before New Task:
   3. Read `.agent/rules/` and `MISSION_STATE.md` locally via R.A.P.S
   4. Check local KIs before external research (DG-1)
-  
+
 During Task:
   5. Poison string scan on all writes (DG-2)
-  
+
 After Task:
   6. Write updated state to `MISSION_STATE.md` and `task.md` locally.
 ```

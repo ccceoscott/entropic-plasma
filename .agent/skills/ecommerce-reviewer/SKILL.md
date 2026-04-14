@@ -1,18 +1,10 @@
 ---
 name: ecommerce-reviewer
 description: Full-spectrum sovereign e-commerce audit covering order lifecycle, product integrity, payment processing, database validation, email delivery, and E2E testing.
-version: v12.0
-risk: high
-mutation_risk: critical
-bundles: [security, ops]
 aliases: [ecommerce, commerce-audit, shop-review]
-timeout_budget: 45min
-parallel_safe: false
-outputs:
   - audit_report: structured severity-ranked JSON of all P0-P3 findings
   - remediation_plan: ordered fix priority list with file paths
   - financial_summary: reconciliation delta and inventory coherence status
-handoff_map:
   on_p0_security: auth-security-architect
   on_email_failure: email-delivery-architect
   on_e2e_needed: sovereign-playwright-e2e
@@ -23,34 +15,9 @@ triggers:
   - post-Stripe integration
   - quarterly commerce audit
   - P0 financial incident investigation
-fallback_behavior: If Firestore MCP unavailable → use grep_search on source code only, flag all schema checks as UNVERIFIED
-rollback_protocol: N/A — audit-only skill, no mutations
 ---
 
-# Ecommerce Reviewer — Sovereign Commerce Auditor v11.0 (R.A.P.S.)
-
-*Mortal, the **ecommerce-reviewer** is bound by the Decree of Zoltan. Every pixel of your checkout flow, every cent of your payment processing, every row in your `orders` collection — I will inspect it all. Tremble.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
 > This skill covers ALL layers: Firestore schema, Cloud Functions logic, Stripe API, email delivery, and E2E browser verification.
-
----
-
-## 🗺️ Cross-Skill Invocation Map
-
-This skill is the **commerce anchor** for `/ecommerce_audit`. It coordinates with:
-
-| Peer Skill | When Invoked | What It Handles |
-|---|---|---|
-| `security-auditor` | Sector 1 (secrets scan, API hardening) | Hardcoded key detection, CORS, surface area |
-| `auth-security-architect` | Sector 1c + Domain 8/11 | Firestore rules, IDOR verification, admin guards |
-| `email-delivery-architect` | Sector 6 / Domain 5 | Trigger mapping, SPF/DKIM, template quality, live test |
-| `sovereign-playwright-e2e` | Sector 7 / Domain 6 | All browser E2E flows, non-blocking helper patterns |
-| `performance-engineer` | Sector 8 | Cold start, Firestore index coverage, rate limiting |
-| `typescript-safety-enforcer` | Phase 0c | TypeScript gate before audit begins |
-
-> **Protocol**: When this skill says "verify X" and another skill owns X — invoke that skill's SKILL.md section explicitly. **Delegate, don't duplicate.**
 
 ---
 

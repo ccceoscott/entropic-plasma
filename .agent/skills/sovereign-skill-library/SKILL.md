@@ -1,23 +1,12 @@
 ---
 name: sovereign-skill-library
 description: R.A.P.S. skill library manager — skill catalog governance, frontmatter standardization, bundle management, and fleet-wide skill propagation.
-version: v10.2
 phase: "209"
 category: protocol
 tags: ["skills", "catalog", "r.a.p.s", "bundles", "governance"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Skill Library (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **sovereign-skill-library** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Sources
 

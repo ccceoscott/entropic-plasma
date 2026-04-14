@@ -1,22 +1,12 @@
 ---
 name: llm-structured-output
 description: LLM structured output engineer — enforces JSON schema constraints, Zod/Pydantic validation on model responses, and retry logic for malformed outputs.
-version: v10.2
 phase: "209"
 category: ai
 tags: ["llm", "structured-output", "json-schema", "zod", "validation"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # LLM Structured Output (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **llm-structured-output** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
 
 ## Structural Mandate
 - **Zod Inscription**: Define all targets via `zod-backend-dmz`.

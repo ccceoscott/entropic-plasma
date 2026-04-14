@@ -1,23 +1,12 @@
 ---
 name: sovereign-refactoring-architect
 description: Sovereign refactoring architect — safe, systemic code evolution with side-effect analysis, module extraction, and zero-regression enforcement.
-version: v10.2
 phase: "209"
 category: backend
 tags: ["refactoring", "architecture", "side-effects", "modules", "evolution"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Refactoring Architect (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **sovereign-refactoring-architect** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Instructions
 

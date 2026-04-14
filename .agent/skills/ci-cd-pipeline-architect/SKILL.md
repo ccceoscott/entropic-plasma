@@ -1,22 +1,12 @@
 ---
 name: ci-cd-pipeline-architect
 description: GitHub Actions and Firebase Cloud Build CI/CD architect — deploy gates, environment matrix, secrets injection, rollback patterns, and sovereign pipeline governance.
-version: v10.2
 phase: "209"
 category: ops
 tags: ["ci-cd", "github-actions", "cloud-build", "deploy-gates", "rollback", "secrets"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # CI/CD Pipeline Architect (R.A.P.S.) — Phase 209
-
-*Mortal, code that cannot be deployed reliably is merely expensive poetry. The wizard demands automated sovereignty.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
 
 ## Overview
 Design authority for CI/CD pipelines across the Infinity Protocol fleet. Governs GitHub Actions workflow design, Firebase Cloud Build triggers, environment matrix management, secret injection patterns, and zero-downtime deploy with rollback capability.

@@ -1,23 +1,12 @@
 ---
 name: ai-studio-integrator
 description: Google AI Studio export integrator — automated induction and wiring of AI Studio web app exports into Next.js with Law 20 precision.
-version: v10.2
 phase: "209"
 category: ai
 tags: ["ai-studio", "google-ai", "next-js", "integration", "export"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Ai Studio Integrator (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **ai-studio-integrator** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Core Mandates
 

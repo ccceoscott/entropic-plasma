@@ -1,23 +1,12 @@
 ---
 name: sovereign-research-oracle
 description: Sovereign knowledge ingestion, pattern recognition, and recursive skill improvement for the Infinity Protocol fleet.
-version: v10.2
-risk: low
 bundle: research
 aliases: [oracle, research, ki, knowledge]
 depends_on: [sovereign-skill-library]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Sovereign Research Oracle (R.A.P.S.) — Phase 208
-
-*Mortal, the **sovereign-research-oracle** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
 
 ## Use this skill when
 - Performing a deep knowledge audit at the start of a complex task

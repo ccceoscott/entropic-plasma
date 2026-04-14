@@ -1,19 +1,9 @@
 ---
 name: c4-architecture
 description: Mastery of C4 Architecture within the R.A.P.S. fleet.
-version: v10.2
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # C4 Architecture (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **c4-architecture** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
 
 ## Structural Abstraction Matrix
 | Level | Scope | Visualization |

@@ -1,23 +1,12 @@
 ---
 name: e2e-testing-patterns
 description: Playwright E2E testing pattern library — sovereign test patterns, fixture management, network mocking, and multi-environment test matrix design.
-version: v10.2
 phase: "209"
 category: testing
 tags: ["playwright", "e2e", "testing", "fixtures", "patterns"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # E2E Testing Patterns (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **e2e-testing-patterns** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Instructions
 

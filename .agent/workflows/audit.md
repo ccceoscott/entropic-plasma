@@ -42,21 +42,20 @@ cd $TARGET && GIT_TERMINAL_PROMPT=0 git add GEMINI.md .agent/workflows/ && git c
 ```
 Log: `✅ [LAW 23 CLEARED] Protocol current in all target workspaces. Audit proceeding.`
 
-
 ### Phase 0b — Auto-Upgrade Execution
 // turbo
 ```bash
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q || true
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" ./scripts/dv downlink 2>&1 | tail -10
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" ./scripts/dv rules 2>&1 | tail -10
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" ./scripts/dv lint-rules 2>&1 | grep -E "\[FAILURE\]|PASS|FAIL" | tail -10
+NODE22_PATH GIT_TERMINAL_PROMPT=0 timeout 30 git fetch --all --prune -q || true
+NODE22_PATH ./scripts/dv downlink 2>&1 | tail -10
+NODE22_PATH ./scripts/dv rules 2>&1 | tail -10
+NODE22_PATH ./scripts/dv lint-rules 2>&1 | grep -E "\[FAILURE\]|PASS|FAIL" | tail -10
 ```
 Any `[ERROR]` or `[FAILURE]` → **HALT** with specific message.
 
 ### Phase 0c — TypeScript Integrity Gate
 // turbo
 ```bash
-cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
+cd functions && NODE22_PATH NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1 | tail -15
 ```
 ANY errors → auto-fix identifiable issues → re-run. Still failing → HALT.
 
@@ -122,7 +121,7 @@ Any wildcard → flag as P1 security issue.
 ### 2d — Functions TypeScript Strict Check
 // turbo
 ```bash
-cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1
+cd functions && NODE22_PATH NODE_OPTIONS=--max-old-space-size=4096 timeout 60 ./node_modules/.bin/tsc --noEmit --skipLibCheck 2>&1
 ```
 ANY type errors → auto-diagnose → fix → re-run. Log each fix.
 
@@ -181,7 +180,7 @@ Any script without it → **auto-add** and log `🔧 [AUTO-FIXED] Added NODE_OPT
 ### 5b — Bundle Analysis
 // turbo
 ```bash
-PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 timeout 120 npm run build 2>&1 | tail -20
+NODE22_PATH NODE_OPTIONS=--max-old-space-size=4096 timeout 120 npm run build 2>&1 | tail -20
 ```
 Any OOM crash → investigate `next.config.ts` for `experimental.memoryBasedWorkersCount`. If found → **remove immediately**.
 
@@ -215,7 +214,7 @@ Critical/high vulnerabilities → document with CVE ID and remediation path.
 ### 7a — Full Test Suite
 // turbo
 ```bash
-cd functions && PATH="/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/bin:$PATH" NODE_OPTIONS=--max-old-space-size=4096 npm test 2>&1 | tail -20
+cd functions && NODE22_PATH NODE_OPTIONS=--max-old-space-size=4096 npm test 2>&1 | tail -20
 ```
 Expected: ALL tests pass. Any FAIL → auto-diagnose → attempt fix → re-run. Persist fix.
 

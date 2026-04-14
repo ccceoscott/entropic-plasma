@@ -1,23 +1,12 @@
 ---
 name: always-verify-gcp
 description: GCP resource verification enforcer — mandates project ID confirmation, IAM audit, and quota checks before any gcloud or Firebase operation.
-version: v10.2
 phase: "209"
 category: ops
 tags: ["gcp", "verification", "iam", "project-guard", "firebase"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Always Verify Gcp (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **always-verify-gcp** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Overview
 

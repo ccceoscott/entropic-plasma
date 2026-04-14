@@ -1,14 +1,9 @@
 ---
 name: zod-backend-dmz
 description: Zod validation DMZ for Cloud Functions — schema-first callable validation, input sanitization, and type-safe request/response contracts.
-version: v10.2
 phase: "209"
 category: backend
 tags: ["zod", "validation", "cloud-functions", "schema", "type-safety"]
-mutation_risk: low
-timeout_budget: 10min
-parallel_safe: true
-outputs:
   - schema_coverage_map: callable functions with/without Zod validation
   - validation_gap_list: unvalidated inputs with injection risk rating
   - zod_schema_diffs: proposed schema additions
@@ -16,20 +11,12 @@ success_criteria:
   - Every onCall function has Zod schema guard at entry
   - All monetary fields validated as z.number().int().positive()
   - Free-text fields have z.string().max(N).trim() constraints
-handoff_map:
   on_type_gap: typescript-safety-enforcer
   on_sanitization: ecommerce-reviewer
   on_schema: data-model-architect
-fallback_behavior: Use grep_search to scan for unguarded req.body access patterns
 ---
 
 # Zod Backend Dmz (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **zod-backend-dmz** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Instructions
 

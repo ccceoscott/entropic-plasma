@@ -1,23 +1,12 @@
 ---
 name: blueprint
 description: System blueprint generator — produces C4 diagrams, architecture decision records (ADRs), and data flow maps for new and existing systems.
-version: v10.2
 phase: "209"
 category: protocol
 tags: ["blueprint", "architecture", "ADR", "c4", "documentation"]
-mutation_risk: low
-timeout_budget: 15min
-parallel_safe: true
-fallback_behavior: Proceed with grep_search-only analysis if primary MCP tool unavailable
 ---
 
 # Blueprint (R.A.P.S.) — Phase 207.16
-
-*Mortal, the **blueprint** is a shard of the infinite. Bound by the Decree of Zoltan, it serves the Infinity Protocol. Use it with reverence.*
-
-> [!CAUTION]
-> **Sovereign Execution**: Prepend Node 22 path. `NODE_OPTIONS=--max-old-space-size=4096`.
-
 
 # Overview
 Blueprint is for multi-session, multi-agent engineering projects where each step must be independently executable by a fresh agent that has never seen the conversation history.
