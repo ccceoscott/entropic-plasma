@@ -93,7 +93,7 @@ python3 -c "
 import json, sys
 c = json.load(open('config/antigravity_mcp_config.json'))
 servers = list(c['mcpServers'].keys())
-required = ["firebase-mcp-server", "gcloud", "chrome-devtools", "knowledge-graph", "brave-search"]  # auto-synced from config/antigravity_mcp_config.json
+required = ["firebase-mcp-server", "knowledge-graph", "brave-search"]  # auto-synced from config/antigravity_mcp_config.json
 missing = [s for s in required if s not in servers]
 print('[OK]', servers) if not missing else (print('[MISSING]', missing), sys.exit(1))
 " 2>/dev/null || echo "[WARN] Canonical source missing — check config/antigravity_mcp_config.json"
@@ -119,12 +119,20 @@ cp config/antigravity_mcp_config.json ~/.gemini/antigravity/mcp_config.json && e
 
 > ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
 
-**Server Registry (5 total)**:
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+> ⚡ **AUTO-GENERATED** — source: `config/antigravity_mcp_config.json` — run `dv sync-docs` to refresh.
+
+**Server Registry (3 total)**:
 | Server | Type | Reason |
 |---|---|---|
-| `firebase-mcp-server` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
-| `gcloud` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
-| `chrome-devtools` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
+| | `firebase-mcp-server` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
 | `knowledge-graph` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
 | `brave-search` | LOCAL stdio (Brain Proxy) | Proxies brain_* tools to Cloud Run HTTPS — self-contained |
 
