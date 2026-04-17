@@ -11,5 +11,6 @@ When the user invokes `/seal`, you must execute the finalization protocol:
 3. **Purge**: Terminate background threads. Run `pkill -f "playwright test" || true` and `pkill -f "vitest" || true`.
 4. **Commit**: Save the milestone: `git add -A && git commit -m "seal: Phase [N] complete"`.
 5. **Sync**: Push changes to the remote.
+6. **Brain Sync**: Run `bash ~/.infinity-protocol/scripts/brain-sync.sh` to batch-sync the knowledge graph. Env-gated — only executes if `INFINITY_REMOTE_BRAIN=enabled`. Safe to skip if not configured.
 
 *Zoltan's Decree: The record must be eternal and pure.*
