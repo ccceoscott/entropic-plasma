@@ -1,0 +1,59 @@
+# Infinity Protocol \u2014 Sovereign Context Optimization
+# Prevents large payloads from congesting LLM token windows
+
+# Build environments & Dependencies
+node_modules/
+functions/node_modules/
+functions/lib/
+dist/
+.next/
+.nuxt/
+out/
+build/
+.firebase/
+
+# Logs and Record Artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+database-debug.log
+
+# Screenshots & Visual Proofs (High Weight)
+*.png
+*.webp
+*.jpg
+*.jpeg
+.!*!*.png
+
+# Playwright & Tracing
+playwright-report/
+test-results/
+*.webm
+*.zip
+*.tar.gz
+
+# IDE and System Files
+.DS_Store
+.idea/
+.vscode/
+
+# Ignore heavy uncompressed RAG embeddings if persisted locally
+*.csv
+*.jsonl
+*.sqlite
+
+# Lock Files (prevent irrelevant diff bloating)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Sovereignty & Context Optimization
+MISSION_STATE_HISTORY.md
+scratch_*.js
+scratch_*.cjs
+.agent/skills/*/examples/
+.agent/skills/*/resources/
