@@ -44,4 +44,8 @@ next-env.d.ts
 .cursorrules
 .cursor/
 .cursorignore
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.code-workspace
+.archive/

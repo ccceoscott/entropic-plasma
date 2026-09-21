@@ -1,0 +1,4 @@
+{
+  "_comment": "Project-scope MCP configuration for entropic-plasma. Extends global ~/.gemini/config/mcp_config.json.",
+  "mcpServers": {}
+}

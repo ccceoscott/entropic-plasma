@@ -1,0 +1,7 @@
+# ==============================================================================
+# Antigravity Workspace Environment Pinning
+# ==============================================================================
+CLOUDSDK_CORE_PROJECT=
+NODE_OPTIONS=--max-old-space-size=4096
+NEXT_TELEMETRY_DISABLED=1
+ANTIGRAVITY_WORKSPACE_ROOT=/Users/teknojunkeee/Developer/entropic-plasma

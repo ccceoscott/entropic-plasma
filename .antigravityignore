@@ -57,3 +57,4 @@ scratch_*.js
 scratch_*.cjs
 .agent/skills/*/examples/
 .agent/skills/*/resources/
+.archive/
